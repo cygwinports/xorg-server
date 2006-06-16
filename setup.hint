@@ -1,0 +1,4 @@
+category: X11
+requires: cygwin libX11_6 libXaw6 libXaw7 libXdmcp6 libXext6 libXfont1 libXi6 libXmu6 libXmuu1 libXrender1 libdmx1 liblbxutil1 rgb xcursor-themes xkbdata xorg-encodings xorg-font-alias xorg-font-cursor-misc xorg-font-misc-misc
+sdesc: "Xorg servers (XWin Xdmx Xnest Xprt Xvfb)"
+ldesc: "Xorg servers (XWin Xdmx Xnest Xprt Xvfb)"
