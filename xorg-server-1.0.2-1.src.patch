@@ -1,4 +1,3 @@
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/Xext/fontcache.c xorg-server-1.0.2/Xext/fontcache.c
 --- xorg-server-1.0.2-orig/Xext/fontcache.c	2005-07-03 03:53:36.000000000 -0500
 +++ xorg-server-1.0.2/Xext/fontcache.c	2006-04-18 16:27:48.198000000 -0500
 @@ -46,8 +46,8 @@
@@ -12,7 +11,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
  #include <X11/Xfuncproto.h>
  
  #include "swaprep.h"
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/configure.ac xorg-server-1.0.2/configure.ac
 --- xorg-server-1.0.2-orig/configure.ac	2006-03-16 15:45:06.000000000 -0600
 +++ xorg-server-1.0.2/configure.ac	2006-04-16 20:14:48.181125000 -0500
 @@ -1143,7 +1143,7 @@
@@ -33,7 +31,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
  	AC_SUBST([XWIN_LIBS])
  fi
  AC_MSG_RESULT([$XWIN])
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/hw/dmx/dmxinit.c xorg-server-1.0.2/hw/dmx/dmxinit.c
 --- xorg-server-1.0.2-orig/hw/dmx/dmxinit.c	2005-07-11 19:52:47.000000000 -0500
 +++ xorg-server-1.0.2/hw/dmx/dmxinit.c	2006-04-20 22:24:42.135250000 -0500
 @@ -1060,3 +1060,8 @@
@@ -45,7 +42,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
 +{
 +    return;
 +}
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/hw/xwin/InitInput.c xorg-server-1.0.2/hw/xwin/InitInput.c
 --- xorg-server-1.0.2-orig/hw/xwin/InitInput.c	2005-07-04 17:10:43.000000000 -0500
 +++ xorg-server-1.0.2/hw/xwin/InitInput.c	2006-04-16 19:59:40.865750000 -0500
 @@ -32,9 +32,6 @@
@@ -58,7 +54,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
  #include "dixstruct.h"
  
  
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/hw/xwin/Makefile.am xorg-server-1.0.2/hw/xwin/Makefile.am
 --- xorg-server-1.0.2-orig/hw/xwin/Makefile.am	2005-11-13 14:53:24.000000000 -0600
 +++ xorg-server-1.0.2/hw/xwin/Makefile.am	2006-04-17 17:45:31.389375000 -0500
 @@ -121,6 +121,7 @@
@@ -78,7 +73,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
  
  winprefsyacc.h: winprefsyacc.c
  winprefslex.c: winprefslex.l winprefsyacc.c winprefsyacc.h
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x 'Makefile.in*' -x configure xorg-server-1.0.2-orig/hw/xwin/winmultiwindowwm.c xorg-server-1.0.2/hw/xwin/winmultiwindowwm.c
 --- xorg-server-1.0.2-orig/hw/xwin/winmultiwindowwm.c	2005-07-05 13:25:44.000000000 -0500
 +++ xorg-server-1.0.2/hw/xwin/winmultiwindowwm.c	2006-04-20 21:50:52.960250000 -0500
 @@ -53,14 +53,7 @@
