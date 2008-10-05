@@ -1,0 +1,10 @@
+--- origsrc/xorg-server-1.3.0.0/configure.ac	2008-10-05 02:51:25.205163100 -0500
++++ src/xorg-server-1.3.0.0/configure.ac	2008-10-05 04:02:10.594597200 -0500
+@@ -844,7 +844,6 @@
+ 
+ AC_DEFINE(DDXOSINIT, 1, [Use OsVendorInit])
+ AC_DEFINE(SERVER_LOCK, 1, [Use a lock to prevent multiple servers on a display])
+-AC_DEFINE(SMART_SCHEDULE, 1, [Include time-based scheduler])
+ AC_DEFINE(NO_LIBCWRAPPER, 1, [Define to 1 if modules should avoid the libcwrapper])
+ AM_CONDITIONAL(DEBUG, test "x$DEBUGGING" = xyes)
+ 

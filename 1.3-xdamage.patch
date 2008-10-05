@@ -1,0 +1,33 @@
+--- origsrc/xorg-server-1.3.0.0/hw/xwin/winshaddd.c	2006-09-18 07:04:18.000000000 +0100
++++ src/xorg-server-1.3.0.0/hw/xwin/winshaddd.c	2008-10-02 16:33:48.281250000 +0100
+@@ -508,7 +508,7 @@
+ {
+   winScreenPriv(pScreen);
+   winScreenInfo		*pScreenInfo = pScreenPriv->pScreenInfo;
+-  RegionPtr		damage = &pBuf->damage;
++  RegionPtr		damage = shadowDamage(pBuf);
+   HRESULT		ddrval = DD_OK;
+   RECT			rcDest, rcSrc;
+   POINT			ptOrigin;
+--- origsrc/xorg-server-1.3.0.0/hw/xwin/winshadddnl.c	2006-09-18 07:04:18.000000000 +0100
++++ src/xorg-server-1.3.0.0/hw/xwin/winshadddnl.c	2008-10-02 16:33:48.281250000 +0100
+@@ -584,7 +584,7 @@
+ {
+   winScreenPriv(pScreen);
+   winScreenInfo		*pScreenInfo = pScreenPriv->pScreenInfo;
+-  RegionPtr		damage = &pBuf->damage;
++  RegionPtr		damage = shadowDamage(pBuf);
+   HRESULT		ddrval = DD_OK;
+   RECT			rcDest, rcSrc;
+   POINT			ptOrigin;
+--- origsrc/xorg-server-1.3.0.0/hw/xwin/winshadgdi.c	2006-09-18 07:04:18.000000000 +0100
++++ src/xorg-server-1.3.0.0/hw/xwin/winshadgdi.c	2008-10-02 16:33:48.281250000 +0100
+@@ -498,7 +498,7 @@
+ {
+   winScreenPriv(pScreen);
+   winScreenInfo		*pScreenInfo = pScreenPriv->pScreenInfo;
+-  RegionPtr		damage = &pBuf->damage;
++  RegionPtr		damage = shadowDamage(pBuf);
+   DWORD			dwBox = REGION_NUM_RECTS (damage);
+   BoxPtr		pBox = REGION_RECTS (damage);
+   int			x, y, w, h;
