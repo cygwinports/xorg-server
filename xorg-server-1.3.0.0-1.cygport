@@ -50,6 +50,7 @@ src_compile() {
 		--disable-install-setuid \
 		--disable-xf86misc \
 		--disable-xf86vidmode \
+		--disable-xinerama \
 		--disable-xorgcfg \
 		--disable-xprint \
 		--disable-xsdl \
