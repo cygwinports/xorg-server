@@ -1,6 +1,6 @@
 xorg-server
 ------------------------------------------
-Xorg servers
+X.Org servers
 
 Runtime requirements:
   cygwin-1.5.25-15
@@ -56,7 +56,6 @@ Build requirements:
   resourceproto-1.0.2-1
   scrnsaverproto-1.1.0-1
   trapproto-3.4.3-1
-  windowswmproto-1.0.3-1
   xcmiscproto-1.1.2-1
   xextproto-7.0.2-1
   xf86bigfontproto-1.1.2-1

@@ -1,4 +1,4 @@
 category: X11
 requires: libX11_6 libdmx1 libfontenc1 libfreetype26 libX11_6 libXau6 libXaw7 libXdmcp6 libXext6 libXfixes3 libXi6 libXmu6 libXmuu1 libXrender1 libXt6 rgb xcursor-themes xkbdata xorg-encodings xorgs-font-alias xorg-font-misc-misc xorg-font-cursor-misc zlib
-sdesc: "Xorg X servers"
-ldesc: "Xorg X servers"
+sdesc: "X.Org X servers"
+ldesc: "X.Org X servers"
