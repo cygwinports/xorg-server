@@ -1,0 +1,214 @@
+---
+ xserver/hw/xwin/InitInput.c               |    4 +-
+ xserver/hw/xwin/win.h                     |    3 ++
+ xserver/hw/xwin/winkeybd.c                |   12 +++++++-
+ xserver/hw/xwin/winmouse.c                |   42 ++++++++++++++++++++++++++----
+ xserver/hw/xwin/winmultiwindowwndproc.c   |    6 ++--
+ xserver/hw/xwin/winwin32rootlesswndproc.c |    6 ++--
+ xserver/hw/xwin/winwndproc.c              |   13 ++++-----
+ 7 files changed, 65 insertions(+), 21 deletions(-)
+
+Index: xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/InitInput.c
++++ xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+@@ -150,8 +150,8 @@ InitInput (int argc, char *argv[])
+   RegisterPointerDevice (pMouse);
+   RegisterKeyboardDevice (pKeyboard);
+ 
+-  miRegisterPointerDevice (screenInfo.screens[0], pMouse);
+-  mieqInit ((DevicePtr)pKeyboard, (DevicePtr)pMouse);
++
++  mieqInit ();
+ 
+   /* Initialize the mode key states */
+   winInitializeModeKeyStates ();
+Index: xorg-server-1.5.1/xserver/hw/xwin/win.h
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/win.h
++++ xorg-server-1.5.1/xserver/hw/xwin/win.h
+@@ -1006,6 +1006,9 @@ winMouseButtonsHandle (ScreenPtr pScreen
+ 		       int iEventType, int iButton,
+ 		       WPARAM wParam);
+ 
++void
++winEnqueueMotion(int x, int y);
++
+ #ifdef XWIN_NATIVEGDI
+ /*
+  * winnativegdi.c
+Index: xorg-server-1.5.1/xserver/hw/xwin/winkeybd.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winkeybd.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winkeybd.c
+@@ -597,7 +597,17 @@ winSendKeyEvent (DWORD dwKey, Bool fDown
+   xCurrentEvent.u.keyButtonPointer.time =
+     g_c32LastInputEventTime = GetTickCount ();
+   xCurrentEvent.u.u.detail = dwKey + MIN_KEYCODE;
+-  mieqEnqueue (&xCurrentEvent);
++
++#if CYGDEBUG
++  ErrorF("winSendKeyEvent: xCurrentEvent.u.u.type: %d, xCurrentEvent.u.u.detail: %d\n",
++          xCurrentEvent.u.u.type, xCurrentEvent.u.u.detail);
++#endif
++  DeviceIntPtr pDev;
++  for (pDev = inputInfo.devices; pDev; pDev = pDev->next)
++    if ((pDev->coreEvents && pDev != inputInfo.keyboard) && pDev->key)
++      {
++	mieqEnqueue (pDev, &xCurrentEvent);
++      }
+ }
+ 
+ BOOL winCheckKeyPressed(WPARAM wParam, LPARAM lParam)
+Index: xorg-server-1.5.1/xserver/hw/xwin/winmouse.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winmouse.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winmouse.c
+@@ -36,7 +36,7 @@
+ #endif
+ #include "win.h"
+ 
+-#if defined(XFree86Server) && defined(XINPUT)
++#ifdef XINPUT
+ #include "inputstr.h"
+ 
+ /* Peek the internal button mapping */
+@@ -106,7 +106,7 @@ winMouseProc (DeviceIntPtr pDeviceInt, i
+ 			       2);
+       free(map);
+ 
+-#if defined(XFree86Server) && defined(XINPUT)
++#ifdef XINPUT
+       g_winMouseButtonMap = pDeviceInt->button->map;
+ #endif
+       break;
+@@ -116,7 +116,7 @@ winMouseProc (DeviceIntPtr pDeviceInt, i
+       break;
+ 
+     case DEVICE_CLOSE:
+-#if defined(XFree86Server) && defined(XINPUT)
++#ifdef XINPUT
+       g_winMouseButtonMap = NULL;
+ #endif
+     case DEVICE_OFF:
+@@ -225,7 +225,7 @@ winMouseButtonsSendEvent (int iEventType
+ 
+   /* Load an xEvent and enqueue the event */
+   xCurrentEvent.u.u.type = iEventType;
+-#if defined(XFree86Server) && defined(XINPUT)
++#ifdef XINPUT
+   if (g_winMouseButtonMap)
+     xCurrentEvent.u.u.detail = g_winMouseButtonMap[iButton];
+   else
+@@ -233,7 +233,17 @@ winMouseButtonsSendEvent (int iEventType
+   xCurrentEvent.u.u.detail = iButton;
+   xCurrentEvent.u.keyButtonPointer.time
+     = g_c32LastInputEventTime = GetTickCount ();
+-  mieqEnqueue (&xCurrentEvent);
++
++#if CYGDEBUG
++  ErrorF("winMouseButtonsSendEvent: xCurrentEvent.u.u.type: %d, xCurrentEvent.u.u.detail: %d\n",
++          xCurrentEvent.u.u.type, xCurrentEvent.u.u.detail);
++#endif
++  DeviceIntPtr pDev;
++  for (pDev = inputInfo.devices; pDev; pDev = pDev->next)
++    if ((pDev->coreEvents && pDev != inputInfo.pointer) && pDev->button)
++      {
++	mieqEnqueue (pDev, &xCurrentEvent);
++      }
+ }
+ 
+ 
+@@ -339,3 +349,25 @@ winMouseButtonsHandle (ScreenPtr pScreen
+ 
+   return 0;
+ }
++
++/**
++ * Enqueue a motion event.
++ */
++void winEnqueueMotion(int x, int y)
++{
++  int i, nevents;
++  int valuators[2];
++
++  xEvent *events = (xEvent *)malloc(sizeof(xEvent) * GetMaximumEventsNum());
++
++  valuators[0] = x;
++  valuators[1] = y;
++  nevents = GetPointerEvents(events, inputInfo.pointer, MotionNotify, 0,
++			     POINTER_ABSOLUTE, 0, 2, valuators);
++
++  for (i = 0; i < nevents; i++)
++    mieqEnqueue(inputInfo.pointer, events + i);
++
++  xfree(events);
++}
++// XXX: miPointerMove does exactly this, but is static :-( (and uses a static buffer)
+Index: xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winmultiwindowwndproc.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwndproc.c
+@@ -535,9 +535,9 @@ winTopLevelWindowProc (HWND hwnd, UINT m
+ 	}
+ 
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (ptMouse.x - s_pScreenInfo->dwXOffset,
+-			       ptMouse.y - s_pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(ptMouse.x - s_pScreenInfo->dwXOffset,
++		       ptMouse.y - s_pScreenInfo->dwYOffset);
++
+       return 0;
+       
+     case WM_NCMOUSEMOVE:
+Index: xorg-server-1.5.1/xserver/hw/xwin/winwin32rootlesswndproc.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winwin32rootlesswndproc.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winwin32rootlesswndproc.c
+@@ -567,9 +567,9 @@ winMWExtWMWindowProc (HWND hwnd, UINT me
+ 	}
+ 
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (ptMouse.x - pScreenInfo->dwXOffset,
+-			       ptMouse.y - pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(ptMouse.x - pScreenInfo->dwXOffset,
++		       ptMouse.y - pScreenInfo->dwYOffset);
++
+       return 0;
+       
+     case WM_NCMOUSEMOVE:
+Index: xorg-server-1.5.1/xserver/hw/xwin/winwndproc.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winwndproc.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winwndproc.c
+@@ -762,11 +762,11 @@ winWindowProc (HWND hwnd, UINT message, 
+ 	  g_fCursor = TRUE;
+ 	  ShowCursor (TRUE);
+ 	}
+-      
++
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (GET_X_LPARAM(lParam)-s_pScreenInfo->dwXOffset,
+-			       GET_Y_LPARAM(lParam)-s_pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(GET_X_LPARAM(lParam)-s_pScreenInfo->dwXOffset,
++		       GET_Y_LPARAM(lParam)-s_pScreenInfo->dwYOffset);
++
+       return 0;
+ 
+     case WM_NCMOUSEMOVE:
+@@ -927,10 +927,9 @@ winWindowProc (HWND hwnd, UINT message, 
+ 	    /* Map from screen (-X, -Y) to root (0, 0) */
+ 	    point.x -= GetSystemMetrics (SM_XVIRTUALSCREEN);
+ 	    point.y -= GetSystemMetrics (SM_YVIRTUALSCREEN);
+-	    
++
+ 	    /* Deliver absolute cursor position to X Server */
+-	    miPointerAbsoluteCursor (point.x, point.y,
+-				     g_c32LastInputEventTime = GetTickCount());
++	    winEnqueueMotion(point.x , point.y);
+ 
+ 	    /* Check if a button was released but we didn't see it */
+ 	    GetCursorPos (&point);

@@ -1,0 +1,13 @@
+--- origsrc/xorg-server-1.5.2/configure.ac	2008-10-28 15:29:12.949856100 -0500
++++ src/xorg-server-1.5.2/configure.ac	2008-10-28 17:54:20.260966100 -0500
+@@ -1699,10 +1699,6 @@
+ 		AC_MSG_NOTICE([Disabling XF86Misc extension])
+ 		XF86MISC=no
+ 	fi
+-	if test "x$COMPOSITE" = xyes; then
+-		AC_MSG_NOTICE([Disabling Composite extension])
+-		COMPOSITE=no
+-	fi
+ fi
+ AM_CONDITIONAL(XWIN, [test "x$XWIN" = xyes])
+ AM_CONDITIONAL(XWIN_MULTIWINDOW, [test "x$XWIN" = xyes])

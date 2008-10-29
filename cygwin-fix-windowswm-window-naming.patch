@@ -1,0 +1,22 @@
+---
+ xserver/hw/xwin/winmultiwindowwm.c |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+Index: xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winmultiwindowwm.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+@@ -1258,11 +1258,10 @@ winInitMultiWindowWM (WMInfoPtr pWMInfo,
+   pWMInfo->atmWmDelete = XInternAtom (pWMInfo->pDisplay,
+ 				      "WM_DELETE_WINDOW",
+ 				      False);
+-#ifdef XWIN_MULTIWINDOWEXTWM
++
+   pWMInfo->atmPrivMap  = XInternAtom (pWMInfo->pDisplay,
+-				      WINDOWSWM_NATIVE_HWND,
++				      "_WINDOWSWM_NATIVE_HWND",
+ 				      False);
+-#endif
+ 
+ 
+   if (1) {

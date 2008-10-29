@@ -1,0 +1,73 @@
+--- origsrc/xorg-server-1.5.2/hw/xwin/XWin.man	2007-05-29 14:36:51.000000000 -0500
++++ src/xorg-server-1.5.2/hw/xwin/XWin.man	2008-10-28 15:31:51.402981100 -0500
+@@ -55,7 +55,7 @@
+ .SH PREFERENCES FILE
+ On startup \fIXWin\fP looks for the file \fI$HOME/.XWinrc\fP or, if
+ the previous file does not exist,
+-\fI/usr/X11R6/lib/X11/system.XWinrc\fP.  \fI.XWinrc\fP allows setting
++\fI/usr/lib/X11/system.XWinrc\fP.  \fI.XWinrc\fP allows setting
+ preferences for the following:
+ .br
+ 1- To include items into the menu associated with the \fIXWin\fP icon
+@@ -245,7 +245,7 @@
+ These options implement the xkeyboard extension for loading
+ a particular keyboard map as the X server starts.  The behavior is similar
+ to the \fIsetxkbmap\fP program.  The layout data is located at
+-\fI/usr/X11R6/lib/X11/xkb/\fP.  Additional information is found in the
++\fI/usr/share/X11/xkb/\fP.  Additional information is found in the
+ README files therein and in the man page of \fIsetxkbmap\fP.  For example
+ in order to load a German layout for a pc105 keyboard one uses
+ the options:
+--- origsrc/xorg-server-1.5.2/hw/xwin/XWinrc.man	2007-05-29 14:36:51.000000000 -0500
++++ src/xorg-server-1.5.2/hw/xwin/XWinrc.man	2008-10-28 15:32:09.090481100 -0500
+@@ -9,7 +9,7 @@
+ The X Server for the X Window System on the Cygwin/X environment
+ running on Microsoft Windows, \fIXWin\fP can be optionally configured
+ with the \fIXWinrc\fP file.  A system-wide configuration file should
+-be placed in \fI/usr/X11R6/lib/X11/system.XWinrc\fP, a per-user file
++be placed in \fI/usr/lib/X11/system.XWinrc\fP, a per-user file
+ should be put at \fI$HOME/.XWinrc\fP.  The \fIsystem.XWinrc\fP file is
+ read only if no \fI$HOME/.XWinrc\fP exist.
+ .PP
+--- origsrc/xorg-server-1.5.2/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc	2007-05-29 14:36:51.000000000 -0500
++++ src/xorg-server-1.5.2/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc	2008-10-28 15:32:30.746731100 -0500
+@@ -1,7 +1,7 @@
+ # XWin Server Resource File - EXAMPLE
+ # Earle F. Philhower, III
+ 
+-# Place in ~/.XWinrc or in /usr/X11R6/lib/X11/system.XWinrc
++# Place in ~/.XWinrc or in /usr/lib/X11/system.XWinrc
+ 
+ # Keywords are case insensitive, comments legal pretty much anywhere
+ # you can have an end-of-line
+--- origsrc/xorg-server-1.5.2/hw/xwin/windialogs.c	2007-11-15 12:32:01.000000000 -0600
++++ src/xorg-server-1.5.2/hw/xwin/windialogs.c	2008-10-28 15:30:48.637356100 -0500
+@@ -677,17 +677,8 @@
+ 	case ID_ABOUT_CHANGELOG:
+ 	  {
+ 	    int			iReturn;
+-#ifdef __CYGWIN__
+-	    const char *	pszCygPath = "/usr/X11R6/share/doc/"
+-	      "xorg-x11-xwin/changelog.html";
+-	    char		pszWinPath[MAX_PATH + 1];
+-
+-	    /* Convert the POSIX path to a Win32 path */
+-	    cygwin_conv_to_win32_path (pszCygPath, pszWinPath);
+-#else
+ 	    const char *	pszWinPath = "http://x.cygwin.com/"
+ 		    "devel/server/changelog.html";
+-#endif
+ 	    
+ 	    iReturn = (int) ShellExecute (NULL,
+ 					  "open",
+--- origsrc/xorg-server-1.5.2/hw/xwin/winprefs.c	2007-10-23 16:26:52.000000000 -0500
++++ src/xorg-server-1.5.2/hw/xwin/winprefs.c	2008-10-28 15:31:31.356106100 -0500
+@@ -724,7 +724,7 @@
+ 
+ 
+ /*
+- * Try and open ~/.XWinrc and /usr/X11R6/lib/X11/system.XWinrc
++ * Try and open ~/.XWinrc and /usr/lib/X11/system.XWinrc
+  * Load it into prefs structure for use by other functions
+  */
+ void

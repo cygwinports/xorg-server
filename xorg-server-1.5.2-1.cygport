@@ -1,0 +1,69 @@
+inherit xorg
+
+PATCH_URI="
+	http://www.straightrunning.com/XmingCode/winlayouts.h.patch
+	http://www.straightrunning.com/XmingCode/wintrayicon.c.patch
+	http://www.straightrunning.com/XmingCode/winwindow.h.patch
+	http://www.straightrunning.com/XmingCode/winwndproc.c.patch
+	cygwin-build-fixes.patch
+	cygwin-mieq.patch
+	cygwin-use-standard-dpms-stubs.patch
+	cygwin-shadow-changes-update.patch
+	cygwin-smart-scheduler-problems-workaround.patch
+	cygwin-build-as-console-app.patch
+	cygwin-fix-windowswm-window-naming.patch
+	cygwin-should-also-use-gettickcount.patch
+	cygwin-fdo-bugzilla-4491-transparent-icon-background-fix.patch
+	1.3-ddxBeforeReset.patch
+	1.5-composite.patch
+	1.5-glx-RTLD_LOCAL.patch
+	1.5-prefix-is-usr.patch
+"
+
+DIFF_EXCLUDES="xf86Build.h *-config.h xorg-server.h"
+
+src_compile() {
+	cd ${S}
+	cygautoreconf
+
+	cd ${B}
+	cygconf \
+		--sysconfdir=/etc/X11 \
+		--enable-kdrive \
+		--enable-xephyr \
+		--disable-builddocs \
+		--disable-install-libxf86config \
+		--disable-install-setuid \
+		--disable-xf86misc \
+		--disable-xf86vidmode \
+		--disable-xinerama \
+		--disable-xorgcfg \
+		--disable-xprint \
+		--disable-xsdl \
+		--disable-xv \
+		--disable-xvmc \
+		--with-fontdir=/usr/share/fonts \
+		--with-log-dir=/tmp \
+		--with-os-name='Cygwin' \
+		--with-os-vendor='Cygwin' \
+		"--with-builder-addr=cygwin-xfree@cygwin.com" \
+		"--with-vendor-name=The Cygwin/X Project" \
+		"--with-vendor-name-short=Cygwin/X" \
+		"--with-vendor-web=http://x.cygwin.com/"
+
+	cygmake
+}
+
+src_install() {
+	cd ${B}
+	cyginstall sdkdir=/usr/include/xorg
+
+	# The SDK is only used for building Xorg drivers (which aren't
+	# applicable to XWin), so we remove it to avoid confusion
+	rm -fr ${D}/usr/include ${D}/usr/lib/pkgconfig ${D}/usr/share/aclocal
+
+	dosym XWin.exe /usr/bin/X
+
+	insinto /usr/lib/X11
+	newins ${S}/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc system.XWinrc
+}

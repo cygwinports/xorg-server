@@ -1,0 +1,221 @@
+Cygwin build machinery fixes
+
+---
+ xserver/configure.ac               |    6 ++++--
+ xserver/hw/xwin/InitInput.c        |    9 ++++++---
+ xserver/hw/xwin/Makefile.am        |   19 ++++++++++---------
+ xserver/hw/xwin/winerror.c         |   11 +++++------
+ xserver/hw/xwin/winmultiwindowwm.c |    9 +--------
+ xserver/hw/xwin/winprocarg.c       |    4 ++--
+ xserver/hw/xwin/winscrinit.c       |    1 -
+ 7 files changed, 28 insertions(+), 31 deletions(-)
+
+Index: xorg-server-1.5.1/xserver/configure.ac
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/configure.ac
++++ xorg-server-1.5.1/xserver/configure.ac
+@@ -1652,12 +1652,14 @@ if test "x$XWIN" = xauto; then
+ 		mingw*) XWIN="yes" ;;
+ 		*) XWIN="no" ;;
+ 	esac
+-	XWIN_LIBS="$FB_LIB $XEXT_LIB $CONFIG_LIB $XI_LIB $XKB_LIB $XKB_STUB_LIB $COMPOSITE_LIB $DAMAGE_LIB $LAYER_LIB $XPSTUBS_LIB $SHADOW_LIB"
++	XWIN_LIBS="$FB_LIB $MI_LIB $FIXES_LIB $XEXT_LIB $CONFIG_LIB $RANDR_LIB $RENDER_LIB $XTRAP_LIB $DBE_LIB $RECORD_LIB $GLX_LIBS $XKB_LIB $XKB_STUB_LIB $COMPOSITE_LIB $DAMAGE_LIB $MIEXT_DAMAGE_LIB $MIEXT_SHADOW_LIB $XI_LIB $MIEXT_LAYER_LIB $LAYER_LIB $XPSTUBS_LIB $SHADOW_LIB $OS_LIB"
+ 	AC_SUBST([XWIN_LIBS])
+ fi
+ AC_MSG_RESULT([$XWIN])
+ 
+ if test "x$XWIN" = xyes; then
++	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
++	AC_CHECK_TOOL(WINDRES, windres)
+ 	case $host_os in
+ 		cygwin*)
+ 			XWIN_SERVER_NAME=XWin
+@@ -1674,7 +1676,7 @@ if test "x$XWIN" = xyes; then
+ 			XWIN_SYS_LIBS=-lwinsock2
+ 			;;
+ 	esac
+-	XWIN_SYS_LIBS="$XWIN_SYS_LIBS $(XWINMODULES_LIBS)"
++	XWIN_SYS_LIBS="$XWIN_SYS_LIBS $XWINMODULES_LIBS"
+ 	AC_SUBST(XWIN_SERVER_NAME)
+ 	AC_SUBST(XWIN_SYS_LIBS)
+ 
+Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/Makefile.am
++++ xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+@@ -120,8 +120,10 @@ SRCS =	InitInput.c \
+ 	winpriv.h \
+ 	winresource.h \
+ 	winwindow.h \
++	XWin.rc \
++	$(top_srcdir)/Xi/stubs.c \
+ 	$(top_srcdir)/mi/miinitext.c \
+-	$(top_srcdir)/fb/fbcmap.c \
++	$(top_srcdir)/fb/fbcmap_mi.c \
+ 	$(SRCS_CLIPBOARD) \
+ 	$(SRCS_GLX_WINDOWS) \
+ 	$(SRCS_MULTIWINDOW) \
+@@ -142,15 +144,13 @@ SRCS =	InitInput.c \
+ 
+ XWin_SOURCES = $(SRCS)
+ 
+-INCLUDES = -I$(top_srcdir)/miext/rootless \
+-           -I$(top_srcdir)/miext/rootless/safeAlpha
+-
+-XWIN_LIBS = \
+-	$(top_builddir)/fb/libfb.la \
+-	$(XSERVER_LIBS)
++INCLUDES = -I$(top_srcdir)/miext/rootless
+ 
+ XWin_DEPENDENCIES = $(XWIN_LIBS)
+-XWin_LDADD = $(XWIN_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
++XWin_LDADD = $(XWIN_LIBS) $(XSERVER_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
++
++.rc.o:
++	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\"
+ 
+ XWin_LDFLAGS = -mwindows -static
+ 
+@@ -163,7 +163,8 @@ CLEANFILES = $(BUILT_SOURCES)
+ AM_YFLAGS = -d
+ AM_LFLAGS = -i
+ AM_CFLAGS = -DHAVE_XWIN_CONFIG_H $(DIX_CFLAGS) \
+-            $(XWINMODULES_CFLAGS)
++            $(XWINMODULES_CFLAGS) \
++            -DXFree86Server
+ 
+ dist_man1_MANS = XWin.man XWinrc.man
+ 
+Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winerror.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winerror.c
+@@ -33,10 +33,9 @@
+ #endif
+ #ifdef XVENDORNAME
+ #define VENDOR_STRING XVENDORNAME
+-#define VERSION_STRING XORG_RELEASE
+ #define VENDOR_CONTACT BUILDERADDR
+ #endif
+-
++#include <../xfree86/common/xorgVersion.h>
+ #include "win.h"
+ 
+ /* References to external symbols */
+@@ -80,7 +79,6 @@ OsVendorVErrorF (const char *pszFormat, 
+  *
+  * Attempt to do last-ditch, safe, important cleanup here.
+  */
+-#ifdef DDXOSFATALERROR
+ void
+ OsVendorFatalError (void)
+ {
+@@ -93,7 +91,6 @@ OsVendorFatalError (void)
+ 		  "Please open %s for more information.\n",
+ 		  MB_ICONERROR, (g_pszLogFile?g_pszLogFile:"the logfile"));
+ }
+-#endif
+ 
+ 
+ /*
+@@ -117,13 +114,15 @@ winMessageBoxF (const char *pszError, UI
+ #define MESSAGEBOXF \
+ 	"%s\n" \
+ 	"Vendor: %s\n" \
+-	"Release: %s\n" \
++	"Release: %d.%d.%d.%d (%d)\n" \
+ 	"Contact: %s\n" \
+ 	"XWin was started with the following command-line:\n\n" \
+ 	"%s\n"
+ 
+   pszMsgBox = Xprintf (MESSAGEBOXF,
+-	   pszErrorF, VENDOR_STRING, VERSION_STRING, VENDOR_CONTACT,
++	   pszErrorF, VENDOR_STRING,
++		       XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT,
++		       VENDOR_CONTACT,
+ 	   g_pszCommandLine);
+   if (!pszMsgBox)
+     goto winMessageBoxF_Cleanup;
+Index: xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winmultiwindowwm.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+@@ -52,14 +52,7 @@
+ #include <X11/cursorfont.h>
+ 
+ /* Windows headers */
+-#ifdef __CYGWIN__
+-/* Fixups to prevent collisions between Windows and X headers */
+-#define ATOM DWORD
+-
+-#include <windows.h>
+-#else
+-#include <Xwindows.h>
+-#endif
++#include <X11/Xwindows.h>
+ 
+ /* Local headers */
+ #include "objbase.h"
+Index: xorg-server-1.5.1/xserver/hw/xwin/winprocarg.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winprocarg.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winprocarg.c
+@@ -31,9 +31,9 @@ from The Open Group.
+ #endif
+ #ifdef XVENDORNAME
+ #define VENDOR_STRING XVENDORNAME
+-#define VERSION_STRING XORG_RELEASE
+ #define VENDOR_CONTACT BUILDERADDR
+ #endif
++#include <../xfree86/common/xorgVersion.h>
+ #include "win.h"
+ #include "winconfig.h"
+ #include "winprefs.h"
+@@ -1525,7 +1525,7 @@ winLogVersionInfo (void)
+ 
+   ErrorF ("Welcome to the XWin X Server\n");
+   ErrorF ("Vendor: %s\n", VENDOR_STRING);
+-  ErrorF ("Release: %s\n\n", VERSION_STRING);
++  ErrorF ("Release: %d.%d.%d.%d (%d)\n\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
+   ErrorF ("Contact: %s\n\n", VENDOR_CONTACT);
+ }
+ 
+Index: xorg-server-1.5.1/xserver/hw/xwin/winscrinit.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/winscrinit.c
++++ xorg-server-1.5.1/xserver/hw/xwin/winscrinit.c
+@@ -37,7 +37,6 @@
+ #endif
+ #include "win.h"
+ #include "winmsg.h"
+-#include "safeAlpha.h"	
+ 
+ 
+ #ifdef XWIN_MULTIWINDOWEXTWM
+Index: xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/InitInput.c
++++ xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+@@ -30,9 +30,6 @@
+ #include <xwin-config.h>
+ #endif
+ #include "win.h"
+-#ifdef XWIN_CLIPBOARD
+-# include "../../Xext/xf86miscproc.h"
+-#endif
+ #include "dixstruct.h"
+ 
+ 
+@@ -104,6 +101,12 @@ ProcessInputEvents (void)
+ #endif
+ }
+ 
++void DDXRingBell(int volume, int pitch, int duration)
++{
++  /* winKeybdBell is used instead */
++  return;
++}
++
+ 
+ int
+ TimeSinceLastInputEvent ()

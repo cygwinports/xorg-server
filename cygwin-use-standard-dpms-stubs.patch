@@ -1,0 +1,44 @@
+Cygwin update to use standard DPMS stubs
+
+---
+ xserver/hw/xwin/InitOutput.c |   17 -----------------
+ xserver/hw/xwin/Makefile.am  |    1 +
+ 2 files changed, 1 insertion(+), 17 deletions(-)
+
+Index: xorg-server-1.5.1/xserver/hw/xwin/InitOutput.c
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/InitOutput.c
++++ xorg-server-1.5.1/xserver/hw/xwin/InitOutput.c
+@@ -1125,20 +1125,3 @@ winCheckDisplayNumber ()
+ 
+   return TRUE;
+ }
+-
+-#ifdef DPMSExtension
+-Bool DPMSSupported(void)
+-{
+-  return FALSE;
+-}
+-
+-void DPMSSet(int level)
+-{
+-  return;
+-}
+-
+-int DPMSGet(int *plevel)
+-{
+-  return 0;
+-}
+-#endif
+Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+===================================================================
+--- xorg-server-1.5.1.orig/xserver/hw/xwin/Makefile.am
++++ xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+@@ -121,6 +121,7 @@ SRCS =	InitInput.c \
+ 	winresource.h \
+ 	winwindow.h \
+ 	XWin.rc \
++	$(top_srcdir)/Xext/dpmsstubs.c \
+ 	$(top_srcdir)/Xi/stubs.c \
+ 	$(top_srcdir)/mi/miinitext.c \
+ 	$(top_srcdir)/fb/fbcmap_mi.c \
