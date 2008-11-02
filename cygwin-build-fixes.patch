@@ -55,7 +55,7 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
  	$(SRCS_CLIPBOARD) \
  	$(SRCS_GLX_WINDOWS) \
  	$(SRCS_MULTIWINDOW) \
-@@ -142,15 +144,13 @@ SRCS =	InitInput.c \
+@@ -142,17 +144,14 @@ SRCS =	InitInput.c \
  
  XWin_SOURCES = $(SRCS)
  
@@ -69,13 +69,16 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
  
  XWin_DEPENDENCIES = $(XWIN_LIBS)
 -XWin_LDADD = $(XWIN_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
+-
+-XWin_LDFLAGS = -mwindows -static
 +XWin_LDADD = $(XWIN_LIBS) $(XSERVER_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
++XWin_LDFLAGS = -mwindows
 +
 +.rc.o:
-+	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\"
++	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\" -DPROJECT_VERSION=\"$(PACKAGE_VERSION)\"
  
- XWin_LDFLAGS = -mwindows -static
- 
+ winprefsyacc.h: winprefsyacc.c
+ winprefslex.c: winprefslex.l winprefsyacc.c winprefsyacc.h
 @@ -163,7 +163,8 @@ CLEANFILES = $(BUILT_SOURCES)
  AM_YFLAGS = -d
  AM_LFLAGS = -i
@@ -86,6 +89,12 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
  
  dist_man1_MANS = XWin.man XWinrc.man
  
+@@ -201,4 +201,4 @@
+ 	xlaunch/window/wizard.h
+ 
+ relink:
+-	rm -f XWin && $(MAKE) XWin
++	rm -f XWin$(EXEEXT) && $(MAKE) XWin$(EXEEXT)
 Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
 ===================================================================
 --- xorg-server-1.5.1.orig/xserver/hw/xwin/winerror.c
@@ -123,7 +132,7 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
  	"%s\n" \
  	"Vendor: %s\n" \
 -	"Release: %s\n" \
-+	"Release: %d.%d.%d.%d (%d)\n" \
++	"Release: %d.%d.%d.%d\n" \
  	"Contact: %s\n" \
  	"XWin was started with the following command-line:\n\n" \
  	"%s\n"
@@ -131,7 +140,7 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
    pszMsgBox = Xprintf (MESSAGEBOXF,
 -	   pszErrorF, VENDOR_STRING, VERSION_STRING, VENDOR_CONTACT,
 +	   pszErrorF, VENDOR_STRING,
-+		       XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT,
++		       XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP,
 +		       VENDOR_CONTACT,
  	   g_pszCommandLine);
    if (!pszMsgBox)

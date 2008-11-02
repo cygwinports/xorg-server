@@ -1,0 +1,447 @@
+Add 'styles' keyword and attributes.
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/XWinrc.man     |   69 ++++++++++++++++++++++++++++++++++---
+ xserver/hw/xwin/winprefs.c     |   48 +++++++++++++++++++++++++
+ xserver/hw/xwin/winprefs.h     |   22 +++++++++++
+ xserver/hw/xwin/winprefslex.l  |    8 ++++
+ xserver/hw/xwin/winprefsyacc.y |   76 ++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 217 insertions(+), 6 deletions(-)
+
+Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.c
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefs.c
++++ xorg-server-1.5.2/xserver/hw/xwin/winprefs.c
+@@ -1,5 +1,6 @@
+ /*
+  * Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
++ * Copyright (C) Colin Harrison 2005-2008
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -26,6 +27,7 @@
+  * from the XFree86 Project.
+  *
+  * Authors:     Earle F. Philhower, III
++ *              Colin Harrison
+  */
+ 
+ #ifdef HAVE_XWIN_CONFIG_H
+@@ -820,3 +822,49 @@ LoadPreferences ()
+     } /* for all menus */
+ 
+ }
++
++
++/*
++ * Check for a match of the window class to one specified in the
++ * STYLES{} section in the prefs file, and return the style type
++ */
++unsigned long
++winOverrideStyle (unsigned long longpWin)
++{
++  WindowPtr pWin = (WindowPtr) longpWin;
++  char *res_name, *res_class;
++  int i;
++  char *wmName;
++
++  if (pWin==NULL)
++    return STYLE_NONE;
++
++  /* If we can't find the class, we can't override from default! */
++  if (!winMultiWindowGetClassHint (pWin, &res_name, &res_class))
++    return STYLE_NONE;
++
++  winMultiWindowGetWMName (pWin, &wmName);
++
++  for (i=0; i<pref.styleItems; i++) {
++    if (!strcmp(pref.style[i].match, res_name) ||
++	!strcmp(pref.style[i].match, res_class) ||
++	(wmName && strstr(wmName, pref.style[i].match)))
++      {
++	free (res_name);
++	free (res_class);
++	if (wmName)
++	  free (wmName);
++
++	if (pref.style[i].type)
++	  return pref.style[i].type;
++      }
++  }
++
++  /* Didn't find the style, fail gracefully */
++  free (res_name);
++  free (res_class);
++  if (wmName)
++    free (wmName);
++
++  return STYLE_NONE;
++}
+Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefs.h
++++ xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
+@@ -2,6 +2,7 @@
+ #define WINPREFS_H
+ /*
+  * Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
++ * Copyright (C) Colin Harrison 2005-2008
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -28,6 +29,7 @@
+  * from the XFree86 Project.
+  *
+  * Authors:     Earle F. Philhower, III
++ *              Colin Harrison
+  */
+ 
+ /* Need Bool */
+@@ -57,6 +59,13 @@ typedef enum MENUCOMMANDTYPE
+   CMD_RELOAD        /* Reparse the .XWINRC file            */
+ } MENUCOMMANDTYPE;
+ 
++#define STYLE_NONE     (0L)    /* Dummy the first entry               */
++#define STYLE_NOTITLE  (1L)    /* Force window style no titlebar      */
++#define STYLE_NOFRAME  (1L<<1) /* Force window style no frame         */
++#define STYLE_TOPMOST  (1L<<2) /* Open a window always-on-top         */
++#define STYLE_MAXIMIZE (1L<<3) /* Open a window maximized             */
++#define STYLE_MINIMIZE (1L<<4) /* Open a window minimized             */
++
+ /* Where to place a system menu */
+ typedef enum MENUPOSITION
+ {
+@@ -97,6 +106,13 @@ typedef struct ICONITEM
+   unsigned long hicon;                /* LoadImage() result */
+ } ICONITEM;
+ 
++/* To redefine styles for certain window types */
++typedef struct STYLEITEM
++{
++  char match[MENU_MAX+1];    /* What string to search for? */
++  unsigned long type;                 /* What should it do? */
++} STYLEITEM;
++
+ typedef struct WINPREFS
+ {
+   /* Menu information */
+@@ -122,6 +138,9 @@ typedef struct WINPREFS
+   ICONITEM *icon;
+   int iconItems;
+ 
++  STYLEITEM *style;
++  int styleItems;
++
+   /* Silent exit flag */
+   Bool fSilentExit;
+ 
+@@ -155,6 +174,9 @@ unsigned long
+ winOverrideIcon (unsigned long longpWin);
+ 
+ unsigned long
++winOverrideStyle (unsigned long longpWin);
++
++unsigned long
+ winTaskbarIcon(void);
+ 
+ unsigned long
+Index: xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefslex.l
++++ xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
+@@ -1,6 +1,7 @@
+ %{ # -*- C -*-
+ /*
+  * Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
++ * Copyright (C) Colin Harrison 2005-2008
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -27,6 +28,7 @@
+  * from the XFree86 Project.
+  *
+  * Authors:     Earle F. Philhower, III
++ *              Colin Harrison
+  */
+ /* $XFree86: $ */
+ 
+@@ -70,6 +72,12 @@ MENU                    { return MENU; }
+ ICONDIRECTORY           { return ICONDIRECTORY; }
+ DEFAULTICON             { return DEFAULTICON; }
+ ICONS                   { return ICONS; }
++STYLES                  { return STYLES; }
++TOPMOST                 { return TOPMOST; }
++MAXIMIZE                { return MAXIMIZE; }
++MINIMIZE                { return MINIMIZE; }
++NOTITLE                 { return NOTITLE; }
++NOFRAME                 { return NOFRAME; }
+ ROOTMENU                { return ROOTMENU; }
+ DEFAULTSYSMENU          { return DEFAULTSYSMENU; }
+ SYSMENU                 { return SYSMENU; }
+Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefsyacc.y
++++ xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
+@@ -1,6 +1,7 @@
+ %{
+ /*
+  * Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
++ * Copyright (C) Colin Harrison 2005-2008
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -27,6 +28,7 @@
+  * from the XFree86 Project.
+  *
+  * Authors:     Earle F. Philhower, III
++ *              Colin Harrison
+  */
+ /* $XFree86: $ */
+ 
+@@ -41,6 +43,10 @@
+ /* The following give better error messages in bison at the cost of a few KB */
+ #define YYERROR_VERBOSE 1
+ 
++/* YYLTYPE_IS_TRIVIAL and YYENABLE_NLS defined to suppress warnings */
++#define YYLTYPE_IS_TRIVIAL 1
++#define YYENABLE_NLS 0
++
+ /* The global pref settings */
+ WINPREFS pref;
+ 
+@@ -64,6 +70,10 @@ static void OpenIcons(void);
+ static void AddIconLine(char *matchstr, char *iconfile);
+ static void CloseIcons(void);
+ 
++static void OpenStyles(void);
++static void AddStyleLine(char *matchstr, unsigned long style);
++static void CloseStyles(void);
++
+ static void OpenSysMenu(void);
+ static void AddSysMenuLine(char *matchstr, char *menuname, int pos);
+ static void CloseSysMenu(void);
+@@ -78,14 +88,19 @@ extern int yylex(void);
+ 
+ %union {
+   char *sVal;
++  unsigned long uVal;
+   int iVal;
+ }
+ 
+-%token NEWLINE MENU LB RB ICONDIRECTORY DEFAULTICON ICONS DEFAULTSYSMENU
++%token NEWLINE MENU LB RB ICONDIRECTORY DEFAULTICON ICONS STYLES
++%token TOPMOST MAXIMIZE MINIMIZE NOTITLE NOFRAME DEFAULTSYSMENU
+ %token SYSMENU ROOTMENU SEPARATOR ATSTART ATEND EXEC ALWAYSONTOP DEBUG
+ %token RELOAD TRAYICON SILENTEXIT
+ 
+ %token <sVal> STRING
++%type <uVal>  group1
++%type <uVal>  group2
++%type <uVal>  stylecombo
+ %type <iVal>  atspot
+ 
+ %%
+@@ -107,6 +122,7 @@ command:	defaulticon
+ 	| icondirectory
+ 	| menu
+ 	| icons
++	| styles
+ 	| sysmenu
+ 	| rootmenu
+ 	| defaultsysmenu
+@@ -154,6 +170,31 @@ iconlist:	iconline
+ icons:	ICONS LB {OpenIcons();} newline_or_nada iconlist RB {CloseIcons();}
+ 	;
+ 
++group1:	TOPMOST { $$=STYLE_TOPMOST; }
++	| MAXIMIZE { $$=STYLE_MAXIMIZE; }
++	| MINIMIZE { $$=STYLE_MINIMIZE; }
++	;
++
++group2:	NOTITLE { $$=STYLE_NOTITLE; }
++	| NOFRAME { $$=STYLE_NOFRAME; }
++	;
++
++stylecombo:	group1 { $$=$1; }
++	| group2 { $$=$1; }
++	| group1 group2 { $$=$1+$2; }
++	| group2 group1 { $$=$1+$2; }
++	;
++
++styleline:	STRING stylecombo NEWLINE newline_or_nada { AddStyleLine($1, $2); free($1); }
++	;
++
++stylelist:	styleline
++	| styleline stylelist
++	;
++
++styles:	STYLES LB {OpenStyles();} newline_or_nada stylelist RB {CloseStyles();}
++	;
++
+ atspot:	{ $$=AT_END; }
+ 	| ATSTART { $$=AT_START; }
+ 	| ATEND { $$=AT_END; }
+@@ -316,6 +357,39 @@ CloseIcons (void)
+ }
+ 
+ static void
++OpenStyles (void)
++{
++  if (pref.style != NULL) {
++    ErrorF("LoadPreferences: Redefining window style\n");
++    free(pref.style);
++    pref.style = NULL;
++  }
++  pref.styleItems = 0;
++}
++
++static void
++AddStyleLine (char *matchstr, unsigned long style)
++{
++  if (pref.style==NULL)
++    pref.style = (STYLEITEM*)malloc(sizeof(STYLEITEM));
++  else
++    pref.style = (STYLEITEM*)
++      realloc(pref.style, sizeof(STYLEITEM)*(pref.styleItems+1));
++
++  strncpy(pref.style[pref.styleItems].match, matchstr, MENU_MAX);
++  pref.style[pref.styleItems].match[MENU_MAX] = 0;
++
++  pref.style[pref.styleItems].type = style;
++
++  pref.styleItems++;
++}
++
++static void
++CloseStyles (void)
++{
++}
++
++static void
+ OpenSysMenu (void)
+ {
+   if (pref.sysMenu != NULL) {
+Index: xorg-server-1.5.2/xserver/hw/xwin/XWinrc.man
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/XWinrc.man
++++ xorg-server-1.5.2/xserver/hw/xwin/XWinrc.man
+@@ -30,6 +30,10 @@ that \fIXWin -multiwindow\fP produces fo
+ Again, that can be done both for the generic case and for particular
+ programs.  The new icons associated should be \fIWindows\fP format
+ icons \fI.ico\fP.
++.PP
++4- To change the style that is associated to the \fIWindows\fP window
++that \fI-multiwindow\fP produces for  each  top-level  X window.   Again,
++that can be done both for the generic case and for particular programs.
+ 
+ 
+ .SH FILE FORMAT
+@@ -41,9 +45,10 @@ completely capitalized.
+ are legal pretty much anywhere you can have an end-of-line; they
+ begin with "#" or "//" and go to the end-of-line.
+ .PP
+-Quote marks in strings are optional unless the string has included spaces.
++Quote marks in strings are optional unless the string has included spaces,
++or could be parsed, ambiguously, as a misplaced keyword.
+ .PP
+-There are three kinds of instructions: miscellaneous, menu, and icon.
++There are four kinds of instructions: miscellaneous, menu, icon and style.
+ 
+ 
+ .SH Miscellaneous instruction
+@@ -117,7 +122,9 @@ included at the start or at the end of t
+ .br
+   \fB}\fP
+ .br
+-Associates a specific menu to a specific WM_CLASS or WM_NAME.
++Associates a specific menu to a specified window class or name
++in \fI-multiwindow\fP mode. The keywords ATSTART or ATEND indicate if
++such items should be included at the startor at the end of the menu.
+ 
+ 
+ .SH Icon Instructions
+@@ -131,7 +138,7 @@ When specifying an \fIicon-file\fP in th
+ .br
+ \t \t ("c:\\windows\\system32\\shell32.dll,4" is the default folder icon)
+ .br
+-\fB",nn"\fP\fI index into XWin.EXE internal ICON resources\fP
++\fB",nnn"\fP\fI index into XWin.EXE internal ICON resources\fP
+ .br
+ \t \t (",101" is the 1st icon inside \fIXWin.EXE\fP)
+ .TP 8
+@@ -155,6 +162,49 @@ Defines icon replacements windows matchi
+ If multiple name or class matches occur for a window, only the first one
+ will be used.
+ 
++.SH Style Instructions
++.TP 8
++.B STYLES {
++\fIclass-or-name-of-window\fP \fIstyle-keyword-1\fP \fIstyle-keyword-2\fP
++.br
++  \fI...\fP
++.br
++\fB}\fP
++
++Associates specific styles to a specified window class or name
++in \fI-multiwindow\fP mode.  If multiple class or name matches occur,
++for a window, only the first one will be used.
++
++The style keywords indicate the following:
++
++\fIstyle-keyword-1\fP
++
++\fBTOPMOST\fP
++.br
++Open the class or name above all NOTOPMOST Microsoft Windows
++.br
++\fBMAXIMIZE\fP
++.br
++Start the class or name fullscreen.
++.br
++\fBMINIMIZE\fP
++.br
++Start the class or name iconic.
++.br
++
++\fIstyle-keyword-2\fP
++
++\fBNOTITLE\fP
++.br
++No Windows title bar, for the class or name.
++.br
++\fBNOFRAME\fP
++.br
++No Windows title bar or border, for the class or name.
++
++One keyword in \fIstyle-keyword-1\fP can be used with one keyword in \fIstyle-keyword-2\fP,
++or any keyword can be used singly.
++
+ 
+ .SH EXAMPLE
+ .TP 8
+@@ -170,6 +220,15 @@ This example adds an Xterm menu item to 
+ ROOTMENU systray
+ \fP
+ 
++.TP 8
++This example makes an oclock window frameless in \fI-multiwindow\fP mode
++\fBSTYLES {
++.br
++\t oclock NOFRAME
++.br
++}
++
++
+ 
+ .SH "SEE ALSO"
+  XWin(1)
+@@ -177,4 +236,4 @@ ROOTMENU systray
+ 
+ .SH AUTHOR
+ The XWinrc feature of XWin was written primarily by Earle F. Philhower
+-III.
++III.  Extended for style configuration by Colin Harrison.

@@ -1,8 +1,11 @@
 Fix for mis-aligned icon data creates bad background masks 
+
 fd.o bugzilla #4491
 
 Transparent icon backgrounds appear with black stripes as mask data is incorrectly aligned.
 Modified the icon DDB bitmap data alignment to 16 bits
+
+from an original patch by Joe Krahn <jkrahn@nc.rr.com>
 
 ---
  xserver/hw/xwin/winmultiwindowicons.c |   10 +++++-----

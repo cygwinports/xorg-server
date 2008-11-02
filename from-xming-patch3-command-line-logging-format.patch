@@ -1,0 +1,39 @@
+Slightly adjust the formatting of the logged command line
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/winprocarg.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+Index: xorg-server-1.5.2/xserver/hw/xwin/winprocarg.c
+===================================================================
+--- xorg-server-1.5.2.orig/xserver/hw/xwin/winprocarg.c
++++ xorg-server-1.5.2/xserver/hw/xwin/winprocarg.c
+@@ -1459,13 +1459,13 @@ winLogCommandLine (int argc, char *argv[
+   for (i = 0, iCurrLen = 0; i < argc; ++i)
+     if (argv[i])
+       {
+-	/* Add a character for lines that overflow */
++	/* Adds two characters for lines that overflow */
+ 	if ((strlen (argv[i]) < CHARS_PER_LINE
+ 	    && iCurrLen + strlen (argv[i]) > CHARS_PER_LINE)
+ 	    || strlen (argv[i]) > CHARS_PER_LINE)
+ 	  {
+ 	    iCurrLen = 0;
+-	    ++iSize;
++	    iSize += 2;
+ 	  }
+ 	
+ 	/* Add space for item and trailing space */
+@@ -1495,7 +1495,7 @@ winLogCommandLine (int argc, char *argv[
+ 	iCurrLen = 0;
+ 	
+ 	/* Add line break if it fits */
+-	strncat (g_pszCommandLine, "\n", iSize - strlen (g_pszCommandLine));
++	strncat (g_pszCommandLine, "\n ", iSize - strlen (g_pszCommandLine));
+       }
+       
+       strncat (g_pszCommandLine, argv[i], iSize - strlen (g_pszCommandLine));

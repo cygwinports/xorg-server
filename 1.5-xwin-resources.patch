@@ -1,0 +1,149 @@
+--- origsrc/xorg-server-1.5.2/hw/xwin/XWin.exe.manifest	1969-12-31 18:00:00.000000000 -0600
++++ src/xorg-server-1.5.2/hw/xwin/XWin.exe.manifest	2008-11-01 23:34:54.000000000 -0500
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
++<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
++	<description>The XWin X Windows server for Cygwin.</description>
++	<dependency>
++	   <dependentAssembly>
++	     <assemblyIdentity
++	       type="win32"
++	       name="Microsoft.Windows.Common-Controls"
++	       version="6.0.0.0"
++	       processorArchitecture="X86"
++	       publicKeyToken="6595b64144ccf1df"
++	       language="*"
++	     />
++	   </dependentAssembly>
++	</dependency>
++</assembly>
+--- origsrc/xorg-server-1.5.2/hw/xwin/XWin.rc	2008-11-01 23:50:22.188146400 -0500
++++ src/xorg-server-1.5.2/hw/xwin/XWin.rc	2008-11-02 01:27:26.586230800 -0600
+@@ -1,5 +1,6 @@
+ /*
+  *Copyright (C) 2002-2004 Harold L Hunt II All Rights Reserved.
++ *Copyright (C) 2008 Yaakov Selkowitz All Rights Reserved
+  *
+  *Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -20,12 +21,12 @@
+  *CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  *WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  *
+- *Except as contained in this notice, the name of Harold L Hunt II
++ *Except as contained in this notice, the names of the authors
+  *shall not be used in advertising or otherwise to promote the sale, use
+  *or other dealings in this Software without prior written authorization
+- *from Harold L Hunt II.
++ *from the authors.
+  *
+- * Authors:	Harold L Hunt II
++ * Authors:	Harold L Hunt II, Yaakov Selkowitz
+  */
+ 
+ #include "windows.h"
+@@ -36,31 +37,26 @@
+  */
+ 
+ /* About */
+-ABOUT_BOX DIALOG DISCARDABLE  32, 32, 240, 105
++ABOUT_BOX DIALOGEX  32, 32, 260, 95
+ STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE | WS_TABSTOP  | DS_CENTERMOUSE
+ CAPTION "About " PROJECT_NAME
+-FONT 8, "MS Sans Serif"
++FONT 8, "MS Shell Dlg 2"
+ BEGIN
+-  CONTROL               PROJECT_NAME " Website", ID_ABOUT_WEBSITE, "Button",
+-                        BS_OWNERDRAW | WS_TABSTOP, 30, 45, 75, 15
+-  CONTROL               "Change Log", ID_ABOUT_CHANGELOG, "Button",
+-                        BS_OWNERDRAW | WS_TABSTOP, 135, 45, 75, 15
+-  CONTROL               "User's Guide", ID_ABOUT_UG, "Button",
+-                        BS_OWNERDRAW | WS_TABSTOP, 30, 65, 75, 15
+-  CONTROL               "FAQ", ID_ABOUT_FAQ, "Button",
+-                        BS_OWNERDRAW | WS_TABSTOP, 135, 65, 75, 15
+-
+-  DEFPUSHBUTTON		"Dismiss", IDOK, 95, 85, 50, 15
+-
+-  CTEXT			"Welcome to the preliminary About box for the " PROJECT_NAME " X Server.  This dialog was created on 2004/03/25 and will eventually be filled with more useful information.  For now, use the links below to learn more about the " PROJECT_NAME " project.", IDC_STATIC, 5, 5, 230, 35
++  CONTROL				IDI_XWIN, IDC_STATIC, "Static", SS_ICON, 8, 8, 32, 32
++  LTEXT			PROJECT_NAME " X Server ", IDC_STATIC, 36, 8, 220, 8
++  LTEXT			"Version " PROJECT_VERSION, IDC_STATIC, 36, 18, 220, 8
++  LTEXT			"This product is licensed under the terms of the MIT/X11 License.", IDC_STATIC, 36, 38, 220, 20
++  CONTROL               "http://x.cygwin.com/", ID_ABOUT_WEBSITE, "Button",
++                        BS_OWNERDRAW | WS_TABSTOP, 36, 58, 68, 8
++  DEFPUSHBUTTON		"OK", IDOK, 105, 75, 50, 15
+ END
+ 
+ 
+ /* Depth change */
+ 
+-DEPTH_CHANGE_BOX DIALOG DISCARDABLE	32, 32, 180, 100
++DEPTH_CHANGE_BOX DIALOGEX	32, 32, 180, 100
+ STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE | DS_CENTERMOUSE
+-FONT 8, "MS Sans Serif"
++FONT 8, "MS Shell Dlg 2"
+ CAPTION PROJECT_NAME
+ BEGIN
+   DEFPUSHBUTTON		"Dismiss", IDOK, 66, 80, 50, 14
+@@ -72,10 +68,10 @@
+ 
+ /* Exit */
+ 
+-EXIT_DIALOG DIALOG DISCARDABLE	32, 32, 180, 78
++EXIT_DIALOG DIALOGEX	32, 32, 180, 78
+ STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE | WS_TABSTOP | DS_CENTERMOUSE
+-FONT 8, "MS Sans Serif"
+-CAPTION PROJECT_NAME " - Exit?"
++FONT 8, "MS Shell Dlg 2"
++CAPTION "Exit " PROJECT_NAME "?"
+ BEGIN
+   PUSHBUTTON "E&xit", IDOK, 55, 56, 30, 14
+   DEFPUSHBUTTON "&Cancel", IDCANCEL, 95, 56, 30, 14
+@@ -89,14 +85,14 @@
+  * Menus
+  */
+ 
+-IDM_TRAYICON_MENU MENU DISCARDABLE
++IDM_TRAYICON_MENU MENU
+ BEGIN
+ 	POPUP "TRAYICON_MENU"
+ 	BEGIN
+ 		MENUITEM "&Hide Root Window", ID_APP_HIDE_ROOT
+ 		MENUITEM "&About...", ID_APP_ABOUT
+ 		MENUITEM SEPARATOR
+-		MENUITEM "E&xit", ID_APP_EXIT
++		MENUITEM "E&xit...", ID_APP_EXIT
+ 	END
+ END
+ 
+@@ -105,5 +101,5 @@
+  * Icons
+  */
+ 
+-IDI_XWIN		ICON	DISCARDABLE	"X.ico"
+-IDI_XWIN_BOXED		ICON	DISCARDABLE	"X-boxed.ico"
++IDI_XWIN		ICON	"X.ico"
++CREATEPROCESS_MANIFEST_RESOURCE_ID	RT_MANIFEST	"XWin.exe.manifest"
+--- origsrc/xorg-server-1.5.2/hw/xwin/windialogs.c	2008-11-01 23:34:53.641741800 -0500
++++ src/xorg-server-1.5.2/hw/xwin/windialogs.c	2008-11-02 01:18:24.522561400 -0600
+@@ -112,8 +112,8 @@
+     crText = RGB(0,0,128+64);
+   SetTextColor (draw->hDC, crText);
+   
+-  /* Create underlined font 14 high, standard dialog font */
+-  font = CreateFont (-14, 0, 0, 0, FW_NORMAL, FALSE, TRUE, FALSE,
++  /* Create font 8 high, standard dialog font */
++  font = CreateFont (-8, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE,
+ 		     0, 0, 0, 0, 0, "MS Sans Serif");
+   if (!font)
+     {
+--- origsrc/xorg-server-1.5.2/hw/xwin/winresource.h	2007-10-23 16:26:52.000000000 -0500
++++ src/xorg-server-1.5.2/hw/xwin/winresource.h	2008-11-02 01:31:01.270982800 -0600
+@@ -37,7 +37,6 @@
+ 
+ #define IDC_STATIC		-1
+ #define IDI_XWIN		101
+-#define IDI_XWIN_BOXED		102
+ #define IDM_TRAYICON_MENU	103
+ #define IDC_CLIENTS_CONNECTED	104
+ 
