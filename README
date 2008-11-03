@@ -99,6 +99,7 @@ Port Notes:
 
 ----- version 1.5.2-1 -----
 Version bump for X11R7.4.
+Incorporated several patches from the Xming project and from Jon Turney.
 Removed support for several obsolete X extensions.
 Added EXPERIMENTAL Composite support.
 
