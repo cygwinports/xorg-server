@@ -29,6 +29,7 @@ PATCH_URI="
 	1.5-glx-RTLD_LOCAL.patch
 	1.5-no-install-sdk-m4-or-pc.patch
 	1.5-prefix-is-usr.patch
+	1.5-xfake-build.patch
 	1.5-xwin-resources.patch
 "
 
@@ -58,6 +59,7 @@ src_compile() {
 		--sysconfdir=/etc/X11 \
 		--enable-kdrive \
 		--enable-xephyr \
+		--enable-xfake \
 		--enable-record \
 		--disable-config-hal \
 		--disable-dri \

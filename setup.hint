@@ -1,4 +1,4 @@
 category: X11
-requires: cygwin libX11_6 libfontenc1 libfreetype26 libX11_6 libXau6 libXdmcp6 libXext6 rgb xcursor-themes xkeyboard-config font-encodings font-alias font-misc-misc font-cursor-misc zlib
+requires: cygwin font-alias font-cursor-misc font-encodings font-misc-misc libfontenc1 libfreetype26 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 openssl rgb xcursor-themes xkeyboard-config zlib
 sdesc: "X.Org X servers"
 ldesc: "X.Org X servers"

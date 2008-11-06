@@ -1,5 +1,5 @@
---- origsrc/xorg-server-1.5.2/hw/xwin/XWin.exe.manifest	1969-12-31 18:00:00.000000000 -0600
-+++ src/xorg-server-1.5.2/hw/xwin/XWin.exe.manifest	2008-11-01 23:34:54.000000000 -0500
+--- origsrc/xorg-server-1.5.3/hw/xwin/XWin.exe.manifest	1969-12-31 18:00:00.000000000 -0600
++++ src/xorg-server-1.5.3/hw/xwin/XWin.exe.manifest	2008-11-05 14:58:21.000000000 -0600
 @@ -0,0 +1,16 @@
 +<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 +<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
@@ -17,8 +17,8 @@
 +	   </dependentAssembly>
 +	</dependency>
 +</assembly>
---- origsrc/xorg-server-1.5.2/hw/xwin/XWin.rc	2008-11-01 23:50:22.188146400 -0500
-+++ src/xorg-server-1.5.2/hw/xwin/XWin.rc	2008-11-02 01:27:26.586230800 -0600
+--- origsrc/xorg-server-1.5.3/hw/xwin/XWin.rc	2008-11-05 15:16:13.938287900 -0600
++++ src/xorg-server-1.5.3/hw/xwin/XWin.rc	2008-11-05 15:28:21.523172900 -0600
 @@ -1,5 +1,6 @@
  /*
   *Copyright (C) 2002-2004 Harold L Hunt II All Rights Reserved.
@@ -26,7 +26,7 @@
   *
   *Permission is hereby granted, free of charge, to any person obtaining
   * a copy of this software and associated documentation files (the
-@@ -20,12 +21,12 @@
+@@ -20,47 +21,43 @@
   *CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   *WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   *
@@ -41,8 +41,13 @@
 + * Authors:	Harold L Hunt II, Yaakov Selkowitz
   */
  
- #include "windows.h"
-@@ -36,31 +37,26 @@
+-#include "windows.h"
++#include <windows.h>
+ #include "winresource.h"
++#include "xwin-config.h"
+ 
+ /*
+  * Dialogs
   */
  
  /* About */
@@ -69,7 +74,7 @@
 +  LTEXT			PROJECT_NAME " X Server ", IDC_STATIC, 36, 8, 220, 8
 +  LTEXT			"Version " PROJECT_VERSION, IDC_STATIC, 36, 18, 220, 8
 +  LTEXT			"This product is licensed under the terms of the MIT/X11 License.", IDC_STATIC, 36, 38, 220, 20
-+  CONTROL               "http://x.cygwin.com/", ID_ABOUT_WEBSITE, "Button",
++  CONTROL               __VENDORDWEBSUPPORT__, ID_ABOUT_WEBSITE, "Button",
 +                        BS_OWNERDRAW | WS_TABSTOP, 36, 58, 68, 8
 +  DEFPUSHBUTTON		"OK", IDOK, 105, 75, 50, 15
  END
@@ -85,7 +90,7 @@
  CAPTION PROJECT_NAME
  BEGIN
    DEFPUSHBUTTON		"Dismiss", IDOK, 66, 80, 50, 14
-@@ -72,10 +68,10 @@
+@@ -72,10 +69,10 @@
  
  /* Exit */
  
@@ -99,7 +104,7 @@
  BEGIN
    PUSHBUTTON "E&xit", IDOK, 55, 56, 30, 14
    DEFPUSHBUTTON "&Cancel", IDCANCEL, 95, 56, 30, 14
-@@ -89,14 +85,14 @@
+@@ -89,14 +86,14 @@
   * Menus
   */
  
@@ -116,7 +121,7 @@
  	END
  END
  
-@@ -105,5 +101,5 @@
+@@ -105,5 +102,5 @@
   * Icons
   */
  
@@ -124,8 +129,8 @@
 -IDI_XWIN_BOXED		ICON	DISCARDABLE	"X-boxed.ico"
 +IDI_XWIN		ICON	"X.ico"
 +CREATEPROCESS_MANIFEST_RESOURCE_ID	RT_MANIFEST	"XWin.exe.manifest"
---- origsrc/xorg-server-1.5.2/hw/xwin/windialogs.c	2008-11-01 23:34:53.641741800 -0500
-+++ src/xorg-server-1.5.2/hw/xwin/windialogs.c	2008-11-02 01:18:24.522561400 -0600
+--- origsrc/xorg-server-1.5.3/hw/xwin/windialogs.c	2008-11-05 15:16:13.953912900 -0600
++++ src/xorg-server-1.5.3/hw/xwin/windialogs.c	2008-11-05 14:58:21.000000000 -0600
 @@ -112,8 +112,8 @@
      crText = RGB(0,0,128+64);
    SetTextColor (draw->hDC, crText);
@@ -137,8 +142,17 @@
  		     0, 0, 0, 0, 0, "MS Sans Serif");
    if (!font)
      {
---- origsrc/xorg-server-1.5.2/hw/xwin/winresource.h	2007-10-23 16:26:52.000000000 -0500
-+++ src/xorg-server-1.5.2/hw/xwin/winresource.h	2008-11-02 01:31:01.270982800 -0600
+@@ -697,7 +697,7 @@
+ 
+ 	case ID_ABOUT_WEBSITE:
+ 	  {
+-	    const char *	pszPath = "http://x.cygwin.com/";
++	    const char *	pszPath = __VENDORDWEBSUPPORT__;
+ 	    int			iReturn;
+ 	    
+ 	    iReturn = (int) ShellExecute (NULL,
+--- origsrc/xorg-server-1.5.3/hw/xwin/winresource.h	2008-11-05 15:16:13.953912900 -0600
++++ src/xorg-server-1.5.3/hw/xwin/winresource.h	2008-11-05 14:58:21.000000000 -0600
 @@ -37,7 +37,6 @@
  
  #define IDC_STATIC		-1

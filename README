@@ -63,15 +63,15 @@ Canonical download:
 -------------------------------------------
 
 Build instructions:
-  unpack xorg-server-1.5.2-X-src.tar.bz2
+  unpack xorg-server-1.5.3-X-src.tar.bz2
     if you use setup to install this src package, it will be
 	 unpacked under /usr/src automatically
   cd /usr/src
-  cygport ./xorg-server-1.5.2-X.cygport all
+  cygport ./xorg-server-1.5.3-X.cygport all
 
 This will create:
-  /usr/src/xorg-server-1.5.2-X-src.tar.bz2
-  /usr/src/xorg-server-1.5.2-X.tar.bz2
+  /usr/src/xorg-server-1.5.3-X-src.tar.bz2
+  /usr/src/xorg-server-1.5.3-X.tar.bz2
 
 -------------------------------------------
 
@@ -80,13 +80,14 @@ Files included in the binary package:
   /usr/bin/X
   /usr/bin/XWin.exe
   /usr/bin/Xephyr.exe
+  /usr/bin/Xfake.exe
   /usr/bin/Xnest.exe
   /usr/bin/Xvfb.exe
   /usr/lib/X11/system.XWinrc
   /usr/lib/xorg/protocol.txt
   /usr/share/X11/xkb/compiled/README.compiled
-  /usr/share/doc/xorg-server-1.5.2/COPYING
-  /usr/share/doc/xorg-server-1.5.2/ChangeLog
+  /usr/share/doc/xorg-server-1.5.3/COPYING
+  /usr/share/doc/xorg-server-1.5.3/ChangeLog
   /usr/share/man/man1/XWin.1.gz
   /usr/share/man/man1/Xnest.1.gz
   /usr/share/man/man1/Xserver.1.gz
@@ -96,6 +97,10 @@ Files included in the binary package:
 ------------------
 
 Port Notes:
+
+----- version 1.5.3-1 -----
+Version bump.
+Added Xfake server.
 
 ----- version 1.5.2-1 -----
 Version bump for X11R7.4.

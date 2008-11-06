@@ -13,9 +13,9 @@ Windows to X, and some windows are drawn expecting them to be exactly the reqeus
 
 ---
  xserver/hw/xwin/winmultiwindowshape.c   |   14 ++++++++++
- xserver/hw/xwin/winmultiwindowwm.c      |    7 ++++-
+ xserver/hw/xwin/winmultiwindowwm.c      |    5 +++
  xserver/hw/xwin/winmultiwindowwndproc.c |   42 ++++++++++++++++++++++++--------
- 3 files changed, 52 insertions(+), 11 deletions(-)
+ 3 files changed, 50 insertions(+), 11 deletions(-)
 
 Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowshape.c
 ===================================================================
@@ -50,16 +50,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwm.c
 ===================================================================
 --- xorg-server-1.5.2.orig/xserver/hw/xwin/winmultiwindowwm.c
 +++ xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwm.c
-@@ -1466,6 +1466,8 @@ ApplyHints (Display *pDisplay, Window iW
-   if (!hWnd) return;
-   if (!IsWindow (hWnd)) return;
- 
-+  ErrorF("ApplyHints: hWnd 0x%x\n", hWnd);
-+
-   if (windowType == None) windowType = XInternAtom(pDisplay, "_NET_WM_WINDOW_TYPE", False);
-   if (windowState == None) windowState = XInternAtom(pDisplay, "_NET_WM_STATE", False);
-   if (motif_wm_hints == None) motif_wm_hints = XInternAtom(pDisplay, "_MOTIF_WM_HINTS", False);
-@@ -1486,12 +1488,13 @@ ApplyHints (Display *pDisplay, Window iW
+@@ -1486,12 +1486,13 @@ ApplyHints (Display *pDisplay, Window iW
        {
  	SetWindowLongPtr (hWnd, GWL_STYLE, (GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW) | WS_SIZEBOX);
  	SetWindowPos (hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED | SWP_NOACTIVATE);
@@ -74,7 +65,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwm.c
        }
      }
    }
-@@ -1534,6 +1537,8 @@ ApplyHints (Display *pDisplay, Window iW
+@@ -1534,6 +1535,8 @@ ApplyHints (Display *pDisplay, Window iW
        {
  	SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
  	SetWindowPos (hWnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
