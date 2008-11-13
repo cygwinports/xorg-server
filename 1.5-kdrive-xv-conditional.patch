@@ -1,0 +1,25 @@
+--- origsrc/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-05 10:52:17.000000000 -0600
++++ src/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-13 15:48:46.357117400 -0600
+@@ -12,6 +12,12 @@
+ 	vga.h
+ endif
+ 
++if XV
++KDRIVE_XV_SOURCES = \
++	kxv.c		\
++	kxv.h
++endif
++
+ libkdrive_a_SOURCES =	\
+ 	fourcc.h	\
+ 	kaa.c		\
+@@ -31,8 +37,7 @@
+ 	koffscreen.c	\
+ 	kshadow.c	\
+ 	ktest.c		\
+-	kxv.c		\
+-	kxv.h		\
++	$(KDRIVE_XV_SOURCES) \
+ 	$(KDRIVE_HW_SOURCES) \
+         $(top_srcdir)/mi/miinitext.c
+ 

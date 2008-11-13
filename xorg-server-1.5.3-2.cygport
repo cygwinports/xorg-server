@@ -30,6 +30,7 @@ PATCH_URI="
 	1.5-composite.patch
 	1.5-glx-RTLD_LOCAL.patch
 	1.5-no-install-sdk-m4-or-pc.patch
+	1.5-kdrive-xv-conditional.patch
 	1.5-xfake-build.patch
 	1.5-xwin-resources.patch
 	1.5-log-in-var-log.patch
