@@ -1,26 +1,24 @@
 Hint handling fixes
 
-When a hint removes titlebar/border, the windows clipping region for shape must be updated
-Also respect the systems ownership of the clipping region
+Respect the systems ownership of the clipping region
 
-Don't stop hint processing on _NET_WM_WINDOW_TYPE_DIALOG, it may have other hints
-(e.g. BMPx about window)
-
-When the style changes because a hint has been applied, adjust the window size so the client
-area remains the same. Otherwise the window size may change when sizing is reflected from 
+When the style changes, adjust the window size so the client area remains the same. 
+Otherwise the window size may change when sizing is reflected from 
 Windows to X, and some windows are drawn expecting them to be exactly the reqeusted size
 (e.g. gmplayer control window)
 
+Use the current style in determining the window border when validating which sizing
+XXX: Needs to allow for different border thickness when uncaptioned?
+
 ---
  xserver/hw/xwin/winmultiwindowshape.c   |   14 ++++++++++
- xserver/hw/xwin/winmultiwindowwm.c      |    5 +++
- xserver/hw/xwin/winmultiwindowwndproc.c |   42 ++++++++++++++++++++++++--------
- 3 files changed, 50 insertions(+), 11 deletions(-)
+ xserver/hw/xwin/winmultiwindowwndproc.c |   43 +++++++++++++++++++++++++-------
+ 2 files changed, 48 insertions(+), 9 deletions(-)
 
-Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowshape.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winmultiwindowshape.c
-+++ xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowshape.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowshape.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
 @@ -73,6 +73,9 @@ winUpdateRgnMultiWindow (WindowPtr pWin)
  {
    SetWindowRgn (winGetWindowPriv(pWin)->hWnd,
@@ -46,46 +44,25 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowshape.c
 +      winUpdateRgnMultiWindow(pWin);
 +    }
 +}
-Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwm.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winmultiwindowwm.c
-+++ xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwm.c
-@@ -1486,12 +1486,13 @@ ApplyHints (Display *pDisplay, Window iW
-       {
- 	SetWindowLongPtr (hWnd, GWL_STYLE, (GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW) | WS_SIZEBOX);
- 	SetWindowPos (hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED | SWP_NOACTIVATE);
-+	/* Recalculate shape clipping region */
-+	winShapeRgnUpdateMultiwindow(hWnd);
- 	return;
-       }
-       else if (a == dialogWindow)
-       {
- 	SetForegroundWindow (hWnd);
--	return;
-       }
-     }
-   }
-@@ -1534,6 +1535,8 @@ ApplyHints (Display *pDisplay, Window iW
-       {
- 	SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
- 	SetWindowPos (hWnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
-+	/* Recalculate shape clipping region */
-+	winShapeRgnUpdateMultiwindow(hWnd);
- 	return;
-       }
-     }
-Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwndproc.c
-===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winmultiwindowwndproc.c
-+++ xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwndproc.c
-@@ -230,20 +230,31 @@ ValidateSizing (HWND hwnd, WindowPtr pWi
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
+@@ -210,6 +210,7 @@ ValidateSizing (HWND hwnd, WindowPtr pWi
+   WinXSizeHints sizeHints;
+   RECT *rect;
+   int iWidth, iHeight;
++  unsigned long rcStyle;
+ 
+   /* Invalid input checking */
+   if (pWin==NULL || lParam==0)
+@@ -231,19 +232,31 @@ ValidateSizing (HWND hwnd, WindowPtr pWi
    iWidth = rect->right - rect->left;
    iHeight = rect->bottom - rect->top;
  
 -  /* Now remove size of any borders */
--  rcStyle = winOverrideStyle((unsigned long)pWin);
 -  iWidth -= 2 * GetSystemMetrics(SM_CXSIZEFRAME);
--  iHeight -= (((rcStyle & STYLE_NOTITLE) ? 0 : GetSystemMetrics(SM_CYCAPTION))
+-  iHeight -= (GetSystemMetrics(SM_CYCAPTION)
 -	      + 2 * GetSystemMetrics(SM_CYSIZEFRAME));
 -	      
 +  /* Now remove size of any borders and title bar */
@@ -105,7 +82,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwndproc.c
  
 -  /* Add back the borders */
 -  iWidth += 2 * GetSystemMetrics(SM_CXSIZEFRAME);
--  iHeight += (((rcStyle & STYLE_NOTITLE) ? 0 : GetSystemMetrics(SM_CYCAPTION))
+-  iHeight += (GetSystemMetrics(SM_CYCAPTION)
 -	      + 2 * GetSystemMetrics(SM_CYSIZEFRAME));
 +  /* Add back the size of borders and title bar */
 +  if (rcStyle & WS_CAPTION)
@@ -120,7 +97,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winmultiwindowwndproc.c
  
    /* Adjust size according to where we're dragging from */
    switch(wParam) {
-@@ -1050,6 +1061,17 @@ winTopLevelWindowProc (HWND hwnd, UINT m
+@@ -991,6 +1005,17 @@ winTopLevelWindowProc (HWND hwnd, UINT m
        if (wParam == SIZE_MINIMIZED) winReorderWindowsMultiWindow();
        return 0; /* end of WM_SIZE handler */
  

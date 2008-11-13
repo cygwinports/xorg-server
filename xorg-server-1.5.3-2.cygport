@@ -11,6 +11,7 @@ PATCH_URI="
 	cygwin-fix-windowswm-window-naming.patch
 	cygwin-should-also-use-gettickcount.patch
 	cygwin-fdo-bugzilla-4491-transparent-icon-background-fix.patch
+	cygwin-net_wm_icon-support.patch
 
 	from-xming-add-keyboard-layouts.patch
 	from-xming-correct-tooltip-and-window-title.patch
@@ -23,14 +24,17 @@ PATCH_URI="
 
 	cygwin-fix-silent-dup-error.patch
 	cygwin-hint-handling-fixes.patch
+	cygwin-window-placement.patch
 
 	1.3-ddxBeforeReset.patch
 	1.5-composite.patch
 	1.5-glx-RTLD_LOCAL.patch
 	1.5-no-install-sdk-m4-or-pc.patch
-	1.5-prefix-is-usr.patch
 	1.5-xfake-build.patch
 	1.5-xwin-resources.patch
+	1.5-log-in-var-log.patch
+	1.5-system_XWinrc-in-etc.patch
+	1.5-manpage-fixups.patch
 "
 
 DIFF_EXCLUDES="xf86Build.h *-config.h xorg-server.h"
@@ -38,6 +42,9 @@ DIFF_EXCLUDES="xf86Build.h *-config.h xorg-server.h"
 CYGPORT_USE_UNSTABLE_API=1
 src_unpack_hook() {
 	mv -f X.ico hw/xwin/X.ico
+
+	# just in case we are running prep() a second time
+	rm -f hw/xwin/XWin.exe.manifest
 }
 
 src_compile() {
@@ -56,7 +63,6 @@ src_compile() {
 	# Record disabled by default, but is required for libXtst, still in use
 	cd ${B}
 	cygconf \
-		--sysconfdir=/etc/X11 \
 		--enable-kdrive \
 		--enable-xephyr \
 		--enable-xfake \
@@ -72,9 +78,11 @@ src_compile() {
 		--disable-xv \
 		--disable-xvmc \
 		--with-fontdir=/usr/share/fonts \
-		--with-log-dir=/tmp \
-		--with-os-name='Cygwin' \
-		--with-os-vendor='Cygwin' \
+		--with-log-dir=/var/log \
+		--with-serverconfig-path=/usr/lib/X11 \
+		--with-xkb-output=/var/lib/xkb \
+		"--with-os-name=Cygwin" \
+		"--with-os-vendor=Red Hat" \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
 		"--with-vendor-name=The Cygwin/X Project" \
 		"--with-vendor-name-short=Cygwin/X" \
@@ -89,11 +97,15 @@ src_install() {
 
 	dosym XWin.exe /usr/bin/X
 
-	# XWinrc belongs in section 5
-	dodir /usr/share/man/man5
-	mv ${D}/usr/share/man/man1/XWinrc.1 ${D}/usr/share/man/man5/XWinrc.5
+	# FIXME: use cpprules.in in hw/xwin/Makefile.am
+	sed -e "s|__vendorversion__|\"${PN} ${PV}\" \"X Version 11\"|g" \
+		-e 's|__filemansuffix__|5|g' \
+		-e 's|__miscmansuffix__|7|g' \
+		-e 's|__datadir__|/usr/share|g' \
+		-e 's|__sysconfdir__|/etc|g' \
+		-e 's|__logdir__|/var/log|g' \
+		-i ${D}/usr/share/man/man*/*.*
 
-	# Move to SYSCONFDIR (/etc/X11) ?
-	insinto /usr/lib/X11
+	insinto /etc/X11
 	newins ${S}/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc system.XWinrc
 }

@@ -1,0 +1,55 @@
+Cygwin: Window placement refinements
+
+Ensure window actually ends up somewhere visible if it tries to create itself offscreen
+Don't allow window decoration to disappear off to top-left as a result of adjustments to add window styles
+
+---
+ xserver/hw/xwin/winmultiwindowwindow.c |    7 +++++++
+ xserver/hw/xwin/winmultiwindowwm.c     |    9 ++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwindow.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
+@@ -511,6 +511,13 @@ winCreateWindowsWindow (WindowPtr pWin)
+   iWidth = pWin->drawable.width;
+   iHeight = pWin->drawable.height;
+ 
++  /* ensure window actually ends up somewhere visible */
++  if (iX > GetSystemMetrics (SM_CXVIRTUALSCREEN))
++    iX = CW_USEDEFAULT;
++
++  if (iY > GetSystemMetrics (SM_CYVIRTUALSCREEN))
++    iY = CW_USEDEFAULT;
++
+   winSelectIcons(pWin, &hIcon, &hIconSmall); 
+ 
+   /* Set standard class name prefix so we can identify window easily */
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwm.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
+@@ -1603,6 +1603,13 @@ winUpdateWindowPosition (HWND hWnd, Bool
+   iDx = pDraw->x - rcNew.left;
+   iDy = pDraw->y - rcNew.top;
+ 
++  /* Don't allow window decoration to disappear off to top-left as a result of this adjustment */
++  if ((rcNew.left + iDx) < GetSystemMetrics(SM_YVIRTUALSCREEN))
++    iDx = GetSystemMetrics(SM_YVIRTUALSCREEN) - rcNew.left;
++
++  if ((rcNew.top + iDy) < GetSystemMetrics(SM_XVIRTUALSCREEN))
++    iDy = GetSystemMetrics(SM_XVIRTUALSCREEN) - rcNew.top;
++
+   /* Calculate new rectangle */
+   rcNew.left += iDx;
+   rcNew.right += iDx;
+@@ -1618,7 +1625,7 @@ winUpdateWindowPosition (HWND hWnd, Bool
+   /* Position the Windows window */
+   SetWindowPos (hWnd, *zstyle, rcNew.left, rcNew.top,
+ 	rcNew.right - rcNew.left, rcNew.bottom - rcNew.top,
+-	SWP_NOMOVE);
++	0);
+ 
+   if (reshape)
+   {

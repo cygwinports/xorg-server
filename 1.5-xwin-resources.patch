@@ -1,5 +1,17 @@
---- origsrc/xorg-server-1.5.3/hw/xwin/XWin.exe.manifest	1969-12-31 18:00:00.000000000 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/XWin.exe.manifest	2008-11-05 14:58:21.000000000 -0600
+---
+ xserver/configure.ac              |    1 
+ xserver/hw/xwin/Makefile.am       |    2 -
+ xserver/hw/xwin/XWin.exe.manifest |   16 +++++++++++
+ xserver/hw/xwin/XWin.rc           |   51 +++++++++++++++++---------------------
+ xserver/hw/xwin/windialogs.c      |    6 ++--
+ xserver/hw/xwin/winresource.h     |    1 
+ xserver/include/xwin-config.h.in  |    1 
+ 7 files changed, 45 insertions(+), 33 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/XWin.exe.manifest
+===================================================================
+--- /dev/null
++++ xorg-server-1.5.3/xserver/hw/xwin/XWin.exe.manifest
 @@ -0,0 +1,16 @@
 +<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 +<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
@@ -17,8 +29,10 @@
 +	   </dependentAssembly>
 +	</dependency>
 +</assembly>
---- origsrc/xorg-server-1.5.3/hw/xwin/XWin.rc	2008-11-05 15:16:13.938287900 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/XWin.rc	2008-11-05 15:28:21.523172900 -0600
+Index: xorg-server-1.5.3/xserver/hw/xwin/XWin.rc
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/XWin.rc
++++ xorg-server-1.5.3/xserver/hw/xwin/XWin.rc
 @@ -1,5 +1,6 @@
  /*
   *Copyright (C) 2002-2004 Harold L Hunt II All Rights Reserved.
@@ -90,7 +104,7 @@
  CAPTION PROJECT_NAME
  BEGIN
    DEFPUSHBUTTON		"Dismiss", IDOK, 66, 80, 50, 14
-@@ -72,10 +69,10 @@
+@@ -72,10 +69,10 @@ END
  
  /* Exit */
  
@@ -104,7 +118,7 @@
  BEGIN
    PUSHBUTTON "E&xit", IDOK, 55, 56, 30, 14
    DEFPUSHBUTTON "&Cancel", IDCANCEL, 95, 56, 30, 14
-@@ -89,14 +86,14 @@
+@@ -89,14 +86,14 @@ END
   * Menus
   */
  
@@ -121,7 +135,7 @@
  	END
  END
  
-@@ -105,5 +102,5 @@
+@@ -105,5 +102,5 @@ END
   * Icons
   */
  
@@ -129,9 +143,11 @@
 -IDI_XWIN_BOXED		ICON	DISCARDABLE	"X-boxed.ico"
 +IDI_XWIN		ICON	"X.ico"
 +CREATEPROCESS_MANIFEST_RESOURCE_ID	RT_MANIFEST	"XWin.exe.manifest"
---- origsrc/xorg-server-1.5.3/hw/xwin/windialogs.c	2008-11-05 15:16:13.953912900 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/windialogs.c	2008-11-05 14:58:21.000000000 -0600
-@@ -112,8 +112,8 @@
+Index: xorg-server-1.5.3/xserver/hw/xwin/windialogs.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/windialogs.c
++++ xorg-server-1.5.3/xserver/hw/xwin/windialogs.c
+@@ -112,8 +112,8 @@ winDrawURLWindow (LPARAM lParam)
      crText = RGB(0,0,128+64);
    SetTextColor (draw->hDC, crText);
    
@@ -142,7 +158,7 @@
  		     0, 0, 0, 0, 0, "MS Sans Serif");
    if (!font)
      {
-@@ -697,7 +697,7 @@
+@@ -706,7 +706,7 @@ winAboutDlgProc (HWND hwndDialog, UINT m
  
  	case ID_ABOUT_WEBSITE:
  	  {
@@ -151,8 +167,10 @@
  	    int			iReturn;
  	    
  	    iReturn = (int) ShellExecute (NULL,
---- origsrc/xorg-server-1.5.3/hw/xwin/winresource.h	2008-11-05 15:16:13.953912900 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/winresource.h	2008-11-05 14:58:21.000000000 -0600
+Index: xorg-server-1.5.3/xserver/hw/xwin/winresource.h
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winresource.h
++++ xorg-server-1.5.3/xserver/hw/xwin/winresource.h
 @@ -37,7 +37,6 @@
  
  #define IDC_STATIC		-1
@@ -161,3 +179,42 @@
  #define IDM_TRAYICON_MENU	103
  #define IDC_CLIENTS_CONNECTED	104
  
+Index: xorg-server-1.5.3/xserver/configure.ac
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/configure.ac
++++ xorg-server-1.5.3/xserver/configure.ac
+@@ -1660,6 +1660,7 @@ AC_MSG_RESULT([$XWIN])
+ 
+ if test "x$XWIN" = xyes; then
+ 	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
++	AC_DEFINE_UNQUOTED(__VENDORDWEBSUPPORT__, ["$VENDOR_WEB"], [Vendor web address for support])
+ 	AC_CHECK_TOOL(WINDRES, windres)
+ 	case $host_os in
+ 		cygwin*)
+Index: xorg-server-1.5.3/xserver/include/xwin-config.h.in
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/include/xwin-config.h.in
++++ xorg-server-1.5.3/xserver/include/xwin-config.h.in
+@@ -21,4 +21,7 @@
+ #undef _XSERVER64
+ 
+ /* Do we require our own snprintf? */
+-#undef NEED_SNPRINTF
++#undef NEED_SNPRINTF
++
++/* Vendor web address for support */
++#undef __VENDORDWEBSUPPORT__
+\ No newline at end of file
+Index: xorg-server-1.5.3/xserver/hw/xwin/Makefile.am
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/Makefile.am
++++ xorg-server-1.5.3/xserver/hw/xwin/Makefile.am
+@@ -152,7 +152,7 @@ XWin_LDADD = $(XWIN_LIBS) $(XSERVER_LIBS
+ XWin_LDFLAGS = -mwindows
+ 
+ .rc.o:
+-	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -I $(top_builddir)/include -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\"
++	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -I $(top_builddir)/include -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\" -DPROJECT_VERSION=\"$(PACKAGE_VERSION)\"
+ 
+ winprefsyacc.h: winprefsyacc.c
+ winprefslex.c: winprefslex.l winprefsyacc.c winprefsyacc.h

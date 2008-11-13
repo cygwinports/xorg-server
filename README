@@ -17,14 +17,16 @@ Runtime requirements:
   libXext6-1.0.4-1
   openssl-0.9.8i-1
   rgb-1.0.3-1
+  xauth-1.0.3-1
   xcursor-themes-1.0.1-1
+  xkbcomp-1.0.5-1
   xkeyboard-config-1.4-1
   zlib-1.2.3-2
 
 Build requirements:
 (besides corresponding devel packages)
   autoconf2.5-2.63-1
-  automake1.10-1.10.1-1
+  automake1.10-1.10.1-2
   binutils-20080624-2
   cygport-0.4.2-1
   gawk-3.1.6-1
@@ -52,7 +54,7 @@ Build requirements:
   xextproto-7.0.3-1
   xorg-util-macros-1.1.6-1
   xproto-7.0.14-1
-  xtrans-1.2.2-1 
+  xtrans-1.2.2-2
 
 Canonical website:
   http://xorg.freedesktop.org/
@@ -77,15 +79,14 @@ This will create:
 
 Files included in the binary package:
 
+  /etc/X11/system.XWinrc
   /usr/bin/X
   /usr/bin/XWin.exe
   /usr/bin/Xephyr.exe
   /usr/bin/Xfake.exe
   /usr/bin/Xnest.exe
   /usr/bin/Xvfb.exe
-  /usr/lib/X11/system.XWinrc
-  /usr/lib/xorg/protocol.txt
-  /usr/share/X11/xkb/compiled/README.compiled
+  /usr/lib/X11/protocol.txt
   /usr/share/doc/xorg-server-1.5.3/COPYING
   /usr/share/doc/xorg-server-1.5.3/ChangeLog
   /usr/share/man/man1/XWin.1.gz
@@ -93,10 +94,20 @@ Files included in the binary package:
   /usr/share/man/man1/Xserver.1.gz
   /usr/share/man/man1/Xvfb.1.gz
   /usr/share/man/man5/XWinrc.5.gz
+  /var/lib/xkb/compiled/README.compiled
 
 ------------------
 
 Port Notes:
+
+----- version 1.5.3-2 -----
+Additional fixes to multiwindow mode:
+- Qt4 program icons display correctly;
+- Window geometry take window decorations into account;
+- Shaped window decorations do not appear and disappear.
+Moved system.XWinrc to /etc/X11.
+Moved XWin.log to /var/log.
+Fixed up man pages.
 
 ----- version 1.5.3-1 -----
 Version bump.

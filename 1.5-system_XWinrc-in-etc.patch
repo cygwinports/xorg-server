@@ -1,0 +1,50 @@
+--- origsrc/xorg-server-1.5.3/configure.ac	2008-11-12 23:41:44.051237400 -0600
++++ src/xorg-server-1.5.3/configure.ac	2008-11-13 00:53:52.598377400 -0600
+@@ -1659,6 +1659,7 @@
+ AC_MSG_RESULT([$XWIN])
+ 
+ if test "x$XWIN" = xyes; then
++	AC_DEFINE_DIR(SYSCONFDIR, sysconfdir, [Location of system.XWinrc])
+ 	AC_DEFINE_DIR(DEFAULT_LOGDIR, logdir, [Default log location])
+ 	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
+ 	AC_DEFINE_UNQUOTED(__VENDORDWEBSUPPORT__, ["$VENDOR_WEB"], [Vendor web address for support])
+--- origsrc/xorg-server-1.5.3/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc	2008-11-12 23:41:42.551237400 -0600
++++ src/xorg-server-1.5.3/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc	2008-11-13 00:29:58.520252400 -0600
+@@ -1,7 +1,7 @@
+ # XWin Server Resource File - EXAMPLE
+ # Earle F. Philhower, III
+ 
+-# Place in ~/.XWinrc or in /usr/X11R6/lib/X11/system.XWinrc
++# Place in ~/.XWinrc or in /etc/X11/system.XWinrc
+ 
+ # Keywords are case insensitive, comments legal pretty much anywhere
+ # you can have an end-of-line
+--- origsrc/xorg-server-1.5.3/hw/xwin/winprefs.c	2008-11-12 23:41:42.566862400 -0600
++++ src/xorg-server-1.5.3/hw/xwin/winprefs.c	2008-11-13 00:31:33.614002400 -0600
+@@ -726,7 +726,7 @@
+ 
+ 
+ /*
+- * Try and open ~/.XWinrc and /usr/X11R6/lib/X11/system.XWinrc
++ * Try and open ~/.XWinrc and system.XWinrc
+  * Load it into prefs structure for use by other functions
+  */
+ void
+@@ -766,7 +766,7 @@
+ #ifdef RELOCATE_PROJECTROOT
+       snprintf(buffer, sizeof(buffer), "%s\\system.XWinrc", winGetBaseDir());
+ #else
+-      strncpy(buffer, PROJECTROOT"/lib/X11/system.XWinrc", sizeof(buffer));
++      strncpy(buffer, SYSCONFDIR"/X11/system.XWinrc", sizeof(buffer));
+ #endif
+       buffer[sizeof(buffer)-1] = 0;
+       prefFile = fopen (buffer, "r");
+--- origsrc/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-12 23:41:44.082487400 -0600
++++ src/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-13 00:54:20.895252400 -0600
+@@ -28,3 +28,6 @@
+ 
+ /* Default log location */
+ #undef DEFAULT_LOGDIR
++
++/* Location of system.XWinrc */
++#undef SYSCONFDIR

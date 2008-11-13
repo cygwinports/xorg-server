@@ -1,5 +1,11 @@
---- origsrc/xorg-server-1.5.2/glx/glxdriswrast.c	2008-10-10 13:12:48.000000000 -0500
-+++ src/xorg-server-1.5.2/glx/glxdriswrast.c	2008-10-28 16:04:48.633516100 -0500
+---
+ xserver/glx/glxdriswrast.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+Index: xorg-server-1.5.3/xserver/glx/glxdriswrast.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/glx/glxdriswrast.c
++++ xorg-server-1.5.3/xserver/glx/glxdriswrast.c
 @@ -55,6 +55,10 @@
  #include "dispatch.h"
  #include "extension_string.h"

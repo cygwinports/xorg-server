@@ -5,17 +5,17 @@ http://www.straightrunning.com/XmingNotes/
 http://sourceforge.net/projects/xming/ 
 
 ---
- xserver/hw/xwin/XWinrc.man     |   69 ++++++++++++++++++++++++++++++++++---
+ xserver/hw/xwin/XWinrc.man     |   69 +++++++++++++++++++++++++++++++++---
  xserver/hw/xwin/winprefs.c     |   48 +++++++++++++++++++++++++
- xserver/hw/xwin/winprefs.h     |   22 +++++++++++
- xserver/hw/xwin/winprefslex.l  |    8 ++++
- xserver/hw/xwin/winprefsyacc.y |   76 ++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 217 insertions(+), 6 deletions(-)
+ xserver/hw/xwin/winprefs.h     |   24 ++++++++++++
+ xserver/hw/xwin/winprefslex.l  |   10 +++++
+ xserver/hw/xwin/winprefsyacc.y |   78 ++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 223 insertions(+), 6 deletions(-)
 
-Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winprefs.c
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefs.c
-+++ xorg-server-1.5.2/xserver/hw/xwin/winprefs.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winprefs.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winprefs.c
 @@ -1,5 +1,6 @@
  /*
   * Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
@@ -81,10 +81,10 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.c
 +
 +  return STYLE_NONE;
 +}
-Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
+Index: xorg-server-1.5.3/xserver/hw/xwin/winprefs.h
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefs.h
-+++ xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winprefs.h
++++ xorg-server-1.5.3/xserver/hw/xwin/winprefs.h
 @@ -2,6 +2,7 @@
  #define WINPREFS_H
  /*
@@ -101,21 +101,23 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
   */
  
  /* Need Bool */
-@@ -57,6 +59,13 @@ typedef enum MENUCOMMANDTYPE
+@@ -57,6 +59,15 @@ typedef enum MENUCOMMANDTYPE
    CMD_RELOAD        /* Reparse the .XWINRC file            */
  } MENUCOMMANDTYPE;
  
-+#define STYLE_NONE     (0L)    /* Dummy the first entry               */
-+#define STYLE_NOTITLE  (1L)    /* Force window style no titlebar      */
-+#define STYLE_NOFRAME  (1L<<1) /* Force window style no frame         */
-+#define STYLE_TOPMOST  (1L<<2) /* Open a window always-on-top         */
-+#define STYLE_MAXIMIZE (1L<<3) /* Open a window maximized             */
-+#define STYLE_MINIMIZE (1L<<4) /* Open a window minimized             */
++#define STYLE_NONE     (0L)    /* Dummy the first entry                      */
++#define STYLE_NOTITLE  (1L)    /* Force window style no titlebar             */
++#define STYLE_OUTLINE  (1L<<1) /* Force window style just thin-line border   */
++#define STYLE_NOFRAME  (1L<<2) /* Force window style no frame                */
++#define STYLE_TOPMOST  (1L<<3) /* Open a window always-on-top                */
++#define STYLE_MAXIMIZE (1L<<4) /* Open a window maximized                    */
++#define STYLE_MINIMIZE (1L<<5) /* Open a window minimized                    */
++#define STYLE_BOTTOM   (1L<<6) /* Open a window at the bottom of the Z order */
 +
  /* Where to place a system menu */
  typedef enum MENUPOSITION
  {
-@@ -97,6 +106,13 @@ typedef struct ICONITEM
+@@ -97,6 +108,13 @@ typedef struct ICONITEM
    unsigned long hicon;                /* LoadImage() result */
  } ICONITEM;
  
@@ -129,7 +131,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
  typedef struct WINPREFS
  {
    /* Menu information */
-@@ -122,6 +138,9 @@ typedef struct WINPREFS
+@@ -122,6 +140,9 @@ typedef struct WINPREFS
    ICONITEM *icon;
    int iconItems;
  
@@ -139,7 +141,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
    /* Silent exit flag */
    Bool fSilentExit;
  
-@@ -155,6 +174,9 @@ unsigned long
+@@ -155,6 +176,9 @@ unsigned long
  winOverrideIcon (unsigned long longpWin);
  
  unsigned long
@@ -149,10 +151,10 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefs.h
  winTaskbarIcon(void);
  
  unsigned long
-Index: xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
+Index: xorg-server-1.5.3/xserver/hw/xwin/winprefslex.l
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefslex.l
-+++ xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winprefslex.l
++++ xorg-server-1.5.3/xserver/hw/xwin/winprefslex.l
 @@ -1,6 +1,7 @@
  %{ # -*- C -*-
  /*
@@ -169,7 +171,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
   */
  /* $XFree86: $ */
  
-@@ -70,6 +72,12 @@ MENU                    { return MENU; }
+@@ -70,6 +72,14 @@ MENU                    { return MENU; }
  ICONDIRECTORY           { return ICONDIRECTORY; }
  DEFAULTICON             { return DEFAULTICON; }
  ICONS                   { return ICONS; }
@@ -177,15 +179,17 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefslex.l
 +TOPMOST                 { return TOPMOST; }
 +MAXIMIZE                { return MAXIMIZE; }
 +MINIMIZE                { return MINIMIZE; }
++BOTTOM                  { return BOTTOM; }
 +NOTITLE                 { return NOTITLE; }
++OUTLINE                 { return OUTLINE; }
 +NOFRAME                 { return NOFRAME; }
  ROOTMENU                { return ROOTMENU; }
  DEFAULTSYSMENU          { return DEFAULTSYSMENU; }
  SYSMENU                 { return SYSMENU; }
-Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
+Index: xorg-server-1.5.3/xserver/hw/xwin/winprefsyacc.y
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winprefsyacc.y
-+++ xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winprefsyacc.y
++++ xorg-server-1.5.3/xserver/hw/xwin/winprefsyacc.y
 @@ -1,6 +1,7 @@
  %{
  /*
@@ -234,7 +238,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
  
 -%token NEWLINE MENU LB RB ICONDIRECTORY DEFAULTICON ICONS DEFAULTSYSMENU
 +%token NEWLINE MENU LB RB ICONDIRECTORY DEFAULTICON ICONS STYLES
-+%token TOPMOST MAXIMIZE MINIMIZE NOTITLE NOFRAME DEFAULTSYSMENU
++%token TOPMOST MAXIMIZE MINIMIZE BOTTOM NOTITLE OUTLINE NOFRAME DEFAULTSYSMENU
  %token SYSMENU ROOTMENU SEPARATOR ATSTART ATEND EXEC ALWAYSONTOP DEBUG
  %token RELOAD TRAYICON SILENTEXIT
  
@@ -253,16 +257,18 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
  	| sysmenu
  	| rootmenu
  	| defaultsysmenu
-@@ -154,6 +170,31 @@ iconlist:	iconline
+@@ -154,6 +170,33 @@ iconlist:	iconline
  icons:	ICONS LB {OpenIcons();} newline_or_nada iconlist RB {CloseIcons();}
  	;
  
 +group1:	TOPMOST { $$=STYLE_TOPMOST; }
 +	| MAXIMIZE { $$=STYLE_MAXIMIZE; }
 +	| MINIMIZE { $$=STYLE_MINIMIZE; }
++ 	| BOTTOM { $$=STYLE_BOTTOM; }
 +	;
 +
 +group2:	NOTITLE { $$=STYLE_NOTITLE; }
++ 	| OUTLINE { $$=STYLE_OUTLINE; }
 +	| NOFRAME { $$=STYLE_NOFRAME; }
 +	;
 +
@@ -285,7 +291,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
  atspot:	{ $$=AT_END; }
  	| ATSTART { $$=AT_START; }
  	| ATEND { $$=AT_END; }
-@@ -316,6 +357,39 @@ CloseIcons (void)
+@@ -316,6 +359,39 @@ CloseIcons (void)
  }
  
  static void
@@ -325,10 +331,10 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winprefsyacc.y
  OpenSysMenu (void)
  {
    if (pref.sysMenu != NULL) {
-Index: xorg-server-1.5.2/xserver/hw/xwin/XWinrc.man
+Index: xorg-server-1.5.3/xserver/hw/xwin/XWinrc.man
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/XWinrc.man
-+++ xorg-server-1.5.2/xserver/hw/xwin/XWinrc.man
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/XWinrc.man
++++ xorg-server-1.5.3/xserver/hw/xwin/XWinrc.man
 @@ -30,6 +30,10 @@ that \fIXWin -multiwindow\fP produces fo
  Again, that can be done both for the generic case and for particular
  programs.  The new icons associated should be \fIWindows\fP format

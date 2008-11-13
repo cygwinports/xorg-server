@@ -1,21 +1,21 @@
 Cygwin build machinery fixes
 
 ---
- xserver/configure.ac               |    7 +++++--
- xserver/hw/xwin/InitInput.c        |    9 ++++++---
- xserver/hw/xwin/Makefile.am        |   19 ++++++++++---------
+ xserver/configure.ac               |    6 ++++--
+ xserver/hw/xwin/InitInput.c        |    8 +++++---
+ xserver/hw/xwin/Makefile.am        |   22 +++++++++++-----------
  xserver/hw/xwin/winerror.c         |   11 +++++------
  xserver/hw/xwin/winmultiwindowwm.c |    9 +--------
  xserver/hw/xwin/winprocarg.c       |    4 ++--
  xserver/hw/xwin/winscrinit.c       |    1 -
- xserver/include/xwin-config.h.in   |    3 +++
- 8 files changed, 32 insertions(+), 31 deletions(-)
+ xserver/include/xwin-config.h.in   |    4 ----
+ 8 files changed, 28 insertions(+), 37 deletions(-)
 
-Index: xorg-server-1.5.1/xserver/configure.ac
+Index: xorg-server-1.5.3/xserver/configure.ac
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/configure.ac
-+++ xorg-server-1.5.1/xserver/configure.ac
-@@ -1652,12 +1652,15 @@ if test "x$XWIN" = xauto; then
+--- xorg-server-1.5.3.orig/xserver/configure.ac
++++ xorg-server-1.5.3/xserver/configure.ac
+@@ -1653,12 +1653,14 @@ if test "x$XWIN" = xauto; then
  		mingw*) XWIN="yes" ;;
  		*) XWIN="no" ;;
  	esac
@@ -27,12 +27,11 @@ Index: xorg-server-1.5.1/xserver/configure.ac
  
  if test "x$XWIN" = xyes; then
 +	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
-+	AC_DEFINE_UNQUOTED(__VENDORDWEBSUPPORT__, ["$VENDOR_WEB"], [Vendor web address for support])
 +	AC_CHECK_TOOL(WINDRES, windres)
  	case $host_os in
  		cygwin*)
  			XWIN_SERVER_NAME=XWin
-@@ -1674,7 +1676,7 @@ if test "x$XWIN" = xyes; then
+@@ -1675,7 +1677,7 @@ if test "x$XWIN" = xyes; then
  			XWIN_SYS_LIBS=-lwinsock2
  			;;
  	esac
@@ -41,10 +40,10 @@ Index: xorg-server-1.5.1/xserver/configure.ac
  	AC_SUBST(XWIN_SERVER_NAME)
  	AC_SUBST(XWIN_SYS_LIBS)
  
-Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+Index: xorg-server-1.5.3/xserver/hw/xwin/Makefile.am
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/Makefile.am
-+++ xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/Makefile.am
++++ xorg-server-1.5.3/xserver/hw/xwin/Makefile.am
 @@ -120,8 +120,10 @@ SRCS =	InitInput.c \
  	winpriv.h \
  	winresource.h \
@@ -71,17 +70,16 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
  
  XWin_DEPENDENCIES = $(XWIN_LIBS)
 -XWin_LDADD = $(XWIN_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
--
--XWin_LDFLAGS = -mwindows -static
 +XWin_LDADD = $(XWIN_LIBS) $(XSERVER_LIBS) $(XSERVER_SYS_LIBS) $(XWIN_SYS_LIBS)
 +XWin_LDFLAGS = -mwindows
-+
+ 
+-XWin_LDFLAGS = -mwindows -static
 +.rc.o:
-+	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -I $(top_builddir)/include -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\" -DPROJECT_VERSION=\"$(PACKAGE_VERSION)\"
++	$(WINDRES) --use-temp-file -i $< --input-format=rc -o $@ -O coff -I $(top_builddir)/include -DPROJECT_NAME=\"$(VENDOR_NAME_SHORT)\"
  
  winprefsyacc.h: winprefsyacc.c
  winprefslex.c: winprefslex.l winprefsyacc.c winprefsyacc.h
-@@ -163,7 +163,8 @@ CLEANFILES = $(BUILT_SOURCES)
+@@ -163,7 +162,8 @@ CLEANFILES = $(BUILT_SOURCES)
  AM_YFLAGS = -d
  AM_LFLAGS = -i
  AM_CFLAGS = -DHAVE_XWIN_CONFIG_H $(DIX_CFLAGS) \
@@ -91,16 +89,16 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/Makefile.am
  
  dist_man1_MANS = XWin.man XWinrc.man
  
-@@ -201,4 +201,4 @@
+@@ -194,4 +194,4 @@ EXTRA_DIST = \
  	xlaunch/window/wizard.h
  
  relink:
 -	rm -f XWin && $(MAKE) XWin
 +	rm -f XWin$(EXEEXT) && $(MAKE) XWin$(EXEEXT)
-Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winerror.c
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/winerror.c
-+++ xorg-server-1.5.1/xserver/hw/xwin/winerror.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winerror.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winerror.c
 @@ -33,10 +33,9 @@
  #endif
  #ifdef XVENDORNAME
@@ -147,10 +145,10 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winerror.c
  	   g_pszCommandLine);
    if (!pszMsgBox)
      goto winMessageBoxF_Cleanup;
-Index: xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/winmultiwindowwm.c
-+++ xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwm.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 @@ -52,14 +52,7 @@
  #include <X11/cursorfont.h>
  
@@ -167,10 +165,10 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winmultiwindowwm.c
  
  /* Local headers */
  #include "objbase.h"
-Index: xorg-server-1.5.1/xserver/hw/xwin/winprocarg.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winprocarg.c
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/winprocarg.c
-+++ xorg-server-1.5.1/xserver/hw/xwin/winprocarg.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winprocarg.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winprocarg.c
 @@ -31,9 +31,9 @@ from The Open Group.
  #endif
  #ifdef XVENDORNAME
@@ -191,10 +189,10 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winprocarg.c
    ErrorF ("Contact: %s\n\n", VENDOR_CONTACT);
  }
  
-Index: xorg-server-1.5.1/xserver/hw/xwin/winscrinit.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/winscrinit.c
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/winscrinit.c
-+++ xorg-server-1.5.1/xserver/hw/xwin/winscrinit.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winscrinit.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winscrinit.c
 @@ -37,7 +37,6 @@
  #endif
  #include "win.h"
@@ -203,10 +201,10 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/winscrinit.c
  
  
  #ifdef XWIN_MULTIWINDOWEXTWM
-Index: xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/InitInput.c
 ===================================================================
---- xorg-server-1.5.1.orig/xserver/hw/xwin/InitInput.c
-+++ xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/InitInput.c
++++ xorg-server-1.5.3/xserver/hw/xwin/InitInput.c
 @@ -30,9 +30,6 @@
  #include <xwin-config.h>
  #endif
@@ -217,7 +215,7 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
  #include "dixstruct.h"
  
  
-@@ -104,6 +101,12 @@ ProcessInputEvents (void)
+@@ -104,6 +101,11 @@ ProcessInputEvents (void)
  #endif
  }
  
@@ -226,16 +224,6 @@ Index: xorg-server-1.5.1/xserver/hw/xwin/InitInput.c
 +  /* winKeybdBell is used instead */
 +  return;
 +}
-+
  
  int
  TimeSinceLastInputEvent ()
---- origsrc/xorg-server-1.5.3/include/xwin-config.h.in	2007-05-29 14:36:51.000000000 -0500
-+++ src/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-05 15:08:27.828912900 -0600
-@@ -22,3 +22,6 @@
- 
- /* Do we require our own snprintf? */
- #undef NEED_SNPRINTF
-+
-+/* Vendor web address for support */
-+#undef __VENDORDWEBSUPPORT__
