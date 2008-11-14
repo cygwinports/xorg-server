@@ -10,6 +10,7 @@ Runtime requirements:
   font-misc-misc-1.0.0-1
   libfontenc1-1.0.4-2
   libfreetype26-2.3.7-1
+  libGL1-7.2-2
   libpixman1_0-0.12.0-1
   libX11_6-1.1.5-1
   libXau6-1.0.4-1
@@ -43,7 +44,6 @@ Build requirements:
   fontsproto-2.0.2-1
   glproto-1.4.9-1
   inputproto-1.4.4-1
-  libGL-devel-7.2-2
   kbproto-1.0.3-1
   randrproto-1.2.2-1
   recordproto-1.13.2-1
@@ -108,6 +108,7 @@ Additional fixes to multiwindow mode:
 Moved system.XWinrc to /etc/X11.
 Moved XWin.log to /var/log.
 Fixed up man pages.
+Added patch to fix build when Xv is disabled and videoproto not installed.
 
 ----- version 1.5.3-1 -----
 Version bump.
