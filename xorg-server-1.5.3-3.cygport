@@ -16,6 +16,7 @@ PATCH_URI="
 	from-xming-add-keyboard-layouts.patch
 	from-xming-correct-tooltip-and-window-title.patch
 	from-xming-patch3-command-line-logging-format.patch
+	from-xming-patch4-dont-center-dialogs-bogusly.patch
 	from-xming-patch6-add-styles.patch
 	from-xming-patch11-wm-fixes.patch
 	from-xming-patch11-internal-authentication-cookie.patch
@@ -33,12 +34,12 @@ PATCH_URI="
 	1.5-kdrive-xv-conditional.patch
 	1.5-xfake-build.patch
 	1.5-xwin-resources.patch
-	1.5-log-in-var-log.patch
+	1.5-log-per-display-and-location-configurable.patch
 	1.5-system_XWinrc-in-etc.patch
 	1.5-manpage-fixups.patch
 "
 
-DIFF_EXCLUDES="xf86Build.h *-config.h xorg-server.h"
+DIFF_EXCLUDES="xfree86 xprint xquartz xf86Build.h *-config.h xorg-server.h"
 
 CYGPORT_USE_UNSTABLE_API=1
 src_unpack_hook() {
@@ -61,7 +62,12 @@ src_compile() {
 	sed -e 's| -lXfont| /usr/lib/libXfont.a|' /usr/lib/pkgconfig/xfont.pc > ${T}/xfont.pc
 	export PKG_CONFIG_PATH=${T}
 
-	# Record disabled by default, but is required for libXtst, still in use
+	# XC-Security required for untrusted X11 forwarding, but read this first:
+	#   http://cygwin.com/ml/cygwin-xfree/2008-11/msg00154.html
+	# To enable, add this (XC-AppGroup has been removed from git master):
+	#	--enable-xcsecurity --disable-appgroup \
+	#
+	# Record required for libXtst, still in use
 	cd ${B}
 	cygconf \
 		--enable-kdrive \

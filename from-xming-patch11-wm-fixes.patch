@@ -25,10 +25,10 @@ http://sourceforge.net/projects/xming/
 ---
  xserver/hw/xwin/winmultiwindowclass.c   |    4 
  xserver/hw/xwin/winmultiwindowwindow.c  |   39 ++++--
- xserver/hw/xwin/winmultiwindowwm.c      |  199 +++++++++++++++++++++++++++++++-
+ xserver/hw/xwin/winmultiwindowwm.c      |  208 +++++++++++++++++++++++++++++++-
  xserver/hw/xwin/winmultiwindowwndproc.c |  118 +++++++-----------
- xserver/hw/xwin/winwindow.h             |   19 +++
- 5 files changed, 294 insertions(+), 85 deletions(-)
+ xserver/hw/xwin/winwindow.h             |   19 ++
+ 5 files changed, 303 insertions(+), 85 deletions(-)
 
 Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowclass.c
 ===================================================================
@@ -252,7 +252,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
    
    return 0;
  }
-@@ -1430,3 +1461,165 @@ winDeinitMultiWindowWM ()
+@@ -1430,3 +1461,174 @@ winDeinitMultiWindowWM ()
    ErrorF ("winDeinitMultiWindowWM - Noting shutdown in progress\n");
    g_shutdown = TRUE;
  }
@@ -371,6 +371,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 +void
 +winUpdateWindowPosition (HWND hWnd, Bool reshape, HWND *zstyle)
 +{
++  int	iX, iY, iWidth, iHeight;
 +  int	iDx, iDy;
 +  RECT	rcNew;
 +  WindowPtr	pWin = GetProp (hWnd, WIN_WINDOW_PROP);
@@ -380,8 +381,16 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 +  pDraw = &pWin->drawable;
 +  if (!pDraw) return;
 +
++  /* Get the X and Y location of the X window */
++  iX = pWin->drawable.x + GetSystemMetrics (SM_XVIRTUALSCREEN);
++  iY = pWin->drawable.y + GetSystemMetrics (SM_YVIRTUALSCREEN);
++
++  /* Get the height and width of the X window */
++  iWidth = pWin->drawable.width;
++  iHeight = pWin->drawable.height;
++
 +  /* Setup a rectangle with the X window position and size */
-+  SetRect (&rcNew, pDraw->x, pDraw->y, pDraw->x + pDraw->width, pDraw->y + pDraw->height);
++  SetRect (&rcNew, iX, iY, iX + iWidth, iY + iHeight);
 +
 +#if 0
 +  ErrorF ("winUpdateWindowPosition - (%d, %d)-(%d, %d)\n",

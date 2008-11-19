@@ -1,6 +1,14 @@
---- origsrc/xorg-server-1.5.3/hw/kdrive/ephyr/Makefile.am	2008-11-05 10:52:17.000000000 -0600
-+++ src/xorg-server-1.5.3/hw/kdrive/ephyr/Makefile.am	2008-11-14 02:21:13.144423300 -0600
-@@ -54,12 +54,16 @@
+--- origsrc/xorg-server-1.5.3/hw/kdrive/ephyr/Makefile.am	2008-11-16 01:04:41.660986300 -0600
++++ src/xorg-server-1.5.3/hw/kdrive/ephyr/Makefile.am	2008-11-16 01:04:23.551611300 -0600
+@@ -27,6 +27,7 @@
+ 
+ if XV
+ libxephyr_hostxv_a_SOURCES=				\
++	ephyrvideo.c \
+ 	ephyrhostvideo.c \
+ 	ephyrhostvideo.h
+ endif
+@@ -54,7 +55,6 @@
  libxephyr_a_SOURCES =	\
  	ephyr.c		\
  	ephyr_draw.c	\
@@ -8,18 +16,8 @@
  	os.c		\
  	hostx.h         \
  	ephyr.h		\
- 	ephyrlog.h
- 
-+if XV
-+libxephyr_a_SOURCES += \
-+	ephyrvideo.c
-+endif
-+
- libxephyr_a_CFLAGS = \
- -I$(top_srcdir) \
- @LIBDRM_CFLAGS@
---- origsrc/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-05 10:52:17.000000000 -0600
-+++ src/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-13 15:48:46.357117400 -0600
+--- origsrc/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-16 01:04:41.660986300 -0600
++++ src/xorg-server-1.5.3/hw/kdrive/src/Makefile.am	2008-11-16 00:40:32.000000000 -0600
 @@ -12,6 +12,12 @@
  	vga.h
  endif
