@@ -5,11 +5,11 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
 
 ---
  configure.ac             |    1 +
- hw/xwin/InitOutput.c     |   14 +++++++-------
+ hw/xwin/InitOutput.c     |   17 +++++++----------
  hw/xwin/winerror.c       |    7 +++++++
  hw/xwin/winglobals.c     |    2 +-
  include/xwin-config.h.in |    1 -
- 5 files changed, 16 insertions(+), 9 deletions(-)
+ 5 files changed, 16 insertions(+), 12 deletions(-)
 
 --- origsrc/xorg-server-1.5.3/configure.ac	2008-11-12 21:54:18.257937400 -0600
 +++ src/xorg-server-1.5.3/configure.ac	2008-11-12 22:13:01.507937400 -0600
@@ -32,6 +32,16 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
      g_fLogInited = TRUE;
    }  
    LogClose ();
+@@ -698,9 +698,6 @@
+   /* Re-initialize global variables on server reset */
+   winInitializeGlobals ();
+ 
+-  LogInit (NULL, NULL);
+-  LogSetParameter (XLOG_VERBOSITY, g_iLogVerbose);
+-
+   winFixupPaths();
+ 
+ #ifdef DDXOSVERRORF
 @@ -715,7 +712,7 @@
       * avoid the second call 
       */  
@@ -41,7 +51,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
    } 
    LogSetParameter (XLOG_FLUSH, 1);
    LogSetParameter (XLOG_VERBOSITY, g_iLogVerbose);
-@@ -888,7 +888,7 @@
+@@ -888,7 +885,7 @@
  #endif
  
    ErrorF ("-logfile filename\n"
@@ -59,7 +69,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
      g_fLogInited = TRUE;
    }  
    LogClose ();
-@@ -926,9 +926,9 @@
+@@ -926,9 +923,9 @@
    /* Notify user where UseMsg text can be found.*/
    if (!g_fNoHelpMessageBox)
      winMessageBoxF ("The " PROJECT_NAME " help text has been printed to "
