@@ -37,6 +37,7 @@ PATCH_URI="
 	1.5-log-per-display-and-location-configurable.patch
 	1.5-system_XWinrc-in-etc.patch
 	1.5-manpage-fixups.patch
+	1.5-TEMPORARY-broken-lockkeys-sync.patch
 "
 
 DIFF_EXCLUDES="xfree86 xprint xquartz xf86Build.h *-config.h xorg-server.h"

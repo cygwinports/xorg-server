@@ -1,13 +1,15 @@
 Allow the default log location to be configurable (e.g. /var/log),
 and use separate logs for each display instance (e.g. XWin.0.log).
 
+FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
+
 ---
  configure.ac             |    1 +
- hw/xwin/InitOutput.c     |   23 ++++++++++++++---------
- hw/xwin/winglobals.c     |    4 ++--
- hw/xwin/winprocarg.c     |    4 ----
+ hw/xwin/InitOutput.c     |   14 +++++++-------
+ hw/xwin/winerror.c       |    7 +++++++
+ hw/xwin/winglobals.c     |    2 +-
  include/xwin-config.h.in |    1 -
- 5 files changed, 17 insertions(+), 16 deletions(-)
+ 5 files changed, 16 insertions(+), 9 deletions(-)
 
 --- origsrc/xorg-server-1.5.3/configure.ac	2008-11-12 21:54:18.257937400 -0600
 +++ src/xorg-server-1.5.3/configure.ac	2008-11-12 22:13:01.507937400 -0600
@@ -21,45 +23,24 @@ and use separate logs for each display instance (e.g. XWin.0.log).
  	AC_CHECK_TOOL(WINDRES, windres)
 --- origsrc/xorg-server-1.5.3/hw/xwin/InitOutput.c	2008-11-12 21:54:13.945437400 -0600
 +++ src/xorg-server-1.5.3/hw/xwin/InitOutput.c	2008-11-12 22:31:23.097847400 -0600
-@@ -657,19 +657,25 @@
-         if (shfolder != NULL)
-             FreeLibrary(shfolder);
-     }
-+#endif /* RELOCATE_PROJECTROOT */
-     if (!g_fLogFileChanged) {
-         static char buffer[MAX_PATH];
--        DWORD size = GetTempPath(sizeof(buffer), buffer);
-+        DWORD size;
-+#ifdef RELOCATE_PROJECTROOT
-+        size = GetTempPath(sizeof(buffer), buffer);
-+#else
-+        size = snprintf(buffer, sizeof(buffer), DEFAULT_LOGDIR"/");
-+#endif
-         if (size && size < sizeof(buffer))
-         {
-             snprintf(buffer + size, sizeof(buffer) - size, 
--                    "XWin.%s.log", display); 
-+                    "XWin.%s.log", display);
-             buffer[sizeof(buffer)-1] = 0;
-             g_pszLogFile = buffer;
-             winMsg (X_DEFAULT, "Logfile set to \"%s\"\n", g_pszLogFile);
-         }
-     }
--#ifdef XKB
-+#if defined(RELOCATE_PROJECTROOT) && defined(XKB)
-     {
-         static char xkbbasedir[MAX_PATH];
+@@ -243,7 +243,7 @@
+ #endif
  
-@@ -679,8 +685,7 @@
-         XkbBaseDirectory = xkbbasedir;
- 	XkbBinDirectory = basedir;
-     }
--#endif /* XKB */
--#endif /* RELOCATE_PROJECTROOT */
-+#endif
- }
- 
- void
+   if (!g_fLogInited) {
+-    LogInit (g_pszLogFile, NULL);
++    g_pszLogFile = LogInit (g_pszLogFile, NULL);
+     g_fLogInited = TRUE;
+   }  
+   LogClose ();
+@@ -715,7 +712,7 @@
+      * avoid the second call 
+      */  
+     g_fLogInited = TRUE;
+-    LogInit (g_pszLogFile, NULL);
++    g_pszLogFile = LogInit (g_pszLogFile, NULL);
+   } 
+   LogSetParameter (XLOG_FLUSH, 1);
+   LogSetParameter (XLOG_VERBOSITY, g_iLogVerbose);
 @@ -888,7 +888,7 @@
  #endif
  
@@ -69,6 +50,15 @@ and use separate logs for each display instance (e.g. XWin.0.log).
  
    ErrorF ("-logverbose verbosity\n"
  	  "\tSet the verbosity of logmessages. [NOTE: Only a few messages\n"
+@@ -918,7 +915,7 @@
+ 
+   /* Log file will not be opened for UseMsg unless we open it now */
+   if (!g_fLogInited) {
+-    LogInit (g_pszLogFile, NULL);
++    g_pszLogFile = LogInit (g_pszLogFile, NULL);
+     g_fLogInited = TRUE;
+   }  
+   LogClose ();
 @@ -926,9 +926,9 @@
    /* Notify user where UseMsg text can be found.*/
    if (!g_fNoHelpMessageBox)
@@ -76,7 +66,7 @@ and use separate logs for each display instance (e.g. XWin.0.log).
 -		  "/tmp/XWin.log.\n"
 -		  "Please open /tmp/XWin.log to read the help text.\n",
 -		  MB_ICONINFORMATION);
-+		  "%s\n"
++		  "%s.\n"
 +		  "Please open %s to read the help text.\n",
 +		  MB_ICONINFORMATION, g_pszLogFile, g_pszLogFile);
  }
@@ -84,42 +74,38 @@ and use separate logs for each display instance (e.g. XWin.0.log).
  /* ddxInitGlobals - called by |InitGlobals| from os/util.c */
 --- origsrc/xorg-server-1.5.3/hw/xwin/winglobals.c	2008-11-18 00:47:16.495683100 -0600
 +++ src/xorg-server-1.5.3/hw/xwin/winglobals.c	2008-11-18 00:47:24.730058100 -0600
-@@ -64,11 +64,11 @@
+@@ -64,7 +64,7 @@
  HICON		g_hIconX = NULL;
  HICON		g_hSmallIconX = NULL;
  #ifndef RELOCATE_PROJECTROOT
 -char *		g_pszLogFile = "/tmp/XWin.log";
-+char *		g_pszLogFile = DEFAULT_LOGDIR "/XWin.log";
++char *		g_pszLogFile = DEFAULT_LOGDIR "/XWin.%s.log";
  #else
  char *		g_pszLogFile = "XWin.log";
--Bool		g_fLogFileChanged = FALSE;
- #endif
-+Bool		g_fLogFileChanged = FALSE;
- int		g_iLogVerbose = 2;
- Bool		g_fLogInited = FALSE;
- char *		g_pszCommandLine = NULL;
---- origsrc/xorg-server-1.5.3/hw/xwin/winprocarg.c	2008-11-18 00:15:43.591088100 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/winprocarg.c	2008-11-18 00:45:13.886308100 -0600
-@@ -54,9 +54,7 @@
- #endif
- extern int			g_iLogVerbose;
- extern char *			g_pszLogFile;
--#ifdef RELOCATE_PROJECTROOT
- extern Bool			g_fLogFileChanged;
--#endif
- extern Bool			g_fXdmcpEnabled;
- extern Bool			g_fAuthEnabled;
- extern char *			g_pszCommandLine;
-@@ -1366,9 +1364,7 @@
-     {
-       CHECK_ARGS (1);
-       g_pszLogFile = argv[++i];
--#ifdef RELOCATE_PROJECTROOT
-       g_fLogFileChanged = TRUE;
--#endif
-       return 2;
-     }
+ Bool		g_fLogFileChanged = FALSE;
+--- origsrc/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-19 23:57:42.368957500 -0600
++++ src/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-20 03:48:25.621350500 -0600
+@@ -42,6 +42,7 @@
+ extern char *		g_pszCommandLine;
+ extern char *		g_pszLogFile;
+ extern Bool		g_fSilentFatalError;
++extern Bool		g_fLogInited;
  
+ 
+ #ifdef DDXOSVERRORF
+@@ -86,6 +87,12 @@
+   if (g_fSilentFatalError)
+     return;
+ 
++  if (!g_fLogInited) {
++    g_fLogInited = TRUE;
++    g_pszLogFile = LogInit (g_pszLogFile, NULL);
++  }
++  LogClose ();
++
+   winMessageBoxF (
+           "A fatal error has occurred and " PROJECT_NAME " will now exit.\n" \
+ 		  "Please open %s for more information.\n",
 --- origsrc/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-12 21:54:18.273562400 -0600
 +++ src/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-12 22:15:07.195437400 -0600
 @@ -24,4 +24,7 @@
