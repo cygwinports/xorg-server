@@ -1,0 +1,30 @@
+Xming: Clipboard fixes
+
+Function 'winProcessXEventsTimeout()' is declared 'static Bool' and 
+defined 'static int' (correct) in 'winclipboardwndproc.c'. This has been 
+wrong since dot, but luckily was of no significance
+
+from-xming-patch15
+
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/winclipboardwndproc.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+@@ -63,7 +63,7 @@ extern HWND		g_hwndClipboard;
+  * Local function prototypes
+  */
+ 
+-static Bool
++static int
+ winProcessXEventsTimeout (HWND hwnd, int iWindow, Display *pDisplay,
+ 			  Bool fUseUnicode, int iTimeoutSec);
+ 

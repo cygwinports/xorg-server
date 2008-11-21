@@ -1,0 +1,38 @@
+Use builtin fonts without disabling server-side local fonts.
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/
+
+---
+ configure.ac   |    2 +-
+ dix/dixfonts.c |    5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+--- origsrc/xorg-server-1.5.3/configure.ac	2008-11-16 03:53:17.677141300 -0600
++++ src/xorg-server-1.5.3/configure.ac	2008-11-17 19:18:35.345788100 -0600
+@@ -467,7 +467,7 @@
+ AC_ARG_WITH(fontdir,         AS_HELP_STRING([--with-fontdir=FONTDIR], [Path to top level dir where fonts are installed (default: ${libdir}/X11/fonts)]),
+                                 [ FONTDIR="$withval" ],
+                                 [ FONTDIR="${libdir}/X11/fonts" ])
+-DEFAULT_FONT_PATH="${FONTDIR}/misc/,${FONTDIR}/TTF/,${FONTDIR}/OTF,${FONTDIR}/Type1/,${FONTDIR}/100dpi/,${FONTDIR}/75dpi/"
++DEFAULT_FONT_PATH="built-ins,${FONTDIR}/misc/,${FONTDIR}/TTF/,${FONTDIR}/OTF,${FONTDIR}/Type1/,${FONTDIR}/100dpi/,${FONTDIR}/75dpi/"
+ case $host_os in
+ 	darwin*)    DEFAULT_FONT_PATH="${DEFAULT_FONT_PATH},/Library/Fonts,/System/Library/Fonts" ;;
+ esac
+--- origsrc/xorg-server-1.5.3/dix/dixfonts.c	2008-11-05 10:52:17.000000000 -0600
++++ src/xorg-server-1.5.3/dix/dixfonts.c	2008-11-17 22:38:29.070367300 -0600
+@@ -1910,12 +1910,9 @@
+     } else 
+ #endif
+     {
+-#ifdef BUILTIN_FONTS
+         BuiltinRegisterFpeFunctions();
+-#else
++#ifndef BUILTIN_FONTS
+ 	FontFileRegisterFpeFunctions();
+-#endif
+-#ifndef NOFONTSERVERACCESS
+ 	fs_register_fpe_functions();
+ #endif
+     }

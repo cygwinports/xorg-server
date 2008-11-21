@@ -17,7 +17,7 @@
  to  the console
  from which it was called and to a log file that by default is located at
 -\fI/tmp/XWin.log\fP.  This file is mainly for debugging purposes.
-+\fI__logdir__/XWin.log\fP.  This file is mainly for debugging purposes.
++\fI__logdir__/XWin.0.log\fP.  This file is mainly for debugging purposes.
  
  
  .SH PREFERENCES FILE
@@ -33,7 +33,7 @@
  .TP 8
  .B "\-logfile \fIFile_Name\fP"
 -Change the log file from the default located at \fI/tmp/XWin.log\fP to
-+Change the log file from the default located at \fI__logdir__/XWin.log\fP to
++Change the log file from the default located at \fI__logdir__/XWin.0.log\fP to
  the one indicated by \fIFile_Name\fP.
  .TP 8
  .B "\-logverbose \fIlevel\fP"
@@ -66,3 +66,12 @@
  should be put at \fI$HOME/.XWinrc\fP.  The \fIsystem.XWinrc\fP file is
  read only if no \fI$HOME/.XWinrc\fP exist.
  .PP
+@@ -54,7 +54,7 @@
+ .SH Miscellaneous instruction
+ .TP 8
+ .B DEBUG \fIString\fP
+-The \fIString\fP is printed to the XWin.log file.
++The \fIString\fP is printed to the XWin log file.
+ 
+ .TP 8
+ .B TRAYICON \fIicon-specifier\fB

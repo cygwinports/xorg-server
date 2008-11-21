@@ -1,0 +1,49 @@
+Xming: Clipboard fixes
+
+The clipboard should only select PropertyChange events and do this on 
+the correct window, the messaging window for the clipboard not the root 
+window!
+
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/winclipboardthread.c |   16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardthread.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardthread.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardthread.c
+@@ -231,15 +231,6 @@ winClipboardProc (void *pvNotUsed)
+   iMaxDescriptor = iConnectionNumber + 1;
+ #endif
+ 
+-  /* Select event types to watch */
+-  if (XSelectInput (pDisplay,
+-		    DefaultRootWindow (pDisplay),
+-		    SubstructureNotifyMask |
+-		    StructureNotifyMask |
+-		    PropertyChangeMask) == BadWindow)
+-    ErrorF ("winClipboardProc - XSelectInput generated BadWindow "
+-	    "on RootWindow\n\n");
+-
+   /* Create atoms */
+   atomClipboard = XInternAtom (pDisplay, "CLIPBOARD", False);
+   atomClipboardManager = XInternAtom (pDisplay, "CLIPBOARD_MANAGER", False);
+@@ -258,6 +249,13 @@ winClipboardProc (void *pvNotUsed)
+       pthread_exit (NULL);
+     }
+ 
++  /* Select event types to watch */
++  if (XSelectInput (pDisplay,
++		    iWindow,
++		    PropertyChangeMask) == BadWindow)
++    ErrorF ("winClipboardProc - XSelectInput generated BadWindow "
++	    "on messaging window\n");
++
+   /* Save the window in the screen privates */
+   g_iClipboardWindow = iWindow;
+ 

@@ -1,0 +1,107 @@
+Xming: Clipboard fixes
+
+Cache the CLIPBOARD atom lookups in winClipboardWindowProc()
+Cache atom lookups in winClipboardFlushXEvents()
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/winclipboardwndproc.c |   15 ++++++---------
+ xserver/hw/xwin/winclipboardxevents.c |   31 +++++++++++++++++++------------
+ 2 files changed, 25 insertions(+), 21 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+@@ -260,12 +260,15 @@ winClipboardWindowProc (HWND hwnd, UINT 
+     case WM_DRAWCLIPBOARD:
+       {
+ 	static Bool s_fProcessingDrawClipboard = FALSE;
++	static Atom atomClipboard;
+ 	Display	*pDisplay = g_pClipboardDisplay;
+ 	Window	iWindow = g_iClipboardWindow;
+ 	int	iReturn;
+ 
+ 	winDebug ("winClipboardWindowProc - WM_DRAWCLIPBOARD: Enter\n");
+ 
++	if (atomClipboard == None) atomClipboard = XInternAtom (pDisplay, "CLIPBOARD", False);
++
+ 	/*
+ 	 * We've occasionally seen a loop in the clipboard chain.
+ 	 * Try and fix it on the first hint of recursion.
+@@ -353,17 +356,13 @@ winClipboardWindowProc (HWND hwnd, UINT 
+ 
+ 	    /* Release CLIPBOARD selection if owned */
+ 	    iReturn = XGetSelectionOwner (pDisplay,
+-					  XInternAtom (pDisplay,
+-						       "CLIPBOARD",
+-						       False));
++					  atomClipboard);
+ 	    if (iReturn == g_iClipboardWindow)
+ 	      {
+ 		winDebug ("winClipboardWindowProc - WM_DRAWCLIPBOARD - "
+ 			"CLIPBOARD selection is owned by us.\n");
+ 		XSetSelectionOwner (pDisplay,
+-				    XInternAtom (pDisplay,
+-						 "CLIPBOARD",
+-						 False),
++				    atomClipboard,
+ 				    None,
+ 				    CurrentTime);
+ 	      }
+@@ -396,9 +395,7 @@ winClipboardWindowProc (HWND hwnd, UINT 
+ 	
+ 	/* Reassert ownership of the CLIPBOARD */	  
+ 	iReturn = XSetSelectionOwner (pDisplay,
+-				      XInternAtom (pDisplay,
+-						   "CLIPBOARD",
+-						   False),
++				      atomClipboard,
+ 				      iWindow,
+ 				      CurrentTime);
+ 	if (iReturn == BadAtom || iReturn == BadWindow)
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardxevents.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
+@@ -51,18 +51,25 @@ winClipboardFlushXEvents (HWND hwnd,
+ 			  Display *pDisplay,
+ 			  Bool fUseUnicode)
+ {
+-  Atom			atomLocalProperty = XInternAtom (pDisplay,
+-							 WIN_LOCAL_PROPERTY,
+-							 False);
+-  Atom			atomUTF8String = XInternAtom (pDisplay,
+-						      "UTF8_STRING",
+-						      False);
+-  Atom			atomCompoundText = XInternAtom (pDisplay,
+-							"COMPOUND_TEXT",
+-							False);
+-  Atom			atomTargets = XInternAtom (pDisplay,
+-						   "TARGETS",
+-						   False);
++  static Atom atomLocalProperty, atomCompoundText;
++  static Atom atomUTF8String, atomTargets;
++
++  if (atomLocalProperty == None)
++    atomLocalProperty = XInternAtom (pDisplay,
++				     WIN_LOCAL_PROPERTY,
++				     False);
++  if (atomUTF8String == None)
++    atomUTF8String = XInternAtom (pDisplay,
++				  "UTF8_STRING",
++				  False);
++  if (atomCompoundText == None)
++    atomCompoundText = XInternAtom (pDisplay,
++				    "COMPOUND_TEXT",
++				    False);
++  if (atomTargets == None)
++    atomTargets = XInternAtom (pDisplay,
++			       "TARGETS",
++			       False);
+ 
+   /* Process all pending events */
+   while (XPending (pDisplay))

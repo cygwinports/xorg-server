@@ -4,10 +4,6 @@ X.Org servers
 
 Runtime requirements:
   cygwin-1.5.25-15
-  font-alias-1.0.1-1
-  font-cursor-misc-1.0.0-1
-  font-encodings-1.0.2-1
-  font-misc-misc-1.0.0-1
   libfontenc1-1.0.4-2
   libfreetype26-2.3.7-1
   libGL1-7.2-2
@@ -54,7 +50,7 @@ Build requirements:
   xextproto-7.0.3-1
   xorg-util-macros-1.1.6-1
   xproto-7.0.14-1
-  xtrans-1.2.2-2
+  xtrans-1.2.2-3
 
 Canonical website:
   http://xorg.freedesktop.org/
@@ -99,6 +95,17 @@ Files included in the binary package:
 ------------------
 
 Port Notes:
+
+----- version 1.5.3-3 -----
+Multiwindow mode fix:
+- Windows which remember their placement don't drift on each instance;
+Multihead fixes:
+- Windows don't appear offscreen when the primary monitor isn't upper-left.
+- XWin dialogs are placed near the tray icon.
+Numerous clipboard fixes.
+Built-in fonts are used by default; server-side fonts remain available.
+Temporary workaround for NumLock/CapsLock sync issues.
+Individual logs for each display (e.g. /var/log/XWin.0.log).
 
 ----- version 1.5.3-2 -----
 Additional fixes to multiwindow mode:

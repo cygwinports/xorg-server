@@ -20,7 +20,15 @@ PATCH_URI="
 	from-xming-patch6-add-styles.patch
 	from-xming-patch11-wm-fixes.patch
 	from-xming-patch11-internal-authentication-cookie.patch
+	from-xming-patch13-nonexclusive-builtin-fonts.patch
 	from-xming-patch14-fdo-bugzilla-11128-fullscreen-and-refresh-switches-crash.patch
+	from-xming-patch15-clipboard-select-events-correctly.patch
+	from-xming-patch15-clipboard-cache-atom-lookups.patch
+	from-xming-patch15-clipboard-xdmcp-startup-wait-improve.patch
+	from-xming-patch15-clipboard-fix-prototype.patch
+	from-xming-patch15-clipboard-check-selection-ownership-after-take.patch
+	from-xming-patch15-clipboard-returndata-leak-fix.patch
+	from-xming-patch15-clipboard-attribution.patch
 	from-xming-patch16-unicode-window-title-fix.patch
 
 	cygwin-fix-silent-dup-error.patch

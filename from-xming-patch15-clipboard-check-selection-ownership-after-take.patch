@@ -1,0 +1,66 @@
+Xming: Clipboard fixes
+
+When you take ownership of a selection you should always check you got 
+it (X11 ICCCM gospel).
+
+from-xming-patch15
+
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/ 
+
+---
+ xserver/hw/xwin/winclipboardthread.c  |    6 ++++--
+ xserver/hw/xwin/winclipboardwndproc.c |    7 +++++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+@@ -382,7 +382,8 @@ winClipboardWindowProc (HWND hwnd, UINT 
+ 				      XA_PRIMARY,
+ 				      iWindow,
+ 				      CurrentTime);
+-	if (iReturn == BadAtom || iReturn == BadWindow)
++	if (iReturn == BadAtom || iReturn == BadWindow ||
++	    XGetSelectionOwner (pDisplay, XA_PRIMARY) != iWindow)
+ 	  {
+ 	    winErrorFVerb (1, "winClipboardWindowProc - WM_DRAWCLIPBOARD - "
+ 		    "Could not reassert ownership of PRIMARY\n");
+@@ -398,7 +399,9 @@ winClipboardWindowProc (HWND hwnd, UINT 
+ 				      atomClipboard,
+ 				      iWindow,
+ 				      CurrentTime);
+-	if (iReturn == BadAtom || iReturn == BadWindow)
++
++ 	if (iReturn == BadAtom || iReturn == BadWindow ||
++ 	    XGetSelectionOwner (pDisplay, atomClipboard) != iWindow)
+ 	  {
+ 	    winErrorFVerb (1, "winClipboardWindowProc - WM_DRAWCLIPBOARD - "
+ 		    "Could not reassert ownership of CLIPBOARD\n");
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardthread.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardthread.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardthread.c
+@@ -271,7 +271,8 @@ winClipboardProc (void *pvNotUsed)
+       /* PRIMARY */
+       iReturn = XSetSelectionOwner (pDisplay, XA_PRIMARY,
+ 				    iWindow, CurrentTime);
+-      if (iReturn == BadAtom || iReturn == BadWindow)
++      if (iReturn == BadAtom || iReturn == BadWindow ||
++	  XGetSelectionOwner (pDisplay, XA_PRIMARY) != iWindow)
+ 	{
+ 	  ErrorF ("winClipboardProc - Could not set PRIMARY owner\n");
+ 	  pthread_exit (NULL);
+@@ -280,7 +281,8 @@ winClipboardProc (void *pvNotUsed)
+       /* CLIPBOARD */
+       iReturn = XSetSelectionOwner (pDisplay, atomClipboard,
+ 				    iWindow, CurrentTime);
+-      if (iReturn == BadAtom || iReturn == BadWindow)
++      if (iReturn == BadAtom || iReturn == BadWindow ||
++	  XGetSelectionOwner (pDisplay, atomClipboard) != iWindow)
+ 	{
+ 	  ErrorF ("winClipboardProc - Could not set CLIPBOARD owner\n");
+ 	  pthread_exit (NULL);
