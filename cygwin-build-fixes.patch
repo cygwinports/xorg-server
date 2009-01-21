@@ -180,15 +180,17 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winprocarg.c
  #include "win.h"
  #include "winconfig.h"
  #include "winprefs.h"
-@@ -1525,7 +1525,7 @@ winLogVersionInfo (void)
+@@ -1525,8 +1525,8 @@ winLogVersionInfo (void)
  
    ErrorF ("Welcome to the XWin X Server\n");
    ErrorF ("Vendor: %s\n", VENDOR_STRING);
 -  ErrorF ("Release: %s\n\n", VERSION_STRING);
-+  ErrorF ("Release: %d.%d.%d.%d (%d)\n\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
-   ErrorF ("Contact: %s\n\n", VENDOR_CONTACT);
+-  ErrorF ("Contact: %s\n\n", VENDOR_CONTACT);
++  ErrorF ("Release: %d.%d.%d.%d (%d)\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
++  ErrorF ("Contact: %s\n", VENDOR_CONTACT);
  }
  
+ /*
 Index: xorg-server-1.5.3/xserver/hw/xwin/winscrinit.c
 ===================================================================
 --- xorg-server-1.5.3.orig/xserver/hw/xwin/winscrinit.c

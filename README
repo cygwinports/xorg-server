@@ -25,7 +25,7 @@ Build requirements:
   autoconf2.5-2.63-1
   automake1.10-1.10.1-2
   binutils-20080624-2
-  cygport-0.4.2-1
+  cygport-0.4.4-1
   gawk-3.1.6-1
   gcc-core-3.4.4-3
   libtool-2.2.6a-1
@@ -47,6 +47,7 @@ Build requirements:
   renderproto-0.9.3-1
   resourceproto-1.0.2-1
   scrnsaverproto-1.1.0-1
+  windowswmproto-1.0.3-1
   xcmiscproto-1.1.2-1
   xextproto-7.0.3-1
   xorg-util-macros-1.1.6-1
@@ -96,6 +97,18 @@ Files included in the binary package:
 ------------------
 
 Port Notes:
+
+----- version 1.5.3-5 -----
+Restored WindowsWM ("-mwextwm") support for use with xwinwm.
+Added patches:
+- Allow pointer warping to work in multiwindow and rootless modes;
+- Fixed keyboard layouts for nation-specific locales;
+- Fixed long-broken -silent-dup-error option;
+- Force keyboard state onto Virtual Core Keyboard on server startup;
+- Generate scan codes for fake keypresses from speech recognizers;
+- Improve mouse tracking for moving/resizing undecorated windows;
+- Reduce mouse polling interval to 50ms;
+- Unmap windows when minimized and map them again when restored.
 
 ----- version 1.5.3-4 -----
 Fix crashing of remote GLX clients built against earlier GLX versions.

@@ -95,10 +95,10 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
  Bool		g_fLogFileChanged = FALSE;
 --- origsrc/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-19 23:57:42.368957500 -0600
 +++ src/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-20 03:48:25.621350500 -0600
-@@ -42,6 +42,7 @@
- extern char *		g_pszCommandLine;
+@@ -43,6 +43,7 @@
  extern char *		g_pszLogFile;
  extern Bool		g_fSilentFatalError;
+ extern Bool		g_fSilentDupError;
 +extern Bool		g_fLogInited;
  
  

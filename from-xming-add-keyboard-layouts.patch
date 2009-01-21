@@ -1,28 +1,47 @@
 Add some reported keyboard layouts
 
-Copyright (C) Colin Harrison 2005-2008
-http://www.straightrunning.com/XmingNotes/
-http://sourceforge.net/projects/xming/ 
-
 ---
- xserver/hw/xwin/winlayouts.h |    8 ++++++++
- 1 file changed, 8 insertions(+)
+ xserver/hw/xwin/winlayouts.h |   21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-Index: xorg-server-1.5.2/xserver/hw/xwin/winlayouts.h
+Index: xorg-git/xserver/hw/xwin/winlayouts.h
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/winlayouts.h
-+++ xorg-server-1.5.2/xserver/hw/xwin/winlayouts.h
-@@ -40,6 +40,7 @@ typedef struct 
+--- xorg-git.orig/xserver/hw/xwin/winlayouts.h	2008-12-18 18:59:47.890625000 +0000
++++ xorg-git/xserver/hw/xwin/winlayouts.h	2008-12-18 19:48:06.531250000 +0000
+@@ -38,34 +38,49 @@
+     char *layoutname;
+ } WinKBLayoutRec, *WinKBLayoutPtr;
  
++/*
++   This table is sorted by low byte of winlayout, then by next byte, etc.
++*/
++
  WinKBLayoutRec winKBLayouts[] = 
  {
 +    {  0x404, -1, "pc105", "zh_TW",   NULL, NULL, "Chinese (Taiwan)"},
      {  0x405, -1, "pc105", "cz",      NULL, NULL, "Czech"},
      {0x10405, -1, "pc105", "cz_qwerty", NULL, NULL, "Czech (QWERTY)"},
      {  0x406, -1, "pc105", "dk",      NULL, NULL, "Danish"},
-@@ -59,13 +60,20 @@ WinKBLayoutRec winKBLayouts[] = 
-     { 0x100c, -1, "pc105", "fr_CH",   NULL, NULL, "French (Switzerland)"},
+     {  0x407, -1, "pc105", "de",      NULL, NULL, "German (Germany)"},
+     {0x10407, -1, "pc105", "de",      NULL, NULL, "German (Germany, IBM)"},
+-    {  0x807, -1, "pc105", "de_CH",   NULL, NULL, "German (Switzerland)"},
++    {  0x807, -1, "pc105", "ch",      "de", NULL, "German (Switzerland)"},
+     {  0x409, -1, "pc105", "us",      NULL, NULL, "English (USA)"},
+     {0x10409, -1, "pc105", "dvorak",  NULL, NULL, "English (USA, Dvorak)"}, 
+     {0x20409, -1, "pc105", "us_intl", NULL, NULL, "English (USA, International)"}, 
+     {  0x809, -1, "pc105", "gb",      NULL, NULL, "English (United Kingdom)"},
+     { 0x1809, -1, "pc105", "ie",      NULL, NULL, "Irish"},
+     {  0x40a, -1, "pc105", "es",      NULL, NULL, "Spanish (Spain, Traditional Sort)"},
++    {  0x80a, -1, "pc105", "la",      NULL, NULL, "Latin American"},
+     {  0x40b, -1, "pc105", "fi",      NULL, NULL, "Finnish"},
+     {  0x40c, -1, "pc105", "fr",      NULL, NULL, "French (Standard)"},
+     {  0x80c, -1, "pc105", "be",      NULL, NULL, "French (Belgian)"},
+-    {  0xc0c, -1, "pc105", "ca_enhanced", NULL, NULL, "French (Canada)"},
+-    { 0x100c, -1, "pc105", "fr_CH",   NULL, NULL, "French (Switzerland)"},
++    {  0xc0c, -1, "pc105", "ca",      "fr", NULL, "French (Canada)"},
++    { 0x100c, -1, "pc105", "ch",      "fr", NULL, "French (Switzerland)"},
      {  0x40e, -1, "pc105", "hu",      NULL, NULL, "Hungarian"},
++    {  0x40f, -1, "pc105", "is",      NULL, NULL, "Icelandic"},
      {  0x410, -1, "pc105", "it",      NULL, NULL, "Italian"},
 +    {0x10410, -1, "pc105", "it",      NULL, NULL, "Italian (142)"},
 +    {0xa0000410,-1, "macbook79","it",   "mac",NULL, "Italiano (Apple)"},
@@ -38,6 +57,7 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/winlayouts.h
      {  0x41d, -1, "pc105", "se",      NULL, NULL, "Swedish (Sweden)"},
 +    {  0x424, -1, "pc105", "si",      NULL, NULL, "Slovenian"},
 +    {  0x425, -1, "pc105", "ee",      NULL, NULL, "Estonian"},
++    {  0x452, -1, "pc105", "gb",      "intl", NULL, "United Kingdom (Extended)"},
      {     -1, -1, NULL,    NULL,      NULL, NULL, NULL}
  };
  

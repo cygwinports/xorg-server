@@ -1,0 +1,59 @@
+Cygwin/X: Add a timestamp to log messages
+
+Add a timestamp to log messages
+Also tidy up a few stray "\n" issues
+
+---
+ xserver/dix/registry.c       |    2 +-
+ xserver/os/log.c             |   18 ++++++++++++++++--
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/os/log.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/os/log.c	2009-01-14 00:29:32.922875000 +0000
++++ xorg-server-1.5.3/xserver/os/log.c	2009-01-14 00:30:06.828125000 +0000
+@@ -253,6 +253,7 @@
+ LogVWrite(int verb, const char *f, va_list args)
+ {
+     static char tmpBuffer[1024];
++    static char tmpBuffer2[1024];
+     int len = 0;
+ 
+     /*
+@@ -261,8 +262,21 @@
+      * stream(s).
+      */
+     if (verb < 0 || logFileVerbosity >= verb || logVerbosity >= verb) {
+-	vsnprintf(tmpBuffer, sizeof(tmpBuffer), f, args);
+-	len = strlen(tmpBuffer);
++	vsnprintf(tmpBuffer2, sizeof(tmpBuffer), f, args);
++	len = strlen(tmpBuffer2);
++
++        if (len > 0)
++          {
++            /* Format the date and time per ISO8601 */
++            time_t t = time(NULL);
++            struct tm tm;
++            localtime_r(&t, &tm);
++            strftime(tmpBuffer, sizeof(tmpBuffer2), "%F %T ",  &tm);
++
++            /* Concatente the string produced by formating the va_list */
++            strncat(tmpBuffer, tmpBuffer2, sizeof(tmpBuffer));
++            len = strlen(tmpBuffer);
++          }
+     }
+     if ((verb < 0 || logVerbosity >= verb) && len > 0)
+ 	fwrite(tmpBuffer, len, 1, stderr);
+Index: xorg-server-1.5.3/xserver/dix/registry.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/dix/registry.c	2008-10-02 22:01:24.000000000 +0100
++++ xorg-server-1.5.3/xserver/dix/registry.c	2009-01-14 01:46:01.890625000 +0000
+@@ -313,7 +313,7 @@
+ 	fclose(fh);
+     fh = fopen(FILENAME, "r");
+     if (!fh)
+-	LogMessage(X_WARNING, "Failed to open protocol names file " FILENAME);
++	LogMessage(X_WARNING, "Failed to open protocol names file " FILENAME "\n");
+ 
+     /* Add built-in resources */
+     RegisterResourceName(RT_NONE, "NONE");

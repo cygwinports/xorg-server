@@ -1,31 +1,26 @@
 Fix the long-broken -silent-dup-error option
 
 ---
- xserver/hw/xwin/InitOutput.c |   18 +++++++++---------
- xserver/hw/xwin/XWin.man     |    4 ++--
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ xserver/hw/xwin/InitOutput.c |   87 -------------------------------------------
+ xserver/hw/xwin/XWin.man     |    4 -
+ xserver/hw/xwin/winerror.c   |   20 +++++++++
+ 3 files changed, 21 insertions(+), 90 deletions(-)
 
-Index: xorg-server-1.5.2/xserver/hw/xwin/InitOutput.c
+Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/InitOutput.c
-+++ xorg-server-1.5.2/xserver/hw/xwin/InitOutput.c
-@@ -686,6 +686,15 @@ winFixupPaths (void)
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/InitOutput.c
++++ xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
+@@ -117,9 +117,6 @@ OsVendorVErrorF (const char *pszFormat, 
  void
- OsVendorInit (void)
- {
-+  /* Check for duplicate invocation on same display number.*/
-+  if (serverGeneration == 1 && !winCheckDisplayNumber ())
-+    {
-+      if (g_fSilentDupError)
-+        g_fSilentFatalError = TRUE;
-+      FatalError ("InitOutput - Duplicate invocation on display "
-+		  "number: %s.  Exiting.\n", display);
-+    }
-+
-   /* Re-initialize global variables on server reset */
-   winInitializeGlobals ();
+ winInitializeDefaultScreens (void);
  
-@@ -953,15 +962,6 @@ InitOutput (ScreenInfo *screenInfo, int 
+-static Bool
+-winCheckDisplayNumber (void);
+-
+ void
+ winLogCommandLine (int argc, char *argv[]);
+ 
+@@ -953,15 +950,6 @@ InitOutput (ScreenInfo *screenInfo, int 
  		  "Exiting.\n");
      }
  
@@ -41,10 +36,89 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/InitOutput.c
  #ifdef XWIN_XF86CONFIG
    /* Try to read the xorg.conf-style configuration file */
    if (!winReadConfigfile ())
-Index: xorg-server-1.5.2/xserver/hw/xwin/XWin.man
+@@ -1052,78 +1040,3 @@ InitOutput (ScreenInfo *screenInfo, int 
+   winDebug ("InitOutput - Returning.\n");
+ #endif
+ }
+-
+-
+-/*
+- * winCheckDisplayNumber - Check if another instance of Cygwin/X is
+- * already running on the same display number.  If no one exists,
+- * make a mutex to prevent new instances from running on the same display.
+- *
+- * return FALSE if the display number is already used.
+- */
+-
+-static Bool
+-winCheckDisplayNumber ()
+-{
+-  int			nDisp;
+-  HANDLE		mutex;
+-  char			name[MAX_PATH];
+-  char *		pszPrefix = '\0';
+-  OSVERSIONINFO		osvi = {0};
+-
+-  /* Check display range */
+-  nDisp = atoi (display);
+-  if (nDisp < 0 || nDisp > 65535)
+-    {
+-      ErrorF ("winCheckDisplayNumber - Bad display number: %d\n", nDisp);
+-      return FALSE;
+-    }
+-
+-  /* Set first character of mutex name to null */
+-  name[0] = '\0';
+-
+-  /* Get operating system version information */
+-  osvi.dwOSVersionInfoSize = sizeof (osvi);
+-  GetVersionEx (&osvi);
+-
+-  /* Want a mutex shared among all terminals on NT > 4.0 */
+-  if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT
+-      && osvi.dwMajorVersion >= 5)
+-    {
+-      pszPrefix = "Global\\";
+-    }
+-
+-  /* Setup Cygwin/X specific part of name */
+-  snprintf (name, sizeof(name), "%sCYGWINX_DISPLAY:%d", pszPrefix, nDisp);
+-
+-  /* Windows automatically releases the mutex when this process exits */
+-  mutex = CreateMutex (NULL, FALSE, name);
+-  if (!mutex)
+-    {
+-      LPVOID lpMsgBuf;
+-
+-      /* Display a fancy error message */
+-      FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+-		     FORMAT_MESSAGE_FROM_SYSTEM | 
+-		     FORMAT_MESSAGE_IGNORE_INSERTS,
+-		     NULL,
+-		     GetLastError (),
+-		     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+-		     (LPTSTR) &lpMsgBuf,
+-		     0, NULL);
+-      ErrorF ("winCheckDisplayNumber - CreateMutex failed: %s\n",
+-	      (LPSTR)lpMsgBuf);
+-      LocalFree (lpMsgBuf);
+-
+-      return FALSE;
+-    }
+-  if (GetLastError () == ERROR_ALREADY_EXISTS)
+-    {
+-      ErrorF ("winCheckDisplayNumber - "
+-	      PROJECT_NAME " is already running on display %d\n",
+-	      nDisp);
+-      return FALSE;
+-    }
+-
+-  return TRUE;
+-}
+Index: xorg-server-1.5.3/xserver/hw/xwin/XWin.man
 ===================================================================
---- xorg-server-1.5.2.orig/xserver/hw/xwin/XWin.man
-+++ xorg-server-1.5.2/xserver/hw/xwin/XWin.man
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/XWin.man
++++ xorg-server-1.5.3/xserver/hw/xwin/XWin.man
 @@ -230,8 +230,8 @@ The \fIAlt-F4\fP key combination is enab
  .B \-swcursor
  Disable the usage of the windows cursor and use the X11 software cursor instead.
@@ -56,3 +130,41 @@ Index: xorg-server-1.5.2/xserver/hw/xwin/XWin.man
  .TP 8
  .B "\-xkblayout \fIlayout\fP"
  .TP 8
+Index: xorg-server-1.5.3/xserver/hw/xwin/winerror.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winerror.c
++++ xorg-server-1.5.3/xserver/hw/xwin/winerror.c
+@@ -42,7 +42,7 @@
+ extern char *		g_pszCommandLine;
+ extern char *		g_pszLogFile;
+ extern Bool		g_fSilentFatalError;
+-
++extern Bool		g_fSilentDupError;
+ 
+ #ifdef DDXOSVERRORF
+ /* Prototype */
+@@ -61,6 +61,24 @@ OsVendorVErrorF (const char *pszFormat, 
+   pthread_mutex_lock (&s_pmPrinting);
+ #endif
+ 
++  /*
++     If we want to silence it,
++     detect if we are going to abort due to duplication error
++  */
++  if (g_fSilentDupError)
++    {
++      if ((strcmp(pszFormat,
++		  "InitOutput - Duplicate invocation on display "
++		  "number: %s.  Exiting.\n") == 0)
++	  || (strcmp(pszFormat,
++		     "Server is already active for display %s\n%s %s\n%s\n") == 0)
++	  || (strcmp(pszFormat,
++		     "MakeAllCOTSServerListeners: server already running\n") == 0))
++	{
++	  g_fSilentFatalError = TRUE;
++	}
++    }
++
+   /* Print the error message to a log file, could be stderr */
+   LogVWrite (0, pszFormat, va_args);
+ 
