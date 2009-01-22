@@ -1,3 +1,11 @@
+Cygwin: Fix multiwindow extwm mode to build again
+
+Note: this depends on the rootless extension, which in turn depends on 
+Apple's Xplugin.h:
+http://lists.apple.com/archives/X11-users/2003/Jun/msg00273.html
+
+Based on patches from Colin Harrison and Jon Turney.
+
 --- origsrc/xorg-server-1.5.3/configure.ac	2009-01-18 22:18:26.582625000 -0600
 +++ src/xorg-server-1.5.3/configure.ac	2009-01-19 01:47:24.192000000 -0600
 @@ -1650,6 +1650,7 @@ fi

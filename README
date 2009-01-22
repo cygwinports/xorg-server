@@ -108,7 +108,6 @@ Added patches:
 - Generate scan codes for fake keypresses from speech recognizers;
 - Improve mouse tracking for moving/resizing undecorated windows;
 - Reduce mouse polling interval to 50ms;
-- Unmap windows when minimized and map them again when restored.
 
 ----- version 1.5.3-4 -----
 Fix crashing of remote GLX clients built against earlier GLX versions.
