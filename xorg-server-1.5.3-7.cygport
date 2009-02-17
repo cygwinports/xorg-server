@@ -62,8 +62,8 @@ PATCH_URI="
 
 	1.5-version-with-builddate.patch
 	1.5-win32rootless-windowswm.patch
-	1.5-hint-handling-skip-taskbar.patch
 "
+#	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-log-timestamps.patch
 #	cygwin-unmap-minimized-windows.patch
 #	1.5-remove-automatic-multiplemonitors.patch
