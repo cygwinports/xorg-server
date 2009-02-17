@@ -1,0 +1,54 @@
+Cygwin/X: In Xinerama-o-vision!
+
+Layout screens according to their native window positions in Xinerama mode
+
+Also apply fix for X.Org bugzilla #18668 so WarpPointer requests done by mouse
+position synchronization don't cause pointere events to be sent to the wrong
+screen's root window
+
+---
+ xserver/hw/xwin/winscrinit.c |   10 ++++++++++
+ xserver/mi/mipointer.c       |    9 ++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winscrinit.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winscrinit.c	2009-02-06 17:30:09.184250000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winscrinit.c	2009-02-06 17:30:49.953125000 +0000
+@@ -237,6 +237,16 @@
+   else
+     winErrorFVerb(2, "winScreenInit - Using software cursor\n");  
+ 
++  /*
++     Note the screen origin in a normalized coordinate space where (0,0) is at the top left
++     of the native virtual desktop area
++  */
++  dixScreenOrigins[index].x = pScreenInfo->dwInitialX - GetSystemMetrics(SM_XVIRTUALSCREEN);
++  dixScreenOrigins[index].y = pScreenInfo->dwInitialY - GetSystemMetrics(SM_YVIRTUALSCREEN);
++
++  ErrorF("Screen %d added at XINERAMA coordinate (%d,%d).\n",
++         index, dixScreenOrigins[index].x, dixScreenOrigins[index].y);
++
+ #if CYGDEBUG || YES
+   winDebug ("winScreenInit - returning\n");
+ #endif
+Index: xorg-server-1.5.3/xserver/mi/mipointer.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/mi/mipointer.c	2009-02-06 17:30:09.218250000 +0000
++++ xorg-server-1.5.3/xserver/mi/mipointer.c	2009-02-06 17:30:49.953125000 +0000
+@@ -260,7 +260,14 @@
+ 	miPointer.pScreen = pScreen;
+     }
+ 
+-    if (changedScreen)
++    /* Don't call USFS if we use Xinerama, otherwise the root window is
++     * updated to the second screen, and we never receive any events.
++     * (FDO bug #18668) */
++    if (changedScreen
++#ifdef PANORAMIX
++            && noPanoramiXExtension
++#endif
++       )
+         UpdateSpriteForScreen (pScreen) ;
+ }
+ 

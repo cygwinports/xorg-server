@@ -1,33 +1,29 @@
 Cygwin/X: Process _NET_WM_STATE_SKIP_TASKBAR hint in multiwindow mode.
 
-To ensure that taskbar learns the correct state initially (since it only 
-updates it's idea of if it should show a button or not on a 
-ShowWindow()), we must be a bit more careful to do things in the right 
-order and set all the style flags before we show the window.
+To ensure that taskbar learns the correct state initially (since it
+only updates it's idea of if it should show a button or not on a ShowWindow()),
+we must be a bit more careful to do things in the right order and set all
+the style flags before we show the window.
 
-This is probably the right thing to do in any case as it means we can 
-avoid the messy appearance of the window changing style just after it is 
-first shown.
+This is probably the right thing to do in any case as it means we can avoid
+the messy appearance of the window changing style just after it is first shown
 
-In this implementation, this is achieved by having WM_CREATE send a 
-WM_WM_CREATE message to our window manager thread, which then does all 
-the work of discovering the windows style; it's convenient to do that 
-there as accessing X internals is awkward in the wndproc; possibly it's 
-more than convenient as there might be some deadlock issue that thread 
-avoids...
+In this implementation, this is achieved by having WM_CREATE send a WM_WM_CREATE
+message to our window manager thread, which then does all the work of discovering
+the windows style; it's convenient to do that there as accessing X internals is
+awkward in the wndproc; possibly it's more than convenient as there might be some
+deadlock issue that thread avoids...
 
-But note that this subtly changes the semantics of 
-winCreateWindowsWindow(): previously the window was visible and drawn 
-before that function returned, now that happens asychronously; I'm not 
-sure if that could cause problems or not...
+But note that this subtly changes the semantics of winCreateWindowsWindow():
+previously the window was visible and drawn before that function returned, now
+that happens asychronously; I'm not sure if that could cause problems or not...
 
-Check PropertyChange events for any of the window properties which we 
-consider to decide on the window style, and update the window style.  
-This allows the styling of the window to change during it's lifetime.
+Check PropertyChange events for any of the window properties which we consider
+to decide on the window style, and update the window style.  This allows the
+styling of the window to change during it's lifetime.
 
-We have to jump through hoops to ensure that the taskbar notices if the 
-window has changed it's style in a way which affects if the taskbar 
-shows it or not.
+We have to jump through hoops to ensure that the taskbar notices if the window
+has changed it's style in a way which affects if the taskbar shows it or not.
 
 ---
  xserver/hw/xwin/winmultiwindowwm.c      |   43 +++++++++++++++++++++++++-------
@@ -306,20 +302,16 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
  	}
        else if (event.type == ClientMessage
  	       && event.xclient.message_type == atmWmChange
-@@ -1471,17 +1508,20 @@
- #define HINT_SIZEBOX	(1l<<2)
- #define HINT_CAPTION	(1l<<3)
- #define HINT_NOMAXIMIZE (1L<<4)
+@@ -1471,6 +1508,8 @@
+ #define HINT_SIZEBOX	(1L<<2)
+ #define HINT_CAPTION	(1L<<3)
+ #define HINT_NOMAXIMIZE	(1L<<4)
 +/* Windows extended window styles */
 +#define HINT_SKIPTASKBAR (1L<<0)
  /* These two are used on their own */
  #define HINT_MAX	(1L<<0)
  #define HINT_MIN	(1L<<1)
- 
-+
- static void
- winApplyHints (Display *pDisplay, Window iWindow, HWND hWnd, HWND *zstyle)
- {
+@@ -1481,7 +1520,7 @@
    static Atom	windowState, motif_wm_hints, windowType;
    Atom		type, *pAtom = NULL;
    int 		format;
@@ -372,7 +364,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
  
    XSizeHints *normal_hint = XAllocSizeHints();
    long supplied;
--  if (normal_hint && (XGetWMNormalHints(pDisplay, iWindow, &normal_hint, &supplied) == Success))
+-  if (normal_hint && (XGetWMNormalHints(pDisplay, iWindow, normal_hint, &supplied) == Success))
 +  if (normal_hint && (XGetWMNormalHints(pDisplay, iWindow, normal_hint, &supplied) == Success))
      {
        if (normal_hint->flags & PMaxSize)
@@ -551,5 +543,3 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winwindow.h
  #define		WM_MANAGE		(WM_USER + 100)
  #define		WM_UNMANAGE		(WM_USER + 102)
  
-
-

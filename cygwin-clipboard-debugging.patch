@@ -1,0 +1,38 @@
+Cygwin/X: Improve debuggability of clipboard problems
+
+Clearly diagnose a timeout while waiting for SelectionNotify event
+(which seems to be behind some of the reported failures)
+
+---
+ xserver/hw/xwin/winclipboardwndproc.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c	2009-01-31 12:35:34.911250000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c	2009-02-10 18:45:43.437500000 +0000
+@@ -106,13 +106,13 @@
+       if (tv.tv_sec < 0)
+ 	return WIN_XEVENTS_SUCCESS;
+ 
+-      /* Wait for a Windows event or an X event */
++      /* Wait for an X event */
+       iReturn = select (iConnNumber + 1,/* Highest fds number */
+ 			&fdsRead,	/* Read mask */
+ 			NULL,		/* No write mask */
+ 			NULL,		/* No exception mask */
+ 			&tv);		/* No timeout */
+-      if (iReturn <= 0)
++      if (iReturn < 0)
+ 	{
+ 	  ErrorF ("winProcessXEventsTimeout - Call to select () failed: %d.  "
+ 		  "Bailing.\n", iReturn);
+@@ -533,6 +533,8 @@
+ 	    if (g_fUnicodeSupport)
+ 	      SetClipboardData (CF_UNICODETEXT, NULL);
+ 	    SetClipboardData (CF_TEXT, NULL);
++
++            ErrorF("winClipboardWindowProc - timed out waiting for WIN_XEVENTS_NOTIFY\n");
+ 	  }
+ 
+ 	/* BPS - Post ourselves a user message whose handler will reset the

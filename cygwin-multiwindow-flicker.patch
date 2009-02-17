@@ -1,0 +1,51 @@
+Cygwin/X: Avoid a visual glitch on window move in rootless modes
+
+Handle and ignore WM_ERASEBKGND since we repaint the entire invalidated region anyhow
+(this avoids a white flickering on window resize)
+
+---
+ xserver/hw/xwin/winmultiwindowwndproc.c   |    8 ++++++++
+ xserver/hw/xwin/winwin32rootlesswndproc.c |   11 +++++++++++
+ 2 files changed, 19 insertions(+)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-10 21:55:54.921875000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-11 14:11:31.343750000 +0000
+@@ -468,6 +468,14 @@
+       HandleCustomWM_INITMENU ((unsigned long)hwnd, wParam);
+       break;
+ 
++    case WM_ERASEBKGND:
++      /*
++       * Pretend that we did erase the background but we don't care,
++       * since we repaint the entire region anyhow
++       * This avoids some flickering when resizing.
++       */
++      return TRUE;
++
+     case WM_PAINT:
+       /* Only paint if our window handle is valid */
+       if (hwndScreen == NULL)
+Index: xorg-server-1.5.3/xserver/hw/xwin/winwin32rootlesswndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winwin32rootlesswndproc.c	2009-02-10 21:55:54.656250000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winwin32rootlesswndproc.c	2009-02-10 21:55:56.593750000 +0000
+@@ -779,6 +779,17 @@
+       SendMessage (hwndScreen, message, wParam, lParam);
+       return 0;
+ 
++    case WM_ERASEBKGND:
++#if CYGDEBUG
++      winDebug ("winMWExtWMWindowProc - WM_ERASEBKGND\n");
++#endif
++      /*
++       * Pretend that we did erase the background but we don't care,
++       * since we repaint the entire region anyhow
++       * This avoids some flickering when resizing.
++       */
++      return TRUE;
++
+     case WM_PAINT:
+     
+       /* BeginPaint gives us an hdc that clips to the invalidated region */

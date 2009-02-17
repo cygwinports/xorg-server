@@ -1,38 +1,48 @@
-Xming: Clipboard fixes
+Xming: Cache clipboard atom lookups
 
-Cache the CLIPBOARD atom lookups in winClipboardWindowProc()
-Cache atom lookups in winClipboardFlushXEvents()
-
-Copyright (C) Colin Harrison 2005-2008
-http://www.straightrunning.com/XmingNotes/
-http://sourceforge.net/projects/xming/ 
+Cache the CLIPBOARD Atom lookups in winClipboardWindowProc()
+Cache the Atom lookups in winClipboardFlushXEvents()
 
 ---
- xserver/hw/xwin/winclipboardwndproc.c |   15 ++++++---------
- xserver/hw/xwin/winclipboardxevents.c |   31 +++++++++++++++++++------------
- 2 files changed, 25 insertions(+), 21 deletions(-)
+ xserver/hw/xwin/winclipboardwndproc.c |   21 ++++++++++++---------
+ xserver/hw/xwin/winclipboardxevents.c |   27 +++++++++++++++------------
+ 2 files changed, 27 insertions(+), 21 deletions(-)
 
 Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
-@@ -260,12 +260,15 @@ winClipboardWindowProc (HWND hwnd, UINT 
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c	2007-10-24 17:12:33.000000000 +0100
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c	2009-02-10 21:54:06.859375000 +0000
+@@ -34,6 +34,7 @@
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include "winclipboard.h"
++#include "misc.h"
+ 
+ extern void		winFixClipboardChain();
+ 
+@@ -259,6 +260,8 @@
+ 
      case WM_DRAWCLIPBOARD:
        {
- 	static Bool s_fProcessingDrawClipboard = FALSE;
 +	static Atom atomClipboard;
++	static int generation;
+ 	static Bool s_fProcessingDrawClipboard = FALSE;
  	Display	*pDisplay = g_pClipboardDisplay;
  	Window	iWindow = g_iClipboardWindow;
- 	int	iReturn;
+@@ -266,6 +269,12 @@
  
  	winDebug ("winClipboardWindowProc - WM_DRAWCLIPBOARD: Enter\n");
  
-+	if (atomClipboard == None) atomClipboard = XInternAtom (pDisplay, "CLIPBOARD", False);
++	if (generation != serverGeneration)
++          {
++            generation = serverGeneration;
++            atomClipboard = XInternAtom (pDisplay, "CLIPBOARD", False);
++          }
 +
  	/*
  	 * We've occasionally seen a loop in the clipboard chain.
  	 * Try and fix it on the first hint of recursion.
-@@ -353,17 +356,13 @@ winClipboardWindowProc (HWND hwnd, UINT 
+@@ -353,17 +362,13 @@
  
  	    /* Release CLIPBOARD selection if owned */
  	    iReturn = XGetSelectionOwner (pDisplay,
@@ -52,7 +62,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
  				    None,
  				    CurrentTime);
  	      }
-@@ -396,9 +395,7 @@ winClipboardWindowProc (HWND hwnd, UINT 
+@@ -396,9 +401,7 @@
  	
  	/* Reassert ownership of the CLIPBOARD */	  
  	iReturn = XSetSelectionOwner (pDisplay,
@@ -65,9 +75,17 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
  	if (iReturn == BadAtom || iReturn == BadWindow)
 Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardxevents.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
-@@ -51,18 +51,25 @@ winClipboardFlushXEvents (HWND hwnd,
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardxevents.c	2007-10-23 22:26:52.000000000 +0100
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c	2009-02-10 21:54:35.687500000 +0000
+@@ -32,6 +32,7 @@
+ #include <xwin-config.h>
+ #endif
+ #include "winclipboard.h"
++#include "misc.h"
+ 
+ 
+ /*
+@@ -51,18 +52,20 @@
  			  Display *pDisplay,
  			  Bool fUseUnicode)
  {
@@ -83,25 +101,20 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
 -  Atom			atomTargets = XInternAtom (pDisplay,
 -						   "TARGETS",
 -						   False);
-+  static Atom atomLocalProperty, atomCompoundText;
-+  static Atom atomUTF8String, atomTargets;
++  static Atom atomLocalProperty;
++  static Atom atomCompoundText;
++  static Atom atomUTF8String;
++  static Atom atomTargets;
++  static int generation;
 +
-+  if (atomLocalProperty == None)
-+    atomLocalProperty = XInternAtom (pDisplay,
-+				     WIN_LOCAL_PROPERTY,
-+				     False);
-+  if (atomUTF8String == None)
-+    atomUTF8String = XInternAtom (pDisplay,
-+				  "UTF8_STRING",
-+				  False);
-+  if (atomCompoundText == None)
-+    atomCompoundText = XInternAtom (pDisplay,
-+				    "COMPOUND_TEXT",
-+				    False);
-+  if (atomTargets == None)
-+    atomTargets = XInternAtom (pDisplay,
-+			       "TARGETS",
-+			       False);
++  if (generation != serverGeneration)
++    {
++      generation = serverGeneration;
++      atomLocalProperty = XInternAtom (pDisplay, WIN_LOCAL_PROPERTY, False);
++      atomUTF8String = XInternAtom (pDisplay, "UTF8_STRING", False);
++      atomCompoundText = XInternAtom (pDisplay, "COMPOUND_TEXT", False);
++      atomTargets = XInternAtom (pDisplay, "TARGETS", False);
++    }
  
    /* Process all pending events */
    while (XPending (pDisplay))

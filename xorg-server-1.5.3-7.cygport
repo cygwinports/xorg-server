@@ -28,6 +28,9 @@ PATCH_URI="
 	from-xming-patch15-clipboard-check-selection-ownership-after-take.patch
 	from-xming-patch15-clipboard-returndata-leak-fix.patch
 	from-xming-patch15-clipboard-attribution.patch
+	from-xming-patch15-clipboard-avoid-log-spam.patch
+	from-xming-patch15-clipboard-lock-x-display-during-winClipboardFlushXEvent.patch
+	from-xming-patch15-clipboard-tidy-ups-in-winClipboardFlushXEvents.patch
 	from-xming-patch16-unicode-window-title-fix.patch
 
 	cygwin-fix-silent-dup-error.patch
@@ -53,13 +56,17 @@ PATCH_URI="
 	cygwin-mouse-capture.patch
 	cygwin-fix-warp-pointer-in-multiwindow-mode.patch
 	cygwin-speech-recognizer-keybd-fix.patch
+	cygwin-xinerama-layout.patch
+	cygwin-clipboard-debugging.patch
+	cygwin-multiwindow-flicker.patch
 
 	1.5-version-with-builddate.patch
 	1.5-win32rootless-windowswm.patch
+	1.5-hint-handling-skip-taskbar.patch
 "
 #	cygwin-log-timestamps.patch
-#	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-unmap-minimized-windows.patch
+#	1.5-remove-automatic-multiplemonitors.patch
 
 DIFF_EXCLUDES="xfree86 xprint xquartz xf86Build.h *-config.h xorg-server.h"
 
@@ -68,7 +75,7 @@ src_unpack_hook() {
 	mv -f X.ico hw/xwin/X.ico
 
 	# just in case we are running prep() a second time
-	rm -f hw/xwin/XWin.exe.manifest
+	rm -f hw/xwin/XWin.exe.manifest miext/rootless/Xplugin.h
 }
 
 src_compile() {
@@ -102,7 +109,6 @@ src_compile() {
 		--disable-xf86bigfont \
 		--disable-xf86misc \
 		--disable-xf86vidmode \
-		--disable-xinerama \
 		--disable-xsdl \
 		--disable-xv \
 		--disable-xvmc \
