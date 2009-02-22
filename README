@@ -103,9 +103,11 @@ Port Notes:
 Enabled Xinerama support in rooted and -rootless modes only
 (NOT multiwindow or mwextwm for now).
 Added patches:
+- fixed Latin American (latam) keyboard layout detection
 - remainder of Xming patch 15 (clipboard issues)
 - additional clipboard debugging messages
 - fix for flickering when resizing in multiwindow
+- removed obsolete references to -co flag from Xserver manpage.
 
 ----- version 1.5.3-6 -----
 Rebuilt with libXfont-1.3.4 to fix problems with the builtin fonts.

@@ -1,3 +1,27 @@
+--- origsrc/xorg-server-1.5.3/doc/Xserver.man.pre	2008-11-05 10:52:17.000000000 -0600
++++ src/xorg-server-1.5.3/doc/Xserver.man.pre	2009-02-22 11:08:54.875000000 -0600
+@@ -118,11 +118,6 @@ sets the visual class for the root windo
+ The class numbers are as specified in the X protocol.
+ Not obeyed by all servers.
+ .TP 8
+-.B \-co \fIfilename\fP
+-sets name of RGB color database.  The default is
+-.IR __projectroot__/share/X11/rgb .
+-.ig
+-.TP 8
+ .B \-config \fIfilename\fP
+ reads more options from the given file.  Options in the file may be separated
+ by newlines if desired.  If a '#' character appears on a line, all characters
+@@ -557,9 +552,6 @@ Bitmap font directories
+ .IR __projectroot__/lib/X11/fonts/TTF , __projectroot__/lib/X11/fonts/Type1
+ Outline font directories
+ .TP 30
+-.I __projectroot__/share/X11/rgb.txt
+-Color database
+-.TP 30
+ .I /tmp/.X11-unix/X\fBn\fP
+ Unix domain socket for display number \fBn\fP
+ .TP 30
 --- origsrc/xorg-server-1.5.3/hw/xwin/Makefile.am	2008-11-12 22:54:28.754097400 -0600
 +++ src/xorg-server-1.5.3/hw/xwin/Makefile.am	2008-11-12 22:59:26.050972400 -0600
 @@ -166,7 +166,8 @@
