@@ -1,0 +1,116 @@
+---
+ xserver/hw/xwin/win.h                     |    3 +++
+ xserver/hw/xwin/winmouse.c                |   26 ++++++++++++++++++++++++++
+ xserver/hw/xwin/winmultiwindowwndproc.c   |    6 +++---
+ xserver/hw/xwin/winwin32rootlesswndproc.c |    6 +++---
+ xserver/hw/xwin/winwndproc.c              |    8 +++-----
+ 5 files changed, 38 insertions(+), 11 deletions(-)
+
+Index: xorg-server-1.6.0/xserver/hw/xwin/win.h
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/win.h	2009-02-26 16:14:40.171875000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/win.h	2009-02-26 16:15:51.984375000 +0000
+@@ -1006,6 +1006,9 @@
+ 		       int iEventType, int iButton,
+ 		       WPARAM wParam);
+ 
++void
++winEnqueueMotion(int x, int y);
++
+ #ifdef XWIN_NATIVEGDI
+ /*
+  * winnativegdi.c
+Index: xorg-server-1.6.0/xserver/hw/xwin/winmouse.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winmouse.c	2009-02-26 16:15:10.015625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winmouse.c	2009-02-26 16:15:52.046875000 +0000
+@@ -344,3 +344,29 @@
+ 
+   return 0;
+ }
++
++/**
++ * Enqueue a motion event.
++ *
++ *  XXX: miPointerMove does exactly this, but is static :-( (and uses a static buffer)
++ *
++ */
++void winEnqueueMotion(int x, int y)
++{
++  miPointerSetPosition(g_pwinPointer, &x, &y);
++  g_c32LastInputEventTime = GetTickCount();
++
++  int i, nevents;
++  int valuators[2];
++
++  EventListPtr events;
++  GetEventList(&events);
++
++  valuators[0] = x;
++  valuators[1] = y;
++  nevents = GetPointerEvents(events, g_pwinPointer, MotionNotify, 0,
++			     POINTER_ABSOLUTE, 0, 2, valuators);
++
++  for (i = 0; i < nevents; i++)
++    mieqEnqueue(g_pwinPointer, events[i].event);
++}
+Index: xorg-server-1.6.0/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-26 16:14:40.171875000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-26 16:15:52.046875000 +0000
+@@ -535,9 +535,9 @@
+ 	}
+ 
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (ptMouse.x - s_pScreenInfo->dwXOffset,
+-			       ptMouse.y - s_pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(ptMouse.x - s_pScreenInfo->dwXOffset,
++		       ptMouse.y - s_pScreenInfo->dwYOffset);
++
+       return 0;
+       
+     case WM_NCMOUSEMOVE:
+Index: xorg-server-1.6.0/xserver/hw/xwin/winwin32rootlesswndproc.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winwin32rootlesswndproc.c	2009-02-26 16:13:13.288625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winwin32rootlesswndproc.c	2009-02-26 16:15:52.046875000 +0000
+@@ -571,9 +571,9 @@
+ 	}
+ 
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (ptMouse.x - pScreenInfo->dwXOffset,
+-			       ptMouse.y - pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(ptMouse.x - pScreenInfo->dwXOffset,
++		       ptMouse.y - pScreenInfo->dwYOffset);
++
+       return 0;
+       
+     case WM_NCMOUSEMOVE:
+Index: xorg-server-1.6.0/xserver/hw/xwin/winwndproc.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winwndproc.c	2009-02-26 16:14:40.171875000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winwndproc.c	2009-02-26 16:15:52.046875000 +0000
+@@ -764,9 +764,8 @@
+ 	}
+       
+       /* Deliver absolute cursor position to X Server */
+-      miPointerAbsoluteCursor (GET_X_LPARAM(lParam)-s_pScreenInfo->dwXOffset,
+-			       GET_Y_LPARAM(lParam)-s_pScreenInfo->dwYOffset,
+-			       g_c32LastInputEventTime = GetTickCount ());
++      winEnqueueMotion(GET_X_LPARAM(lParam)-s_pScreenInfo->dwXOffset,
++		       GET_Y_LPARAM(lParam)-s_pScreenInfo->dwYOffset);
+       return 0;
+ 
+     case WM_NCMOUSEMOVE:
+@@ -929,8 +928,7 @@
+ 	    point.y -= GetSystemMetrics (SM_YVIRTUALSCREEN);
+ 	    
+ 	    /* Deliver absolute cursor position to X Server */
+-	    miPointerAbsoluteCursor (point.x, point.y,
+-				     g_c32LastInputEventTime = GetTickCount());
++	    winEnqueueMotion(point.x , point.y);
+ 
+ 	    /* Check if a button was released but we didn't see it */
+ 	    GetCursorPos (&point);

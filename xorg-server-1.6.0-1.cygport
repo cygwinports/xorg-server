@@ -4,7 +4,12 @@ inherit xorg
 SRC_URI+=" X.ico"
 PATCH_URI="
 	cygwin-build-fixes.patch
-	cygwin-mieq.patch
+
+	cygwin-update-for-MPX-cursor-API-changes.patch
+	cygwin-update-for-MPX-device-changes.patch
+	cygwin-update-for-changes-in-mieq-API.patch
+	cygwin-update-to-enqueue-pointer-motion-event-on-mouse-movement.patch
+
 	cygwin-use-standard-dpms-stubs.patch
 	cygwin-shadow-changes-update.patch
 	cygwin-smart-scheduler-problems-workaround.patch
@@ -38,19 +43,16 @@ PATCH_URI="
 	cygwin-window-placement.patch
 	cygwin-fix-keyboard-lock-mode-sync.patch
 	cygwin-glx-crash-workaround.patch
-	cygwin-xkb-fixes.patch
 
 	1.3-ddxBeforeReset.patch
 	1.5-composite.patch
 	1.5-glx-RTLD_LOCAL.patch
 	1.5-no-install-sdk-m4-or-pc.patch
-	1.5-kdrive-xv-conditional.patch
 	1.5-xfake-build.patch
 	1.5-xwin-resources.patch
 	1.5-log-per-display-and-location-configurable.patch
 	1.5-system_XWinrc-in-etc.patch
 	1.5-manpage-fixups.patch
-	1.5-use-bitmap-and-builtin-fonts.patch
 
 	cygwin-adjust-MOUSE_POLLING_INTERVAL.patch
 	cygwin-mouse-capture.patch
@@ -61,14 +63,18 @@ PATCH_URI="
 	cygwin-multiwindow-flicker.patch
 
 	1.5-version-with-builddate.patch
-	1.5-win32rootless-windowswm.patch
+
+	1.6-dolt.patch
+	1.6-libXfont14.patch
+	1.6-use-bitmap-and-builtin-fonts.patch
+	1.6-win32rootless-windowswm.patch
 "
 #	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-log-timestamps.patch
 #	cygwin-unmap-minimized-windows.patch
 #	1.5-remove-automatic-multiplemonitors.patch
 
-DIFF_EXCLUDES="xfree86 xprint xquartz xf86Build.h *-config.h xorg-server.h"
+DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
 CYGPORT_USE_UNSTABLE_API=1
 src_unpack_hook() {
@@ -93,8 +99,8 @@ src_compile() {
 
 	# XC-Security required for untrusted X11 forwarding, but read this first:
 	#   http://cygwin.com/ml/cygwin-xfree/2008-11/msg00154.html
-	# To enable, add this (XC-AppGroup has been removed from git master):
-	#	--enable-xcsecurity --disable-appgroup \
+	# To enable, add:
+	#	--enable-xcsecurity \
 	#
 	# Record required for libXtst, still in use
 	cd ${B}
@@ -105,9 +111,9 @@ src_compile() {
 		--enable-record \
 		--disable-config-hal \
 		--disable-dri \
+		--disable-dri2 \
 		--disable-install-setuid \
 		--disable-xf86bigfont \
-		--disable-xf86misc \
 		--disable-xf86vidmode \
 		--disable-xsdl \
 		--disable-xv \

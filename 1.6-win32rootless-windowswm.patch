@@ -893,7 +893,7 @@ Based on patches from Colin Harrison and Jon Turney.
  void RootlessChangeBorderWidth(WindowPtr pWin, unsigned int width);
 +#ifdef __APPLE__
  void RootlessNativeWindowMoved (WindowPtr pWin);
- void RootlessNativeWindowStateChanged (xp_window_id id, unsigned int state); 
+ void RootlessNativeWindowStateChanged (WindowPtr pWin, unsigned int state); 
 +#endif
  
  #endif

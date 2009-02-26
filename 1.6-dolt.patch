@@ -1,0 +1,12 @@
+--- origsrc/xorg-server-1.6.0/acinclude.m4	2008-12-16 14:03:03.000000000 -0600
++++ src/xorg-server-1.6.0/acinclude.m4	2009-02-25 23:06:00.763625000 -0600
+@@ -29,6 +29,9 @@ i?86-*-linux*|x86_64-*-linux*|powerpc-*-
+ i?86-apple-darwin*)
+     pic_options='-fno-common'
+     ;;
++*-*-cygwin*|*-*-mingw32)
++    pic_options='-DDLL_EXPORT'
++    ;;
+ *)
+     dolt_supported=no
+     ;;

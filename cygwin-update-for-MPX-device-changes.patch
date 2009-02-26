@@ -1,0 +1,99 @@
+---
+ xserver/hw/xwin/InitInput.c             |   16 +++++++++-------
+ xserver/hw/xwin/win.h                   |    2 ++
+ xserver/hw/xwin/winmultiwindowwndproc.c |    4 ++--
+ xserver/hw/xwin/winwndproc.c            |    4 ++--
+ 4 files changed, 15 insertions(+), 11 deletions(-)
+
+Index: xorg-server-1.6.0/xserver/hw/xwin/InitInput.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/InitInput.c	2009-02-26 16:13:13.281625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/InitInput.c	2009-02-26 16:14:40.171875000 +0000
+@@ -49,6 +49,8 @@
+  */
+ 
+ CARD32				g_c32LastInputEventTime = 0;
++DeviceIntPtr g_pwinPointer;
++DeviceIntPtr g_pwinKeyboard;
+ 
+ 
+ /*
+@@ -94,7 +96,6 @@
+ #endif
+ 
+   mieqProcessInputEvents ();
+-  miPointerUpdate ();
+ 
+ #if 0
+   ErrorF ("ProcessInputEvents - returning\n");
+@@ -120,8 +121,6 @@
+ void
+ InitInput (int argc, char *argv[])
+ {
+-  DeviceIntPtr		pMouse, pKeyboard;
+-
+ #if CYGDEBUG
+   winDebug ("InitInput\n");
+ #endif
+@@ -143,11 +142,14 @@
+     }
+ #endif
+ 
+-  pMouse = AddInputDevice (winMouseProc, TRUE);
+-  pKeyboard = AddInputDevice (winKeybdProc, TRUE);
++  g_pwinPointer = AddInputDevice (serverClient, winMouseProc, TRUE);
++  g_pwinKeyboard = AddInputDevice (serverClient, winKeybdProc, TRUE);
+   
+-  RegisterPointerDevice (pMouse);
+-  RegisterKeyboardDevice (pKeyboard);
++  RegisterPointerDevice (g_pwinPointer);
++  RegisterKeyboardDevice (g_pwinKeyboard);
++
++  g_pwinPointer->name = strdup("Windows mouse");
++  g_pwinKeyboard->name = strdup("Windows keyboard");
+ 
+   miRegisterPointerDevice (screenInfo.screens[0], pMouse);
+   mieqInit ((DevicePtr)pKeyboard, (DevicePtr)pMouse);
+Index: xorg-server-1.6.0/xserver/hw/xwin/win.h
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/win.h	2009-02-26 16:13:13.282625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/win.h	2009-02-26 16:14:40.171875000 +0000
+@@ -639,6 +639,8 @@
+ extern int                      g_copyROP[];
+ extern int                      g_patternROP[];
+ extern const char *		g_pszQueryHost;
++extern DeviceIntPtr             g_pwinPointer;
++extern DeviceIntPtr             g_pwinKeyboard;
+ 
+ 
+ /*
+Index: xorg-server-1.6.0/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-26 16:13:13.287625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-26 16:14:40.171875000 +0000
+@@ -495,8 +495,8 @@
+ 	break;
+ 
+       /* Has the mouse pointer crossed screens? */
+-      if (s_pScreen != miPointerGetScreen(inputInfo.pointer))
+-	miPointerSetScreen (inputInfo.pointer, s_pScreenInfo->dwScreen,
++      if (s_pScreen != miPointerGetScreen(g_pwinPointer))
++	miPointerSetScreen (g_pwinPointer, s_pScreenInfo->dwScreen,
+ 			       ptMouse.x - s_pScreenInfo->dwXOffset,
+ 			       ptMouse.y - s_pScreenInfo->dwYOffset);
+ 
+Index: xorg-server-1.6.0/xserver/hw/xwin/winwndproc.c
+===================================================================
+--- xorg-server-1.6.0.orig/xserver/hw/xwin/winwndproc.c	2009-02-26 16:13:13.291625000 +0000
++++ xorg-server-1.6.0/xserver/hw/xwin/winwndproc.c	2009-02-26 16:14:40.171875000 +0000
+@@ -724,8 +724,8 @@
+ 	break;
+ 
+       /* Has the mouse pointer crossed screens? */
+-      if (s_pScreen != miPointerGetScreen(inputInfo.pointer))
+-	miPointerSetScreen (inputInfo.pointer, s_pScreenInfo->dwScreen,
++      if (s_pScreen != miPointerGetScreen(g_pwinPointer))
++	miPointerSetScreen (g_pwinPointer, s_pScreenInfo->dwScreen,
+ 			       GET_X_LPARAM(lParam)-s_pScreenInfo->dwXOffset,
+ 			       GET_Y_LPARAM(lParam)-s_pScreenInfo->dwYOffset);
+ 

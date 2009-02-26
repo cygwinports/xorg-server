@@ -272,16 +272,14 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowicons.c
    
    hDC = GetDC (GetDesktopWindow ());
    planes = GetDeviceCaps (hDC, PLANES);
-@@ -302,32 +389,93 @@ winXIconToHICON (WindowPtr pWin, int ico
+@@ -302,30 +389,93 @@ winXIconToHICON (WindowPtr pWin, int ico
    /* Mask is 1-bit deep */
    maskStride = ((iconSize * 1 + 15) & (~15)) / 8;
  
--  image = (unsigned char * ) malloc (stride * iconSize);
--  imageMask = (unsigned char *) malloc (stride * iconSize);
--  mask = (unsigned char *) malloc (maskStride * iconSize);
--  
+-  image = malloc (stride * iconSize);
+-  imageMask = malloc (stride * iconSize);
 -  /* Default to a completely black mask */
--  memset (mask, 0, maskStride * iconSize);
+-  mask = calloc (maskStride, iconSize);
 +  if (!_XA_NET_WM_ICON) _XA_NET_WM_ICON = MakeAtom("_NET_WM_ICON", 12, FALSE);
    
 -  winScaleXBitmapToWindows (iconSize, effBPP, iconPtr, image);

@@ -207,16 +207,6 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/InitInput.c
 ===================================================================
 --- xorg-server-1.5.3.orig/xserver/hw/xwin/InitInput.c
 +++ xorg-server-1.5.3/xserver/hw/xwin/InitInput.c
-@@ -30,9 +30,6 @@
- #include <xwin-config.h>
- #endif
- #include "win.h"
--#ifdef XWIN_CLIPBOARD
--# include "../../Xext/xf86miscproc.h"
--#endif
- #include "dixstruct.h"
- 
- 
 @@ -104,6 +101,11 @@ ProcessInputEvents (void)
  #endif
  }

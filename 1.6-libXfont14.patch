@@ -1,0 +1,21 @@
+libXfont 1.4 un-weak'ened this symbol (commit daa7af), resulting in:
+
+/usr/lib/libXfont.a(fontfile.o):fontfile.c:(.text+0x0): multiple definition of `_CopyISOLatin1Lowered'
+../../../dix/.libs/libdix.a(dixutils.o):dixutils.c:(.text+0xe0): first defined here
+
+--- origsrc/xorg-server-1.6.0/dix/dixutils.c	2009-02-25 13:12:10.000000000 -0600
++++ src/xorg-server-1.6.0/dix/dixutils.c	2009-02-26 11:39:41.652055600 -0600
+@@ -165,7 +165,12 @@ ISOLatin1ToLower (unsigned char source)
+ }
+ 
+ 
+-_X_EXPORT void
++#ifdef __CYGWIN__
++static
++#else
++_X_EXPORT
++#endif
++void
+ CopyISOLatin1Lowered(unsigned char *dest, unsigned char *source, int length)
+ {
+     int i;

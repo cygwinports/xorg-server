@@ -27,24 +27,6 @@ Index: xorg-server-1.5.3/xserver/configure.ac
  else
          GLX=no
  fi
-@@ -1215,7 +1215,7 @@
- 
- if test "x$XVFB" = xyes; then
- 	XVFB_LIBS="$FB_LIB $FIXES_LIB $XEXT_LIB $CONFIG_LIB $DBE_LIB $XTRAP_LIB $RECORD_LIB $GLX_LIBS $RENDER_LIB $RANDR_LIB $DAMAGE_LIB $MIEXT_DAMAGE_LIB $MIEXT_SHADOW_LIB $XI_LIB $XKB_LIB $XKB_STUB_LIB $COMPOSITE_LIB $XPSTUBS_LIB"
--	XVFB_SYS_LIBS="$XVFBMODULES_LIBS"
-+	XVFB_SYS_LIBS="$XVFBMODULES_LIBS $GLX_SYS_LIBS"
- 	AC_SUBST([XVFB_LIBS])
- 	AC_SUBST([XVFB_SYS_LIBS])
- fi
-@@ -1233,7 +1233,7 @@
- 
- if test "x$XNEST" = xyes; then
- 	XNEST_LIBS="$FB_LIB $FIXES_LIB $MI_LIB $XEXT_LIB $DBE_LIB $XTRAP_LIB $RECORD_LIB $GLX_LIBS $RENDER_LIB $RANDR_LIB $DAMAGE_LIB $MIEXT_DAMAGE_LIB $MIEXT_SHADOW_LIB $XI_LIB $XKB_LIB $XKB_STUB_LIB $COMPOSITE_LIB $XPSTUBS_LIB $DIX_LIB $OS_LIB $CONFIG_LIB"
--	XNEST_SYS_LIBS="$XNESTMODULES_LIBS"
-+	XNEST_SYS_LIBS="$XNESTMODULES_LIBS $GLX_SYS_LIBS"
- 	AC_SUBST([XNEST_LIBS])
- 	AC_SUBST([XNEST_SYS_LIBS])
- fi
 @@ -1680,7 +1680,7 @@
  			XWIN_SYS_LIBS=-lwinsock2
  			;;
@@ -54,15 +36,6 @@ Index: xorg-server-1.5.3/xserver/configure.ac
  	AC_SUBST(XWIN_SERVER_NAME)
  	AC_SUBST(XWIN_SYS_LIBS)
  
-@@ -1965,7 +1965,7 @@
-     KDRIVE_LOCAL_LIBS="$TSLIB_LIBS $DIX_LIB $KDRIVE_LIB $KDRIVE_STUB_LIB $CONFIG_LIB"
-     KDRIVE_LOCAL_LIBS="$KDRIVE_LOCAL_LIBS $FB_LIB $MI_LIB $KDRIVE_PURE_LIBS"
-     KDRIVE_LOCAL_LIBS="$KDRIVE_LOCAL_LIBS $KDRIVE_OS_LIB $OS_LIB"
--    KDRIVE_LIBS="$KDRIVE_LOCAL_LIBS $XSERVER_SYS_LIBS"
-+    KDRIVE_LIBS="$KDRIVE_LOCAL_LIBS $XSERVER_SYS_LIBS $GLX_SYS_LIBS"
- 
-     # check if we can build Xephyr
-     PKG_CHECK_MODULES(XEPHYR, $XEPHYR_REQUIRED_LIBS, [xephyr="yes"], [xephyr="no"])
 Index: xorg-server-1.5.3/xserver/glx/Makefile.am
 ===================================================================
 --- xorg-server-1.5.3.orig/xserver/glx/Makefile.am	2008-11-05 10:52:17.000000000 -0600
@@ -74,10 +47,11 @@ Index: xorg-server-1.5.3/xserver/glx/Makefile.am
 -	glapi.c					\
  	glapi.h					\
  	glapioffsets.h				\
+ 	glprocs.h				\
 -	glthread.c				\
- 	glthread.h				\
- 	glprocs.h
+ 	glthread.h
  
+ libglxdri_la_SOURCES = \  
 Index: xorg-server-1.5.3/xserver/glx/single2.c
 ===================================================================
 --- xorg-server-1.5.3.orig/xserver/glx/single2.c

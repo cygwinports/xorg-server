@@ -30,9 +30,9 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
  
  
 @@ -209,3 +212,14 @@ winReshapeMultiWindow (WindowPtr pWin)
+   
    return;
  }
- #endif
 +
 +void
 +winShapeRgnUpdateMultiwindow(HWND hwnd)
