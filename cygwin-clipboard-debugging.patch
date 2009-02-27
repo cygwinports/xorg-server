@@ -3,15 +3,20 @@ Cygwin/X: Improve debuggability of clipboard problems
 Clearly diagnose a timeout while waiting for SelectionNotify event
 (which seems to be behind some of the reported failures)
 
+Turn useless #if 0/ErrorF()/#endif into useful winDebug()
+
 ---
- xserver/hw/xwin/winclipboardwndproc.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ xserver/hw/xwin/winclipboardtextconv.c |    8 ---
+ xserver/hw/xwin/winclipboardwndproc.c  |    8 ++-
+ xserver/hw/xwin/winclipboardwrappers.c |   49 ++++++++----------------
+ xserver/hw/xwin/winclipboardxevents.c  |   67 ++++++++++++++-------------------
+ 4 files changed, 54 insertions(+), 78 deletions(-)
 
 Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c	2009-01-31 12:35:34.911250000 +0000
-+++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c	2009-02-10 18:45:43.437500000 +0000
-@@ -106,13 +106,13 @@
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwndproc.c	2009-02-22 14:22:58.515625000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c	2009-02-25 18:06:12.390625000 +0000
+@@ -107,13 +107,13 @@
        if (tv.tv_sec < 0)
  	return WIN_XEVENTS_SUCCESS;
  
@@ -27,7 +32,18 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
  	{
  	  ErrorF ("winProcessXEventsTimeout - Call to select () failed: %d.  "
  		  "Bailing.\n", iReturn);
-@@ -533,6 +533,8 @@
+@@ -443,9 +443,9 @@
+        * follow this message and reassert ownership of the X11
+        * selections, handling the issue for us.
+        */
++      winDebug ("winClipboardWindowProc - WM_DESTROYCLIPBOARD - Ignored.\n");
+       return 0;
+ 
+-
+     case WM_RENDERFORMAT:
+     case WM_RENDERALLFORMATS:
+       {
+@@ -539,6 +539,8 @@
  	    if (g_fUnicodeSupport)
  	      SetClipboardData (CF_UNICODETEXT, NULL);
  	    SetClipboardData (CF_TEXT, NULL);
@@ -36,3 +52,284 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwndproc.c
  	  }
  
  	/* BPS - Post ourselves a user message whose handler will reset the
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardtextconv.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardtextconv.c	2007-10-23 22:26:52.000000000 +0100
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardtextconv.c	2009-02-22 17:58:47.872005000 +0000
+@@ -84,9 +84,7 @@
+   unsigned char		*pszEnd = pszSrc + iLength;
+   unsigned char		*pszDest = NULL, *pszDestBegin = NULL;
+ 
+-#if 0
+-  ErrorF ("UNIXtoDOS () - Original data:\n%s\n", *ppszData);
+-#endif
++  winDebug("UNIXtoDOS () - Original data:'%s'\n", *ppszData);
+ 
+   /* Count \n characters without leading \r */
+   while (pszSrc < pszEnd)
+@@ -153,7 +151,5 @@
+   free (*ppszData);
+   *ppszData = pszDestBegin;
+ 
+-#if 0
+-  ErrorF ("UNIXtoDOS () - Final string:\n%s\n", pszDestBegin);
+-#endif
++  winDebug("UNIXtoDOS () - Final string:'%s'\n", pszDestBegin);
+ }
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardwrappers.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardwrappers.c	2009-02-22 14:22:58.000000000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardwrappers.c	2009-02-22 17:55:15.575130000 +0000
+@@ -324,9 +324,7 @@
+   
+   REQUEST_SIZE_MATCH(xSetSelectionOwnerReq);
+ 
+-#if 0
+-  ErrorF ("winProcSetSelectionOwner - Hello.\n");
+-#endif
++  winDebug("winProcSetSelectionOwner - Hello.\n");
+ 
+   /* Watch for server reset */
+   if (s_ulServerGeneration != serverGeneration)
+@@ -369,10 +367,8 @@
+ 	{
+ 	  fOwnedToNotOwned = TRUE;
+ 
+-#if 0
+-	  ErrorF ("winProcSetSelectionOwner - PRIMARY - Going from "
++	  winDebug("winProcSetSelectionOwner - PRIMARY - Going from "
+ 		  "owned to not owned.\n");
+-#endif
+ 
+ 	  /* Adjust last owned selection */
+ 	  if (None != s_iOwners[CLIP_OWN_CLIPBOARD])
+@@ -384,10 +380,8 @@
+       /* Save new selection owner or None */
+       s_iOwners[CLIP_OWN_PRIMARY] = stuff->window;
+ 
+-#if 0
+-      ErrorF ("winProcSetSelectionOwner - PRIMARY - Now owned by: %d\n",
++      winDebug("winProcSetSelectionOwner - PRIMARY - Now owned by: %d\n",
+ 	      stuff->window);
+-#endif
+     }
+   else if (MakeAtom ("CLIPBOARD", 9, TRUE) == stuff->selection)
+     {
+@@ -396,11 +390,9 @@
+ 	  && None != s_iOwners[CLIP_OWN_CLIPBOARD])
+ 	{
+ 	  fOwnedToNotOwned = TRUE;
+-	  
+-#if 0
+-	  ErrorF ("winProcSetSelectionOwner - CLIPBOARD - Going from "
+-		  "owned to not owned.\n");
+-#endif
++
++	  winDebug("winProcSetSelectionOwner - CLIPBOARD - Going from "
++                   "owned to not owned.\n");
+ 
+ 	  /* Adjust last owned selection */
+ 	  if (None != s_iOwners[CLIP_OWN_PRIMARY])
+@@ -412,10 +404,9 @@
+       /* Save new selection owner or None */
+       s_iOwners[CLIP_OWN_CLIPBOARD] = stuff->window;
+ 
+-#if 0
+-      ErrorF ("winProcSetSelectionOwner - CLIPBOARD - Now owned by: %d\n",
+-	      stuff->window);
+-#endif
++      winDebug("winProcSetSelectionOwner - CLIPBOARD - Now owned by: %d\n",
++               stuff->window);
++
+     }
+   else
+     goto winProcSetSelectionOwner_Done;
+@@ -446,13 +437,11 @@
+       && g_hwndClipboard != NULL
+       && g_hwndClipboard == GetClipboardOwner ())
+     {
+-#if 0
+-      ErrorF ("winProcSetSelectionOwner - We currently own the "
+-	      "clipboard and neither the PRIMARY nor the CLIPBOARD "
+-	      "selections are owned, releasing ownership of Win32 "
+-	      "clipboard.\n");
+-#endif
+-      
++      winDebug("winProcSetSelectionOwner - We currently own the "
++               "clipboard and neither the PRIMARY nor the CLIPBOARD "
++               "selections are owned, releasing ownership of Win32 "
++               "clipboard.\n");
++
+       /* Release ownership of the Windows clipboard */
+       OpenClipboard (NULL);
+       EmptyClipboard ();
+@@ -468,9 +457,7 @@
+   /* Abort if no window at this point */
+   if (None == stuff->window)
+     {
+-#if 0
+-      ErrorF ("winProcSetSelectionOwner - No window, returning.\n");
+-#endif
++      winDebug("winProcSetSelectionOwner - No window, returning.\n");
+       goto winProcSetSelectionOwner_Done;
+     }
+ 
+@@ -487,10 +474,8 @@
+   /* Abort if clipboard manager is owning the selection */
+   if (pDrawable->id == g_iClipboardWindow)
+     {
+-#if 0
+-      ErrorF ("winProcSetSelectionOwner - We changed ownership, "
+-	      "aborting.\n");
+-#endif
++      winDebug("winProcSetSelectionOwner - We changed ownership, "
++               "aborting.\n");
+       goto winProcSetSelectionOwner_Done;
+     }
+ 
+Index: xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winclipboardxevents.c	2009-02-22 14:22:58.000000000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winclipboardxevents.c	2009-02-25 18:07:47.203125000 +0000
+@@ -105,20 +105,17 @@
+ 	   */
+ 
+ 	case SelectionRequest:
+-#if 0
+ 	  {
+ 	    char			*pszAtomName = NULL;
+-	    
+-	    ErrorF ("SelectionRequest - target %d\n",
+-		    event.xselectionrequest.target);
+-	    
++	    winDebug("SelectionRequest - target %d\n",
++                     event.xselectionrequest.target);
++
+ 	    pszAtomName = XGetAtomName (pDisplay,
+ 					event.xselectionrequest.target);
+-	    ErrorF ("SelectionRequest - Target atom name %s\n", pszAtomName);
++	    winDebug("SelectionRequest - Target atom name %s\n", pszAtomName);
+ 	    XFree (pszAtomName);
+ 	    pszAtomName = NULL;
+ 	  }
+-#endif
+ 
+ 	  /* Abort if invalid target type */
+ 	  if (event.xselectionrequest.target != XA_STRING
+@@ -450,21 +447,17 @@
+ 	   */ 
+ 
+ 	case SelectionNotify:
+-#if 0
+-	  ErrorF ("winClipboardFlushXEvents - SelectionNotify\n");
++
++	  winDebug ("winClipboardFlushXEvents - SelectionNotify\n");
+ 	  {
+ 	    char		*pszAtomName;
+-	    
+ 	    pszAtomName = XGetAtomName (pDisplay,
+ 					event.xselection.selection);
+ 
+-	    ErrorF ("winClipboardFlushXEvents - SelectionNotify - ATOM: %s\n",
+-		    pszAtomName);
+-	    
++	    winDebug("winClipboardFlushXEvents - SelectionNotify - ATOM: %s\n",
++                     pszAtomName);
+ 	    XFree (pszAtomName);
+ 	  }
+-#endif
+-
+ 
+ 	  /*
+ 	   * Request conversion of UTF8 and CompoundText targets.
+@@ -473,18 +466,16 @@
+ 	    {
+ 	      if (event.xselection.target == XA_STRING)
+ 		{
+-#if 0
+-		  ErrorF ("winClipboardFlushXEvents - SelectionNotify - "
+-			  "XA_STRING\n");
+-#endif
++		  winDebug ("winClipboardFlushXEvents - SelectionNotify - "
++                            "XA_STRING\n");
++
+ 		  return WIN_XEVENTS_CONVERT;
+ 		}
+ 	      else if (event.xselection.target == atomUTF8String)
+ 		{
+-#if 0
+-		  ErrorF ("winClipboardFlushXEvents - SelectionNotify - "
+-			  "Requesting conversion of UTF8 target.\n");
+-#endif
++		  winDebug("winClipboardFlushXEvents - SelectionNotify - "
++                           "Requesting conversion of UTF8 target.\n");
++
+ 		  iReturn = XConvertSelection (pDisplay,
+ 					       event.xselection.selection,
+ 					       XA_STRING,
+@@ -507,10 +498,9 @@
+ #ifdef X_HAVE_UTF8_STRING
+ 	      else if (event.xselection.target == atomCompoundText)
+ 		{
+-#if 0
+-		  ErrorF ("winClipboardFlushXEvents - SelectionNotify - "
+-			  "Requesting conversion of CompoundText target.\n");
+-#endif
++		  winDebug("winClipboardFlushXEvents - SelectionNotify - "
++                           "Requesting conversion of CompoundText target.\n");
++
+ 		  iReturn = XConvertSelection (pDisplay,
+ 					       event.xselection.selection,
+ 					       atomUTF8String,
+@@ -561,10 +551,8 @@
+ 	      break;
+ 	    }
+ 
+-#if 0
+-	  ErrorF ("SelectionNotify - returned data %d left %d\n",
+-		  xtpText.nitems, ulReturnBytesLeft);
+-#endif
++	  winDebug("SelectionNotify - returned data %d left %d\n",
++                   xtpText.nitems, ulReturnBytesLeft);
+ 
+ 	  /* Request the selection data */
+ 	  iReturn = XGetWindowProperty (pDisplay,
+@@ -587,19 +575,16 @@
+ 	      break;
+ 	    }
+ 
+-#if 0
+ 	    {
+ 	      char		*pszAtomName = NULL;
+ 
+-	      ErrorF ("SelectionNotify - returned data %d left %d\n",
+-		      xtpText.nitems, ulReturnBytesLeft);
+-	      
++	      winDebug("SelectionNotify - returned data %d left %d\n",
++                       xtpText.nitems, ulReturnBytesLeft);
+ 	      pszAtomName = XGetAtomName(pDisplay, xtpText.encoding);
+-	      ErrorF ("Notify atom name %s\n", pszAtomName);
++	      winDebug("Notify atom name %s\n", pszAtomName);
+ 	      XFree (pszAtomName);
+ 	      pszAtomName = NULL;
+ 	    }
+-#endif
+ 
+ 	  if (fUseUnicode)
+ 	    {
+@@ -794,7 +779,15 @@
+ 	    SetClipboardData (CF_TEXT, NULL);
+ 	  return WIN_XEVENTS_NOTIFY;
+ 
++        case SelectionClear:
++          winDebug("SelectionClear - doing nothing\n");
++          break;
++
++	case PropertyNotify:
++	  break;
++
+ 	default:
++          ErrorF ("winClipboardFlushXEvents - unexpected event type %d\n", event.type);
+ 	  break;
+ 	}
+     }

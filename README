@@ -13,7 +13,6 @@ Runtime requirements:
   libXdmcp6-1.0.2-3
   libXext6-1.0.5-1
   openssl-0.9.8i-1
-  rgb-1.0.3-1
   xauth-1.0.3-1
   xcursor-themes-1.0.1-1
   xkbcomp-1.0.5-1
@@ -102,6 +101,11 @@ Port Notes:
 
 ----- version 1.6.0-1 -----
 Version bump.
+Added patches:
+- added Hebrew keyboard layout detection.
+- even more clipboard debugging messages.
+- reverted upstream clipboard change that wreaked havoc with other
+  applications monitoring the clipboard (e.g. MS Office Clipboard, VNC).
 
 ----- version 1.5.3-7 -----
 Enabled Xinerama support in rooted and -rootless modes only
