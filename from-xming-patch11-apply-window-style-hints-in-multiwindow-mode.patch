@@ -1,14 +1,17 @@
-Various internalwm fixes
+Apply window style hints in -multiwindow mode
 
 # Remove frames from 'dock' windows and make them topmost in -multiwindow mode.
 # Remove frames from windows with MOTIF_WM_HINTS of no decorations in -multiwindow mode.
 # Apply some _NET_WM_STATE hints in -multiwindow mode.
-# Now with extra style handling goodness!
-# Correctly parent XA_WM_TRANSIENT_FOR windows in -multiwindow mode when a windows window is created.
-# Bugzilla 11147, fix a crash in function winMultiWindowGetTransientFor().
-# Fix the annoying menu/tooltip 'punch-through' problem in -multiwindow mode.
-# Only allow WM_MOUSEWHEEL messages to act on the client area of a focussed window.
+# Apply window styles overrides from .rc file
+# Correctly update region of shaped windows when applying styles
+
+Split out
 # Prevent the mouse wheel from stalling when another window is minimized.
+# Only allow WM_MOUSEWHEEL messages to act on the client area of a focussed window.
+# Correctly parent XA_WM_TRANSIENT_FOR windows in -multiwindow mode when a windows window is created.
+# Fix the annoying menu/tooltip 'punch-through' problem in -multiwindow mode.
+# Bugzilla 11147, fix a crash in function winMultiWindowGetTransientFor().
 # Notify X when the keyboard focus is lost to a pure Windows window in -multiwindow mode.
 
 Things in xming patch 11 not included here
@@ -17,142 +20,20 @@ Things in xming patch 11 not included here
 # Change superseded functions GetWindowLong(), SetWindowLong() and RegisterClass().
 # Adjust the style of the Windows title in XDMCP mode from 'Xming - hostname' to 'hostname:display-number.screen'. (in tooltip fix patch)
 
-
 Copyright (C) Colin Harrison 2005-2008
 http://www.straightrunning.com/XmingNotes/
 http://sourceforge.net/projects/xming/ 
 
 ---
- xserver/hw/xwin/winmultiwindowclass.c   |    4 
- xserver/hw/xwin/winmultiwindowwindow.c  |   39 ++++--
- xserver/hw/xwin/winmultiwindowwm.c      |  208 +++++++++++++++++++++++++++++++-
- xserver/hw/xwin/winmultiwindowwndproc.c |  118 +++++++-----------
+ xserver/hw/xwin/winmultiwindowwm.c      |  204 +++++++++++++++++++++++++++++++-
+ xserver/hw/xwin/winmultiwindowwndproc.c |   91 ++++----------
  xserver/hw/xwin/winwindow.h             |   19 ++
- 5 files changed, 303 insertions(+), 85 deletions(-)
+ 3 files changed, 246 insertions(+), 68 deletions(-)
 
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowclass.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowclass.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowclass.c
-@@ -1,5 +1,6 @@
- /*
-  *Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
-+ *Copyright (C) Colin Harrison 2005-2008
-  *
-  *Permission is hereby granted, free of charge, to any person obtaining
-  * a copy of this software and associated documentation files (the
-@@ -26,6 +27,7 @@
-  *from the XFree86 Project.
-  *
-  * Authors:     Earle F. Philhower, III
-+ *              Colin Harrison
-  */
- 
- #ifdef HAVE_XWIN_CONFIG_H
-@@ -263,7 +265,7 @@ winMultiWindowGetTransientFor (WindowPtr
-       if (prop->propertyName == XA_WM_TRANSIENT_FOR)
-         {
-           if (ppDaddy)
--            memcpy (*ppDaddy, prop->data, sizeof (WindowPtr));
-+            memcpy (ppDaddy, prop->data, sizeof (WindowPtr));
-           return 1;
-         }
-       else
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwindow.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
-@@ -1,5 +1,6 @@
- /*
-  *Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
-+ *Copyright (C) Colin Harrison 2005-2008
-  *
-  *Permission is hereby granted, free of charge, to any person obtaining
-  * a copy of this software and associated documentation files (the
-@@ -28,6 +29,7 @@
-  * Authors:	Kensuke Matsuzaki
-  *		Earle F. Philhower, III
-  *		Harold L Hunt II
-+ *              Colin Harrison
-  */
- 
- #ifdef HAVE_XWIN_CONFIG_H
-@@ -486,6 +488,7 @@ winCreateWindowsWindow (WindowPtr pWin)
-   int			iWidth;
-   int			iHeight;
-   HWND			hWnd;
-+  HWND			hFore = NULL;
-   WNDCLASSEX		wc;
-   winWindowPriv(pWin);
-   HICON			hIcon;
-@@ -496,6 +499,7 @@ winCreateWindowsWindow (WindowPtr pWin)
-   static int		s_iWindowID = 0;
-   winPrivScreenPtr	pScreenPriv = pWinPriv->pScreenPriv;
-   WinXSizeHints         hints;
-+  WindowPtr		pDaddy;
- 
- #if CYGMULTIWINDOW_DEBUG
-   ErrorF ("winCreateWindowsWindow - pWin: %08x\n", pWin);
-@@ -504,17 +508,6 @@ winCreateWindowsWindow (WindowPtr pWin)
-   iX = pWin->drawable.x + GetSystemMetrics (SM_XVIRTUALSCREEN);
-   iY = pWin->drawable.y + GetSystemMetrics (SM_YVIRTUALSCREEN);
- 
--  /* Default positions if none specified */
--  if (!winMultiWindowGetWMNormalHints(pWin, &hints))
--    hints.flags = 0;
--  if ( !(hints.flags & (USPosition|PPosition)) &&
--       !winMultiWindowGetTransientFor (pWin, NULL) &&
--       !pWin->overrideRedirect )
--    {
--      iX = CW_USEDEFAULT;
--      iY = CW_USEDEFAULT;
--    }
--
-   iWidth = pWin->drawable.width;
-   iHeight = pWin->drawable.height;
- 
-@@ -570,6 +563,28 @@ winCreateWindowsWindow (WindowPtr pWin)
-   wc.lpszClassName = pszClass;
-   RegisterClassEx (&wc);
- 
-+  if (!pWin->overrideRedirect)
-+  {
-+    if (winMultiWindowGetTransientFor (pWin, &pDaddy))
-+    {
-+      if (pDaddy)
-+      {
-+        hFore = GetForegroundWindow();
-+        if (hFore && (pDaddy != (WindowPtr)GetProp(hFore, WIN_WID_PROP))) hFore = NULL;
-+      }
-+    }
-+    else
-+    {
-+      /* Default positions if none specified */
-+      if (!winMultiWindowGetWMNormalHints(pWin, &hints)) hints.flags = 0;
-+      if (!(hints.flags & (USPosition|PPosition)))
-+      {
-+        iX = CW_USEDEFAULT;
-+        iY = CW_USEDEFAULT;
-+      }
-+    }
-+  }
-+
-   /* Create the window */
-   /* Make it OVERLAPPED in create call since WS_POPUP doesn't support */
-   /* CW_USEDEFAULT, change back to popup after creation */
-@@ -581,7 +596,7 @@ winCreateWindowsWindow (WindowPtr pWin)
- 			  iY,			/* Vertical position */
- 			  iWidth,		/* Right edge */ 
- 			  iHeight,		/* Bottom edge */
--			  (HWND) NULL,		/* No parent or owner window */
-+			  hFore,		/* Null or Parent window if transient*/
- 			  (HMENU) NULL,		/* No menu */
- 			  GetModuleHandle (NULL), /* Instance handle */
- 			  pWin);		/* ScreenPrivates */
 Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwm.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwm.c	2009-02-16 14:08:32.208125000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c	2009-02-16 14:22:29.173250000 +0000
 @@ -1,5 +1,6 @@
  /*
   *Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
@@ -185,7 +66,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
  
  #ifndef CYGDEBUG
  #define CYGDEBUG NO
-@@ -184,6 +191,11 @@ PreserveWin32Stack(WMInfoPtr pWMInfo, Wi
+@@ -184,6 +191,11 @@
  static Bool
  CheckAnotherWindowManager (Display *pDisplay, DWORD dwScreen);
  
@@ -197,7 +78,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
  
  /*
   * Local globals
-@@ -698,10 +710,25 @@ winMultiWindowWMProc (void *pArg)
+@@ -698,10 +710,25 @@
  			   1);
  	  UpdateName (pWMInfo, pNode->msg.iWindow);
  	  winUpdateIcon (pNode->msg.iWindow);
@@ -226,43 +107,16 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
  	  break;
  
  	case WM_WM_UNMAP:
-@@ -796,6 +823,7 @@ winMultiWindowWMProc (void *pArg)
- #if CYGMULTIWINDOW_DEBUG
-   ErrorF("-winMultiWindowWMProc ()\n");
- #endif
-+  return NULL;
- }
- 
- 
-@@ -1056,6 +1084,7 @@ winMultiWindowXMsgProc (void *pArg)
- 
-   XCloseDisplay (pProcArg->pDisplay);
-   pthread_exit (NULL);
-+  return NULL;
-  
- }
- 
-@@ -1356,7 +1385,9 @@ winMultiWindowXMsgProcErrorHandler (Disp
- 		 pErr->error_code,
- 		 pszErrorMsg,
- 		 sizeof (pszErrorMsg));
-+#if CYGMULTIWINDOW_DEBUG
-   ErrorF ("winMultiWindowXMsgProcErrorHandler - ERROR: %s\n", pszErrorMsg);
-+#endif
-   
-   return 0;
- }
-@@ -1430,3 +1461,199 @@ winDeinitMultiWindowWM ()
+@@ -1430,3 +1457,174 @@
    ErrorF ("winDeinitMultiWindowWM - Noting shutdown in progress\n");
    g_shutdown = TRUE;
  }
 +
 +/* Windows window styles */
-+#define HINT_NOFRAME	(1L<<0)
++#define HINT_NOFRAME	(1l<<0)
 +#define HINT_BORDER	(1L<<1)
-+#define HINT_SIZEBOX	(1L<<2)
-+#define HINT_CAPTION	(1L<<3)
-+#define HINT_NOMAXIMIZE	(1L<<4)
++#define HINT_SIZEBOX	(1l<<2)
++#define HINT_CAPTION	(1l<<3)
 +/* These two are used on their own */
 +#define HINT_MAX	(1L<<0)
 +#define HINT_MIN	(1L<<1)
@@ -340,29 +194,6 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 +    if (pAtom) XFree(pAtom);
 +  }
 +
-+  XSizeHints *normal_hint = XAllocSizeHints();
-+  long supplied;
-+  if (normal_hint && (XGetWMNormalHints(pDisplay, iWindow, normal_hint, &supplied) == Success))
-+    {
-+      if (normal_hint->flags & PMaxSize)
-+	{
-+	  /* Not maximizable if a maximum size is specified */
-+	  hint |= HINT_NOMAXIMIZE;
-+
-+	  if (normal_hint->flags & PMinSize)
-+	    {
-+	      /*
-+		 If both minimum size and maximum size are specified and are the same,
-+		 don't bother with a resizing frame
-+	      */
-+	      if ((normal_hint->min_width == normal_hint->max_width)
-+		  && (normal_hint->min_height == normal_hint->max_height))
-+		  hint = (hint & ~HINT_SIZEBOX);
-+	    }
-+	}
-+    }
-+  XFree(normal_hint);
-+
 +  /* Apply Styles, overriding hint settings from above */
 +  rcStyle = winOverrideStyle((unsigned long)pWin);
 +  if (rcStyle & STYLE_TOPMOST) *zstyle = HWND_TOPMOST;
@@ -381,22 +212,21 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 +	hint = (hint & ~HINT_BORDER & ~HINT_CAPTION & ~HINT_SIZEBOX) | HINT_NOFRAME;
 +
 +  SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_CAPTION & ~WS_SIZEBOX); /* Just in case */
-+  if (!hint) /* All on */
-+    SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) | WS_CAPTION | WS_SIZEBOX);
++  if (!hint) /* All on, but no resize of children is allowed */
++    SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) | WS_CAPTION | (GetParent(hWnd) ? 0 : WS_SIZEBOX));
 +  else if (hint & HINT_NOFRAME); /* All off, so do nothing */
 +  else  SetWindowLongPtr (hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) |
 +			((hint & HINT_BORDER) ? WS_BORDER : 0) |
-+			((hint & HINT_SIZEBOX) ? WS_SIZEBOX : 0) |
++			((hint & HINT_SIZEBOX) ? (GetParent(hWnd) ? 0 : WS_SIZEBOX) : 0) |
 +			((hint & HINT_CAPTION) ? WS_CAPTION : 0));
 +
-+  if (hint & HINT_NOMAXIMIZE)
-+    SetWindowLongPtr(hWnd, GWL_STYLE, GetWindowLongPtr(hWnd, GWL_STYLE) & ~WS_MAXIMIZEBOX);
++  return;
 +}
 +
 +void
 +winUpdateWindowPosition (HWND hWnd, Bool reshape, HWND *zstyle)
 +{
-+  int	iX, iY, iWidth, iHeight;
++  int iX, iY, iWidth, iHeight;
 +  int	iDx, iDy;
 +  RECT	rcNew;
 +  WindowPtr	pWin = GetProp (hWnd, WIN_WINDOW_PROP);
@@ -454,24 +284,9 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
 +}
 Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
-@@ -1,5 +1,6 @@
- /*
-  *Copyright (C) 1994-2000 The XFree86 Project, Inc. All Rights Reserved.
-+ *Copyright (C) Colin Harrison 2005-2008
-  *
-  *Permission is hereby granted, free of charge, to any person obtaining
-  * a copy of this software and associated documentation files (the
-@@ -28,6 +29,7 @@
-  * Authors:	Kensuke Matsuzaki
-  *		Earle F. Philhower, III
-  *		Harold L Hunt II
-+ *              Colin Harrison
-  */
- 
- #ifdef HAVE_XWIN_CONFIG_H
-@@ -49,6 +51,8 @@ extern Bool			g_fKeyboardHookLL;
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 14:08:32.212125000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 14:22:28.312500000 +0000
+@@ -49,6 +49,8 @@
  extern Bool			g_fSoftwareCursor;
  extern Bool			g_fButton[3];
  
@@ -480,7 +295,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
  
  /*
   * Local globals
-@@ -403,6 +407,8 @@ winTopLevelWindowProc (HWND hwnd, UINT m
+@@ -403,6 +405,8 @@
        SetWindowRgn (hwnd, hRgnWindow, TRUE);
        DeleteObject(hRgnWindow);
  
@@ -489,57 +304,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
        return 0;
  
      case WM_INIT_SYS_MENU:
-@@ -646,15 +652,24 @@ winTopLevelWindowProc (HWND hwnd, UINT m
-       return winMouseButtonsHandle (s_pScreen, ButtonRelease, HIWORD(wParam) + 5, wParam);
- 
-     case WM_MOUSEWHEEL:
--      
--      /* Pass the message to the root window */
--      SendMessage (hwndScreen, message, wParam, lParam);
--      return 0;
-+      if (SendMessage(hwnd, WM_NCHITTEST, 0, MAKELONG(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))) == HTCLIENT)
-+	{
-+	  /* Pass the message to the root window */
-+	  SendMessage (hwndScreen, message, wParam, lParam);
-+	  return 0;
-+	}
-+      else break;
- 
-     case WM_SETFOCUS:
-       if (s_pScreenPriv == NULL || s_pScreenInfo->fIgnoreInput)
- 	break;
- 
-+      {
-+	/* Get the parent window for transient handling */
-+	HWND hParent = GetParent(hwnd);
-+	if (hParent && IsIconic(hParent)) ShowWindow (hParent, SW_RESTORE);
-+      }
-+
-       winRestoreModeKeyStates ();
- 
-       /* Add the keyboard hook if possible */
-@@ -668,6 +683,9 @@ winTopLevelWindowProc (HWND hwnd, UINT m
- 
-       /* Remove our keyboard hook if it is installed */
-       winRemoveKeyboardHookLL ();
-+      if (!wParam)
-+	/* Revert the X focus as well, but only if the Windows focus is going to another thread */
-+	DeleteWindowFromAnyEvents(pWin, FALSE);
-       return 0;
- 
-     case WM_SYSDEADCHAR:      
-@@ -770,6 +788,10 @@ winTopLevelWindowProc (HWND hwnd, UINT m
- 	    if (!pWin || !pWin->overrideRedirect) /* for OOo menus */
- 	      winSendMessageToWM (s_pScreenPriv->pWMInfo, &wmMsg);
- 	}
-+      /* Prevent the mouse wheel from stalling when another window is minimized */
-+      if (HIWORD(wParam) == 0 && LOWORD(wParam) == WA_ACTIVE &&
-+	  (HWND)lParam != NULL && (HWND)lParam != (HWND)GetParent(hwnd))
-+	SetFocus(hwnd);
-       return 0;
- 
-     case WM_ACTIVATEAPP:
-@@ -824,94 +846,51 @@ winTopLevelWindowProc (HWND hwnd, UINT m
+@@ -824,94 +828,51 @@
        if (!wParam)
  	return 0;
  
@@ -610,17 +375,17 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
  	      /* Set the window standard style flags */
 -	      SetWindowLongPtr (hwnd, GWL_STYLE,
 -				WS_POPUP | WS_SIZEBOX | WS_OVERLAPPEDWINDOW);
--
++	      else SetWindowLongPtr (hwnd, GWL_STYLE,
++		   (WS_POPUP | WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
++		   & ~WS_CAPTION & ~WS_SIZEBOX);
+ 
 -	      /* Position the Windows window */
 -	      SetWindowPos (hwnd, HWND_TOP,
 -			    rcNew.left, rcNew.top,
 -			    rcNew.right - rcNew.left, rcNew.bottom - rcNew.top,
 -			    SWP_NOMOVE | SWP_FRAMECHANGED
 -			    | SWP_SHOWWINDOW | SWP_NOACTIVATE);
-+	      else SetWindowLongPtr (hwnd, GWL_STYLE,
-+		   (WS_POPUP | WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
-+		   & ~WS_CAPTION & ~WS_SIZEBOX);
- 
+-
 -	      /* Bring the Windows window to the foreground */
 +	      winUpdateWindowPosition (hwnd, FALSE, &zstyle);
  	      SetForegroundWindow (hwnd);
@@ -656,18 +421,10 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
        /* Tell our Window Manager thread to map the window */
        if (fWMMsgInitialized)
  	winSendMessageToWM (s_pScreenPriv->pWMInfo, &wmMsg);
-@@ -1009,6 +988,7 @@ winTopLevelWindowProc (HWND hwnd, UINT m
- #endif
-       /* Adjust the X Window to the moved Windows window */
-       winAdjustXWindow (pWin, hwnd);
-+      if (wParam == SIZE_MINIMIZED) winReorderWindowsMultiWindow();
-       return 0; /* end of WM_SIZE handler */
- 
-     case WM_MOUSEACTIVATE:
 Index: xorg-server-1.5.3/xserver/hw/xwin/winwindow.h
 ===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winwindow.h
-+++ xorg-server-1.5.3/xserver/hw/xwin/winwindow.h
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winwindow.h	2009-02-16 14:08:32.235125000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winwindow.h	2009-02-16 14:09:00.515625000 +0000
 @@ -2,6 +2,7 @@
  #define _WINWINDOW_H_
  /*
@@ -693,7 +450,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winwindow.h
  typedef struct _winPrivScreenRec *winPrivScreenPtr;
  
  
-@@ -111,9 +115,24 @@ typedef struct _winWMMessageRec{
+@@ -111,9 +115,24 @@
  #define		WM_WM_NAME_EVENT	(WM_USER + 9)
  #define		WM_WM_HINTS_EVENT	(WM_USER + 10)
  #define		WM_WM_CHANGE_STATE	(WM_USER + 11)

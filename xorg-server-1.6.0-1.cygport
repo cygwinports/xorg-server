@@ -23,7 +23,16 @@ PATCH_URI="
 	from-xming-patch3-command-line-logging-format.patch
 	from-xming-patch4-dont-center-dialogs-bogusly.patch
 	from-xming-patch6-add-styles.patch
-	from-xming-patch11-wm-fixes.patch
+	from-xming-patch11-apply-window-style-hints-in-multiwindow-mode.patch
+	from-xming-patch11-fix-no-return-value-warnings.patch
+	from-xming-patch11-notify-X-when-keyboard-focus-is-lost.patch
+	from-xming-patch11-bugzilla-11147.patch
+	from-xming-patch11-correctly-parent-WM_TRANSIENT_FOR-windows.patch
+	from-xming-patch11-fix-annoying-menu-tooltip-punch-through.patch
+	from-xming-patch11-prevent-the-mouse-wheel-from-stalling.patch
+	from-xming-patch11-tidy-up-window-initial-position-code.patch
+	from-xming-patch11-fix-some-log-spam.patch
+	from-xming-patch11-allow-WM_MOUSEWHEEL-to-only-act-on-client-area.patch
 	from-xming-patch11-internal-authentication-cookie.patch
 	from-xming-patch14-fdo-bugzilla-11128-fullscreen-and-refresh-switches-crash.patch
 	from-xming-patch15-clipboard-select-events-correctly.patch

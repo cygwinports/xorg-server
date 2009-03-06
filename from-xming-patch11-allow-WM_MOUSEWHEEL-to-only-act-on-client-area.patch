@@ -1,0 +1,35 @@
+Xming: Only allow WM_MOUSEWHEEL messages to act on the client area of a focused window.
+
+Fix internal WM so it only allows WM_MOUSEWHEEL messages to act on the client area of a focused window.
+
+
+Copyright (C) Colin Harrison 2005-2008
+http://www.straightrunning.com/XmingNotes/
+http://sourceforge.net/projects/xming/
+
+---
+ xserver/hw/xwin/winmultiwindowwndproc.c |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 12:23:11.437500000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 12:25:09.968750000 +0000
+@@ -652,10 +652,13 @@
+       return winMouseButtonsHandle (s_pScreen, ButtonRelease, HIWORD(wParam) + 5, wParam);
+ 
+     case WM_MOUSEWHEEL:
+-      
+-      /* Pass the message to the root window */
+-      SendMessage (hwndScreen, message, wParam, lParam);
+-      return 0;
++      if (SendMessage(hwnd, WM_NCHITTEST, 0, MAKELONG(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))) == HTCLIENT)
++	{
++	  /* Pass the message to the root window */
++	  SendMessage (hwndScreen, message, wParam, lParam);
++	  return 0;
++	}
++      else break;
+ 
+     case WM_SETFOCUS:
+       if (s_pScreenPriv == NULL || s_pScreenInfo->fIgnoreInput)

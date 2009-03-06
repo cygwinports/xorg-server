@@ -1,0 +1,22 @@
+Notify X when the keyboard focus is lost to a pure Windows window in -multiwindow mode.
+
+Fix internal WM to notify X when the keyboard focus is lost to a pure Windows window in -multiwindow mode.
+
+---
+ xserver/hw/xwin/winmultiwindowwndproc.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
+===================================================================
+--- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 13:32:54.015625000 +0000
++++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c	2009-02-16 13:34:56.765625000 +0000
+@@ -672,6 +672,9 @@
+ 
+       /* Remove our keyboard hook if it is installed */
+       winRemoveKeyboardHookLL ();
++      if (!wParam)
++	/* Revert the X focus as well, but only if the Windows focus is going to another window */
++	DeleteWindowFromAnyEvents(pWin, FALSE);
+       return 0;
+ 
+     case WM_SYSDEADCHAR:      
