@@ -106,6 +106,7 @@ Version bump, built for Cygwin 1.7.
 Added patches:
 - added Hebrew keyboard layout detection.
 - even more clipboard debugging messages.
+- fixed numeric keypad input.
 - reverted upstream clipboard change that wreaked havoc with other
   applications monitoring the clipboard (e.g. MS Office Clipboard, VNC).
 
