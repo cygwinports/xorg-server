@@ -81,6 +81,9 @@ PATCH_URI="
 	1.6-revert-fdo-bug-5735.patch
 	1.6-cygwin17.patch
 	1.6-gcc4.patch
+	1.6-xwin-noclipboard.patch
+
+	1.6-solaris-keyboard-badalloc.patch
 "
 #	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-log-timestamps.patch

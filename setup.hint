@@ -1,4 +1,4 @@
 category: X11
-requires: cygwin libfontenc1 libfreetype6 libgcc1 libGL1 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 openssl xauth xcursor-themes xkbcomp xkeyboard-config zlib0
+requires: libfontenc1 libfreetype6 libgcc1 libGL1 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 openssl xauth xcursor-themes xkbcomp xkeyboard-config zlib0
 sdesc: "X.Org X servers"
 ldesc: "X.Org X servers"
