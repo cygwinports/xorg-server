@@ -53,8 +53,8 @@ Build requirements:
   xextproto-7.0.5-1
   xineramaproto-1.1.2-1
   xorg-util-macros-1.2.2-1
-  xproto-7.0.15-1
-  xtrans-1.2.3-1
+  xproto-7.0.15-2
+  xtrans-1.2.3-2
 
 Canonical website:
   http://xorg.freedesktop.org/
@@ -65,15 +65,15 @@ Canonical download:
 -------------------------------------------
 
 Build instructions:
-  unpack xorg-server-1.6.1.901-X-src.tar.bz2
+  unpack xorg-server-1.6.1.902-X-src.tar.bz2
     if you use setup to install this src package, it will be
 	 unpacked under /usr/src automatically
   cd /usr/src
-  cygport ./xorg-server-1.6.1.901-X.cygport all
+  cygport ./xorg-server-1.6.1.902-X.cygport all
 
 This will create:
-  /usr/src/xorg-server-1.6.1.901-X-src.tar.bz2
-  /usr/src/xorg-server-1.6.1.901-X.tar.bz2
+  /usr/src/xorg-server-1.6.1.902-X-src.tar.bz2
+  /usr/src/xorg-server-1.6.1.902-X.tar.bz2
 
 -------------------------------------------
 
@@ -101,12 +101,11 @@ Files included in the binary package:
 
 Port Notes:
 
------ version 1.6.1.901-1 -----
+----- version 1.6.1.902-1 -----
 Version bump.
 Added patches:
 - Enable clipboard integration by default, can be disabled with -noclipboard.
-- XkbSetNamedIndicator should ignore SD's without LED's (might fix
-  reported problems with X clients on Solaris)
+- Fixed crash caused by IPv6 interfaces with no broadcast address.
 
 ----- version 1.6.0-10 -----
 Version bump, built for Cygwin 1.7.

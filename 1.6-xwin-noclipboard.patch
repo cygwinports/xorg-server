@@ -1,4 +1,4 @@
-Enable clipboard integration by default, can be turned of with -noclipboard.
+Enable clipboard integration by default, can be turned off with -noclipboard.
 We still accept -clipboard for backwards compatibility.  If both are passed,
 the last one is accepted (just as other arguments are handled).
 
