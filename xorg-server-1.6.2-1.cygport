@@ -84,6 +84,7 @@ PATCH_URI="
 	1.6-xwin-noclipboard.patch
 
 	cygwin-getifaddr-check-for-null-broadcastaddr.patch
+	cygwin-execute-commands-in-login-shell.patch
 "
 #	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-log-timestamps.patch
