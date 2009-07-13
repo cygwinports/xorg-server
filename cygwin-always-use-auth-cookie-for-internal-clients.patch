@@ -1,0 +1,336 @@
+From cd051005ebc567476d56bd3315419410ccf3c3ca Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Mon, 13 Jul 2009 13:46:45 +0100
+Subject: [PATCH 1/2] Cygwin/X: Always use an authorization cookie for internal clients
+
+Don't conditionalize use of a authorization cookie for internal client
+threads on XCSECURITY, always use one (this avoids certain problems
+with XDMCP setups where the XDMCP host removes localhost from the access
+list etc.)
+
+Conditionalize the use of a XCSECURITY authorization descriptor on XCSECURITY
+
+Consolidate the various places where the authorization cookie is set
+for internal threads into a new function, winSetAuthorization()
+
+Use authorization cookie for multiwindow WM X message thread as well
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/InitOutput.c         |    2 -
+ hw/xwin/win.h                |    3 +-
+ hw/xwin/winauth.c            |  103 +++++++++++++++++++++++++++++++++++-------
+ hw/xwin/winclipboardthread.c |   19 +-------
+ hw/xwin/winmultiwindowwm.c   |   19 ++------
+ include/os.h                 |    2 +
+ 6 files changed, 96 insertions(+), 52 deletions(-)
+
+diff --git a/hw/xwin/InitOutput.c b/hw/xwin/InitOutput.c
+index 97e27eb..4c8c0fd 100644
+--- a/hw/xwin/InitOutput.c
++++ b/hw/xwin/InitOutput.c
+@@ -1013,11 +1013,9 @@ InitOutput (ScreenInfo *screenInfo, int argc, char *argv[])
+ 
+ #if defined(XWIN_CLIPBOARD) || defined(XWIN_MULTIWINDOW)
+ 
+-#if defined(XCSECURITY)
+   /* Generate a cookie used by internal clients for authorization */
+   if (g_fXdmcpEnabled || g_fAuthEnabled)
+     winGenerateAuthorization ();
+-#endif
+ 
+   /* Perform some one time initialization */
+   if (1 == serverGeneration)
+diff --git a/hw/xwin/win.h b/hw/xwin/win.h
+index 271bb20..10290f2 100644
+--- a/hw/xwin/win.h
++++ b/hw/xwin/win.h
+@@ -768,10 +768,9 @@ winAllocateCmapPrivates (ColormapPtr pCmap);
+  */
+ 
+ #if defined(XWIN_CLIPBOARD) || defined(XWIN_MULTIWINDOW)
+-# if defined(XCSECURITY)  
+ Bool
+ winGenerateAuthorization (void);
+-# endif
++void winSetAuthorization(void);
+ #endif
+ 
+ 
+diff --git a/hw/xwin/winauth.c b/hw/xwin/winauth.c
+index b57a35a..fcd1872 100644
+--- a/hw/xwin/winauth.c
++++ b/hw/xwin/winauth.c
+@@ -1,7 +1,3 @@
+-#ifdef HAVE_XWIN_CONFIG_H
+-#include <xwin-config.h>
+-#endif
+-#if defined(XCSECURITY)
+ /*
+  *Copyright (C) 2003-2004 Harold L Hunt II All Rights Reserved.
+  *
+@@ -32,12 +28,14 @@
+  * Authors:	Harold L Hunt II
+  */
+ 
++#ifdef HAVE_XWIN_CONFIG_H
++#include <xwin-config.h>
++#endif
++
+ #include "win.h"
+ 
+ /* Includes for authorization */
+-#include <X11/Xauth.h>
+ #include "securitysrv.h"
+-#include <X11/extensions/securstr.h>
+ 
+ 
+ /*
+@@ -48,13 +46,76 @@
+ 
+ 
+ /*
+- * Globals
++ * Locals
++ */
++
++static XID g_authId = 0;
++static unsigned int g_uiAuthDataLen = 0;
++static char *g_pAuthData = NULL;
++
++/*
++ * Code to generate a MIT-MAGIC-COOKIE-1, copied from under XCSECURITY
+  */
+ 
+-XID		g_authId = 0;
+-unsigned int	g_uiAuthDataLen = 0;
+-char		*g_pAuthData = NULL;
++#ifndef XCSECURITY
++static
++void
++GenerateRandomData (int len, char *buf)
++{
++    int fd;
++
++    fd = open("/dev/urandom", O_RDONLY);
++    read(fd, buf, len);
++    close(fd);
++}
++
++
++static char cookie[16]; /* 128 bits */
++
++XID
++static MitGenerateCookie (
++    unsigned	data_length,
++    char	*data,
++    XID		id,
++    unsigned	*data_length_return,
++    char	**data_return)
++{
++    int i = 0;
++    int status;
++
++    while (data_length--)
++    {
++	cookie[i++] += *data++;
++	if (i >= sizeof (cookie)) i = 0;
++    }
++    GenerateRandomData(sizeof (cookie), cookie);
++    status = MitAddCookie(sizeof (cookie), cookie, id);
++    if (!status)
++    {
++	id = -1;
++    }
++    else
++    {
++	*data_return = cookie;
++	*data_length_return = sizeof (cookie);
++    }
++    return id;
++}
+ 
++static
++XID
++GenerateAuthorization(
++	unsigned name_length,
++	char	*name,
++	unsigned data_length,
++	char	*data,
++	unsigned *data_length_return,
++	char	**data_return)
++{
++    return MitGenerateCookie(data_length, data,
++                             FakeClientID(0), data_length_return, data_return);
++}
++#endif
+ 
+ /*
+  * Generate authorization cookie for internal server clients
+@@ -78,15 +139,15 @@ winGenerateAuthorization ()
+       ErrorF ("winGenerateAuthorization - GenerateAuthorization failed\n");
+       goto auth_bailout;
+     }
+-#if 0
++
+   else
+     {
+-      ErrorF ("winGenerateAuthorization - GenerateAuthorization success!\n"
++      winDebug("winGenerateAuthorization - GenerateAuthorization success!\n"
+ 	      "AuthDataLen: %d AuthData: %s\n",
+ 	      g_uiAuthDataLen, g_pAuthData);
+     }
+-#endif
+-  
++
++#ifdef XCSECURITY
+   /* Allocate structure for additional auth information */
+   pAuth = (SecurityAuthorizationPtr) 
+     xalloc (sizeof (SecurityAuthorizationRec));
+@@ -119,7 +180,8 @@ winGenerateAuthorization ()
+   
+   /* Don't free the auth data, since it is still used internally */
+   pAuth = NULL;
+-  
++#endif
++
+   return TRUE;
+ 
+  auth_bailout:
+@@ -128,4 +190,13 @@ winGenerateAuthorization ()
+   
+   return FALSE;
+ }
+-#endif
++
++/* Use our generated cookie for authentication */
++void
++winSetAuthorization(void)
++{
++  XSetAuthorization (AUTH_NAME,
++		     strlen (AUTH_NAME),
++		     g_pAuthData,
++		     g_uiAuthDataLen);
++}
+diff --git a/hw/xwin/winclipboardthread.c b/hw/xwin/winclipboardthread.c
+index 7eabb0f..3b81e90 100644
+--- a/hw/xwin/winclipboardthread.c
++++ b/hw/xwin/winclipboardthread.c
+@@ -38,27 +38,15 @@
+ #ifdef __CYGWIN__
+ #include <errno.h>
+ #endif
+-#include "X11/Xauth.h"
+ #include <X11/Xlibint.h>
+ 
+ 
+ /*
+- * Constants
+- */
+-
+-#define AUTH_NAME	"MIT-MAGIC-COOKIE-1"
+-
+-
+-/*
+  * References to external symbols
+  */
+ 
+ extern Bool		g_fUnicodeClipboard;
+ extern unsigned long	serverGeneration;
+-#if defined(XCSECURITY)
+-extern unsigned int	g_uiAuthDataLen;
+-extern char		*g_pAuthData;
+-#endif
+ extern Bool		g_fClipboardStarted;
+ extern HWND		g_hwndClipboard;
+ extern void		*g_pClipboardDisplay;
+@@ -154,13 +142,8 @@ winClipboardProc (void *pvNotUsed)
+       pthread_exit (NULL);
+     }
+ 
+-#if defined(XCSECURITY)
+   /* Use our generated cookie for authentication */
+-  XSetAuthorization (AUTH_NAME,
+-		     strlen (AUTH_NAME),
+-		     g_pAuthData,
+-		     g_uiAuthDataLen);
+-#endif
++  winSetAuthorization();
+ 
+   /* Set error handler */
+   XSetErrorHandler (winClipboardErrorHandler);
+diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
+index 2567a78..c2d506a 100644
+--- a/hw/xwin/winmultiwindowwm.c
++++ b/hw/xwin/winmultiwindowwm.c
+@@ -86,8 +86,6 @@ extern void winUpdateRgnMultiWindow(WindowPtr pWin);
+ #endif
+ #define WIN_JMP_OKAY		0
+ #define WIN_JMP_ERROR_IO	2
+-#define AUTH_NAME		"MIT-MAGIC-COOKIE-1"
+-
+ 
+ /*
+  * Local structures
+@@ -136,11 +134,6 @@ typedef struct _XMsgProcArgRec {
+ 
+ extern char *display;
+ extern void ErrorF (const char* /*f*/, ...);
+-#if defined(XCSECURITY)
+-extern unsigned int	g_uiAuthDataLen;
+-extern char		*g_pAuthData;
+-#endif
+-
+ 
+ /*
+  * Prototypes for local functions
+@@ -930,6 +923,9 @@ winMultiWindowXMsgProc (void *pArg)
+ 
+   /* Print the display connection string */
+   ErrorF ("winMultiWindowXMsgProc - DISPLAY=%s\n", pszDisplay);
++
++  /* Use our generated cookie for authentication */
++  winSetAuthorization();
+   
+   /* Initialize retry count */
+   iRetries = 0;
+@@ -1284,14 +1280,9 @@ winInitMultiWindowWM (WMInfoPtr pWMInfo, WMProcArgPtr pProcArg)
+   /* Print the display connection string */
+   ErrorF ("winInitMultiWindowWM - DISPLAY=%s\n", pszDisplay);
+ 
+-#if defined(XCSECURITY)
+   /* Use our generated cookie for authentication */
+-  XSetAuthorization (AUTH_NAME,
+-		     strlen (AUTH_NAME),
+-		     g_pAuthData,
+-		     g_uiAuthDataLen);
+-#endif
+-  
++  winSetAuthorization();
++
+   /* Open the X display */
+   do
+     {
+diff --git a/include/os.h b/include/os.h
+index 77e9448..43ea210 100644
+--- a/include/os.h
++++ b/include/os.h
+@@ -388,6 +388,7 @@ extern int AddAuthorization(
+     unsigned int	/*data_length*/,
+     char *		/*data*/);
+ 
++#ifdef XCSECURITY
+ extern XID GenerateAuthorization(
+     unsigned int   /* name_length */,
+     char	*  /* name */,
+@@ -395,6 +396,7 @@ extern XID GenerateAuthorization(
+     char	*  /* data */,
+     unsigned int * /* data_length_return */,
+     char	** /* data_return */);
++#endif
+ 
+ extern int ddxProcessArgument(int /*argc*/, char * /*argv*/ [], int /*i*/);
+ 
+-- 
+1.6.3.2
+

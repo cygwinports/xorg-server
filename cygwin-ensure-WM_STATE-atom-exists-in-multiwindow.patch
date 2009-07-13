@@ -1,0 +1,38 @@
+From f15295333e29194795ad50e3447a73f45edbee95 Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Sun, 12 Jul 2009 23:58:32 +0100
+Subject: [PATCH 2/2] Cygwin/X: Ensure WM_STATE atom exists in multiwindow mode
+
+Workaround a bug in iiimxcf (assuming the WM_STATE atom exists),
+which can cause many Solaris clients to simply fail with a BadAtom
+error
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/winmultiwindowwm.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
+index c2d506a..81b9d7f 100644
+--- a/hw/xwin/winmultiwindowwm.c
++++ b/hw/xwin/winmultiwindowwm.c
+@@ -1005,6 +1005,16 @@ winMultiWindowXMsgProc (void *pArg)
+ 			      "WM_CHANGE_STATE",
+ 			      False);
+ 
++  /*
++    iiimxcf had a bug until 2009-04-27, assuming that the
++    WM_STATE atom exists, causing clients to fail with
++    a BadAtom X error if it doesn't.
++
++    Since this is on in the default Solaris 10 install,
++    workaround this by making sure it does exist...
++   */
++  XInternAtom(pProcArg->pDisplay, "WM_STATE", 0);
++
+   /* Loop until we explicitly break out */
+   while (1)
+     {
+-- 
+1.6.3.2
+

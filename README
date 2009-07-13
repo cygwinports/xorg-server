@@ -101,6 +101,13 @@ Files included in the binary package:
 
 Port Notes:
 
+----- version 1.6.2-2 -----
+Added patches:
+* Always use an authorization cookie for internal clients (fixes clipboard
+  integration in XDMCP sessions).
+* Ensure WM_STATE atom exists in multiwindow mode (fixes BadAtom errors
+  with Solaris X clients).
+
 ----- version 1.6.2-1 -----
 Version bump.
 Added patch:

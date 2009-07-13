@@ -85,6 +85,8 @@ PATCH_URI="
 
 	cygwin-getifaddr-check-for-null-broadcastaddr.patch
 	cygwin-execute-commands-in-login-shell.patch
+	cygwin-always-use-auth-cookie-for-internal-clients.patch
+	cygwin-ensure-WM_STATE-atom-exists-in-multiwindow.patch
 "
 #	1.5-hint-handling-skip-taskbar.patch
 #	cygwin-log-timestamps.patch
