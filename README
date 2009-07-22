@@ -107,6 +107,8 @@ Added patches:
   integration in XDMCP sessions).
 * Ensure WM_STATE atom exists in multiwindow mode (fixes BadAtom errors
   with Solaris X clients).
+* Fix issue with X window menus sometimes appearing beneath the window
+  which activated it.
 * The -logverbose option now affects the verbosity of both the logfile and
   the console output.
 * Add timestamps to logfile messages.
