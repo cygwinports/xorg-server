@@ -1,21 +1,18 @@
-Tidy up window initial position code
-
-XXX: Can we have overrideRedirect windows which are transientFor?
-If so, do we want them to be parented or not?  The side effect of
-this change is not to parent them...
-
-XXX: So where does this end up positioning windows which aren't
-CW_USEDEFAULT?
+From 8e34f863486cb2b11d33ea1d49cfff41b451d7ce Mon Sep 17 00:00:00 2001
+From: Colin Harrison <colin.harrison@virgin.net>
+Date: Tue, 21 Jul 2009 01:15:25 +0100
+Subject: [PATCH] Cygwin/X: Tidy up code for initial native window positioning
+ (avoid a duplicate call to winMultiWindowGetTransientFor())
 
 ---
- xserver/hw/xwin/winmultiwindowwindow.c |   24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ hw/xwin/winmultiwindowwindow.c |   22 +++++++++++-----------
+ 1 files changed, 11 insertions(+), 11 deletions(-)
 
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwindow.c	2009-02-16 12:29:40.843750000 +0000
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c	2009-02-16 12:30:43.937500000 +0000
-@@ -508,17 +508,6 @@
+diff --git a/hw/xwin/winmultiwindowwindow.c b/hw/xwin/winmultiwindowwindow.c
+index f9ada7c..2e6714e 100644
+--- a/hw/xwin/winmultiwindowwindow.c
++++ b/hw/xwin/winmultiwindowwindow.c
+@@ -523,17 +523,6 @@ winCreateWindowsWindow (WindowPtr pWin)
    iX = pWin->drawable.x + GetSystemMetrics (SM_XVIRTUALSCREEN);
    iY = pWin->drawable.y + GetSystemMetrics (SM_YVIRTUALSCREEN);
  
@@ -33,30 +30,24 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
    iWidth = pWin->drawable.width;
    iHeight = pWin->drawable.height;
  
-@@ -574,6 +563,8 @@
-   wc.lpszClassName = pszClass;
-   RegisterClassEx (&wc);
- 
-+  if (!pWin->overrideRedirect)
-+  {
-     if (winMultiWindowGetTransientFor (pWin, &pDaddy))
-     {
-       if (pDaddy)
-@@ -582,6 +573,17 @@
+@@ -545,6 +534,17 @@ winCreateWindowsWindow (WindowPtr pWin)
          if (hFore && (pDaddy != (WindowPtr)GetProp(hFore, WIN_WID_PROP))) hFore = NULL;
        }
      }
-+    else
++  else
 +    {
 +      /* Default positions if none specified */
 +      if (!winMultiWindowGetWMNormalHints(pWin, &hints)) hints.flags = 0;
-+      if (!(hints.flags & (USPosition|PPosition)))
++      if (!(hints.flags & (USPosition|PPosition)) &&
++          !pWin->overrideRedirect)
 +      {
 +        iX = CW_USEDEFAULT;
 +        iY = CW_USEDEFAULT;
 +      }
 +    }
-+  }
  
    /* Create the window */
    /* Make it OVERLAPPED in create call since WS_POPUP doesn't support */
+-- 
+1.6.3.2
+

@@ -1,0 +1,29 @@
+From 759e9f3d0d3c96a7c6a97f295fffee2e2ecf433b Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Tue, 21 Jul 2009 02:23:21 +0100
+Subject: [PATCH 1/2] Cygwin/X: Make -logverbose affect the verbosity of logging to the log file
+
+Make -logverbose affect the verbosity of logging to the log file, not just the
+verbosity of logging to the console
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/InitOutput.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/hw/xwin/InitOutput.c b/hw/xwin/InitOutput.c
+index 4c8c0fd..b91271a 100644
+--- a/hw/xwin/InitOutput.c
++++ b/hw/xwin/InitOutput.c
+@@ -707,7 +707,7 @@ OsVendorInit (void)
+   } 
+   LogSetParameter (XLOG_FLUSH, 1);
+   LogSetParameter (XLOG_VERBOSITY, g_iLogVerbose);
+-  LogSetParameter (XLOG_FILE_VERBOSITY, 1);
++  LogSetParameter (XLOG_FILE_VERBOSITY, g_iLogVerbose);
+ 
+   /* Log the version information */
+   if (serverGeneration == 1)
+-- 
+1.6.3.2
+

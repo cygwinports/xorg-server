@@ -87,9 +87,10 @@ PATCH_URI="
 	cygwin-execute-commands-in-login-shell.patch
 	cygwin-always-use-auth-cookie-for-internal-clients.patch
 	cygwin-ensure-WM_STATE-atom-exists-in-multiwindow.patch
+	cygwin-make-logverbose-affect-logfile-verbosity.patch
+	cygwin-add-timestamps-to-logfile.patch
 "
 #	1.5-hint-handling-skip-taskbar.patch
-#	cygwin-log-timestamps.patch
 #	cygwin-unmap-minimized-windows.patch
 #	1.5-remove-automatic-multiplemonitors.patch
 
