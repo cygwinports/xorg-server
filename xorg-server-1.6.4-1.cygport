@@ -84,15 +84,17 @@ PATCH_URI="
 	1.6-xwin-noclipboard.patch
 
 	cygwin-getifaddr-check-for-null-broadcastaddr.patch
-	cygwin-execute-commands-in-login-shell.patch
 	cygwin-always-use-auth-cookie-for-internal-clients.patch
 	cygwin-ensure-WM_STATE-atom-exists-in-multiwindow.patch
 	cygwin-make-logverbose-affect-logfile-verbosity.patch
 	cygwin-add-timestamps-to-logfile.patch
 "
-#	1.5-hint-handling-skip-taskbar.patch
-#	cygwin-unmap-minimized-windows.patch
 #	1.5-remove-automatic-multiplemonitors.patch
+#	cygwin-Re-order-window-creation-process.patch
+#	cygwin-Process-_NET_WM_STATE_SKIP_TASKBAR-hint-in-.patch
+#	cygwin-Unmap-minimized-windows-in-rootless-modes.patch
+#	cygwin-Fix-system-menu-after-window-initialization.patch
+#	cygwin-Hide-native-windows-for-unmapped-non-minimi.patch
 
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
