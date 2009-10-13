@@ -1,0 +1,39 @@
+From c40eefa350a78579539b8bcaf7ec6a7b750c936c Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Sun, 4 Oct 2009 15:55:40 +0100
+Subject: [PATCH] Tidy up system.Xwinrc
+
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/_usr_X11R6_lib_X11_system.XWinrc |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc b/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc
+index 2360bfc..8e74d0c 100644
+--- a/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc
++++ b/hw/xwin/_usr_X11R6_lib_X11_system.XWinrc
+@@ -18,6 +18,9 @@
+ #                               ^^ This command will have any "%display%"
+ #                                  string replaced with the proper display
+ #                                  variable (i.e. 127.0.0.1:<display>.0)
++#                                  (This should only rarely be needed as
++#                                  the DISPLAY environment variable is also
++#                                  set correctly)
+ #  or	<Menu Text>	MENU	<name-of-some-prior-defined-menu>
+ #  or	<Menu Text>	ALWAYSONTOP
+ #                         ^^ Sets the window to display above all others
+@@ -79,8 +82,8 @@
+ 
+ // Make some menus...
+ menu apps {
+-	xterm	exec	"xterm"
+-	"Emacs"		exec	"emacs"
++	xterm	exec	"xterm"
++	"Emacs"	exec	"emacs"
+ 	notepad	exec	notepad
+ 	xload	exec	"xload -display %display%"  # Comment
+ }
+-- 
+1.6.4.2
+

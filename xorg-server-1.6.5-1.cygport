@@ -88,8 +88,13 @@ PATCH_URI="
 	cygwin-ensure-WM_STATE-atom-exists-in-multiwindow.patch
 	cygwin-make-logverbose-affect-logfile-verbosity.patch
 	cygwin-add-timestamps-to-logfile.patch
+	cygwin-Workaround-for-SWF-Motif-bug.patch
+	cygwin-Tidy-up-system_Xwinrc.patch
+
+	from-xming-fix-UTF8String-and-CompoundText-clipboard.patch
 "
 #	1.5-remove-automatic-multiplemonitors.patch
+#
 #	cygwin-Re-order-window-creation-process.patch
 #	cygwin-Process-_NET_WM_STATE_SKIP_TASKBAR-hint-in-.patch
 #	cygwin-Unmap-minimized-windows-in-rootless-modes.patch
