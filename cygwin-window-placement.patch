@@ -1,18 +1,19 @@
-Cygwin: Window placement refinements
+Cygwin/X: Window placement refinements
 
-Ensure window actually ends up somewhere visible if it tries to create itself offscreen
-Don't allow window decoration to disappear off to top-left as a result of adjustments to add window styles
+Ensure window actually ends up somewhere visible if it tries to create 
+itself offscreen. Also, get windows which assume the Windows default 
+position placed correctly in multiwindow mode.
 
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
 ---
- xserver/hw/xwin/winmultiwindowwindow.c |    7 +++++++
- xserver/hw/xwin/winmultiwindowwm.c     |   25 +++++++++++++++----------
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ hw/xwin/winmultiwindowwindow.c |    13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletion(-)
 
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwindow.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
-@@ -511,6 +511,13 @@ winCreateWindowsWindow (WindowPtr pWin)
+diff --git a/hw/xwin/winmultiwindowwindow.c b/hw/xwin/winmultiwindowwindow.c
+index bb558d1..753dc2c 100644
+--- a/hw/xwin/winmultiwindowwindow.c
++++ b/hw/xwin/winmultiwindowwindow.c
+@@ -527,6 +527,13 @@ winCreateWindowsWindow (WindowPtr pWin)
    iWidth = pWin->drawable.width;
    iHeight = pWin->drawable.height;
  
@@ -23,49 +24,23 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwindow.c
 +  if (iY > GetSystemMetrics (SM_CYVIRTUALSCREEN))
 +    iY = CW_USEDEFAULT;
 +
-   winSelectIcons(pWin, &hIcon, &hIconSmall); 
- 
-   /* Set standard class name prefix so we can identify window easily */
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwm.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwm.c
-@@ -1608,15 +1608,20 @@ winUpdateWindowPosition (HWND hWnd, Bool
- 
-   AdjustWindowRectEx (&rcNew, GetWindowLongPtr (hWnd, GWL_STYLE), FALSE, WS_EX_APPWINDOW);
- 
--  /* Calculate position deltas */
--  iDx = pDraw->x - rcNew.left;
--  iDy = pDraw->y - rcNew.top;
--
--  /* Calculate new rectangle */
--  rcNew.left += iDx;
--  rcNew.right += iDx;
--  rcNew.top += iDy;
--  rcNew.bottom += iDy;
-+  /* Don't allow window decoration to disappear off to top-left as a result of this adjustment */
-+  if (rcNew.left < GetSystemMetrics(SM_XVIRTUALSCREEN))
-+    {
-+      iDx = GetSystemMetrics(SM_XVIRTUALSCREEN) - rcNew.left;
-+      rcNew.left += iDx;
-+      rcNew.right += iDx;
-+    }
+     if (winMultiWindowGetTransientFor (pWin, &pDaddy))
+     {
+       if (pDaddy)
+@@ -580,7 +580,11 @@ winCreateWindowsWindow (WindowPtr pWin)
+   winSelectIcons(pWin, &hIcon, &hIconSmall);
+   if (hIcon) SendMessage (hWnd, WM_SETICON, ICON_BIG, (LPARAM) hIcon);
+   if (hIconSmall) SendMessage (hWnd, WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
+- 
 +
-+  if (rcNew.top < GetSystemMetrics(SM_YVIRTUALSCREEN))
-+    {
-+      iDy = GetSystemMetrics(SM_YVIRTUALSCREEN) - rcNew.top;
-+      rcNew.top += iDy;
-+      rcNew.bottom += iDy;
-+    }
- 
- #if 0
-   ErrorF ("winUpdateWindowPosition - (%d, %d)-(%d, %d)\n",
-@@ -1627,7 +1632,7 @@ winUpdateWindowPosition (HWND hWnd, Bool
-   /* Position the Windows window */
-   SetWindowPos (hWnd, *zstyle, rcNew.left, rcNew.top,
- 	rcNew.right - rcNew.left, rcNew.bottom - rcNew.top,
--	SWP_NOMOVE);
-+	0);
- 
-   if (reshape)
-   {
++  /* If we asked the native WM to place the window, synchronize the X window position */
++  if ((iX == CW_USEDEFAULT) || (iY == CW_USEDEFAULT))
++    winAdjustXWindow(pWin, hWnd);
++
+   /* Change style back to popup, already placed... */
+   SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+   SetWindowPos (hWnd, 0, 0, 0, 0, 0,
+
+-- 
+1.6.4.2
+

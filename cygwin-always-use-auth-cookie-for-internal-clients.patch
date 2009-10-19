@@ -221,7 +221,7 @@ index 7eabb0f..3b81e90 100644
  #include <errno.h>
  #endif
 -#include "X11/Xauth.h"
- #include <X11/Xlibint.h>
+ #include "misc.h"
  
  
  /*
@@ -311,25 +311,6 @@ index 2567a78..c2d506a 100644
    /* Open the X display */
    do
      {
-diff --git a/include/os.h b/include/os.h
-index 77e9448..43ea210 100644
---- a/include/os.h
-+++ b/include/os.h
-@@ -388,6 +388,7 @@ extern int AddAuthorization(
-     unsigned int	/*data_length*/,
-     char *		/*data*/);
- 
-+#ifdef XCSECURITY
- extern XID GenerateAuthorization(
-     unsigned int   /* name_length */,
-     char	*  /* name */,
-@@ -395,6 +396,7 @@ extern XID GenerateAuthorization(
-     char	*  /* data */,
-     unsigned int * /* data_length_return */,
-     char	** /* data_return */);
-+#endif
- 
- extern int ddxProcessArgument(int /*argc*/, char * /*argv*/ [], int /*i*/);
  
 -- 
 1.6.3.2

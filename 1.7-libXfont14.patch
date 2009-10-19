@@ -5,14 +5,14 @@ definition of `_CopyISOLatin1Lowered'
 ../../../dix/.libs/libdix.a(dixutils.o):dixutils.c:(.text+0xe0): first 
 defined here
 
---- origsrc/xorg-server-1.6.0/dix/dixutils.c	2009-03-12 21:51:48.093750000 -0500
-+++ src/xorg-server-1.6.0/dix/dixutils.c	2009-03-13 00:56:14.859375000 -0500
+--- origsrc/xorg-server-1.7.0.901/dix/dixutils.c
++++ src/xorg-server-1.7.0.901/dix/dixutils.c
 @@ -165,6 +165,7 @@ ISOLatin1ToLower (unsigned char source)
  }
  
  
 +#ifndef __CYGWIN__
- _X_EXPORT void
+ void
  CopyISOLatin1Lowered(unsigned char *dest, unsigned char *source, int length)
  {
 @@ -174,6 +175,7 @@ CopyISOLatin1Lowered(unsigned char *dest

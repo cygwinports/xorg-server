@@ -10,34 +10,9 @@ frame it (as the frame is a native window, not an X window)
 
 Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
 ---
- hw/xwin/winmultiwindowwindow.c |   13 ----
  hw/xwin/winmultiwindowwm.c     |  119 ++++++++++++++++++++++++++-------------
- 2 files changed, 79 insertions(+), 53 deletions(-)
+ 1 file changed, 79 insertions(+), 40 deletions(-)
 
-diff --git a/hw/xwin/winmultiwindowwindow.c b/hw/xwin/winmultiwindowwindow.c
-index 27f6bfb..f127646 100644
---- a/hw/xwin/winmultiwindowwindow.c
-+++ b/hw/xwin/winmultiwindowwindow.c
-@@ -65,19 +65,6 @@ static void
- winFindWindow (pointer value, XID id, pointer cdata);
- 
- /*
-- * Macros
-- */
--
--#define SubSend(pWin) \
--    ((pWin->eventMask|wOtherEventMasks(pWin)) & SubstructureNotifyMask)
--
--#define StrSend(pWin) \
--    ((pWin->eventMask|wOtherEventMasks(pWin)) & StructureNotifyMask)
--
--#define SubStrSend(pWin,pParent) (StrSend(pWin) || SubSend(pParent))
--
--
--/*
-  * CreateWindow - See Porting Layer Definition - p. 37
-  */
- 
 diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
 index 2ef2d59..dc0d9a8 100644
 --- a/hw/xwin/winmultiwindowwm.c

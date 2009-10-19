@@ -1,15 +1,13 @@
 Fix the long-broken -silent-dup-error option
 
 ---
- xserver/hw/xwin/InitOutput.c |   87 -------------------------------------------
- xserver/hw/xwin/XWin.man     |    4 -
- xserver/hw/xwin/winerror.c   |   20 +++++++++
- 3 files changed, 21 insertions(+), 90 deletions(-)
+ xserver/hw/xwin/InitOutput.c |   87 -----------------------------------------------------------
+ xserver/hw/xwin/XWin.man.pre |    4 +-
+ xserver/hw/xwin/winerror.c   |   17 +++++++++++
+ 3 files changed, 19 insertions(+), 89 deletions(-)
 
-Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/InitOutput.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/InitOutput.c	2009-10-13 22:14:32.087315100 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/InitOutput.c	2009-10-13 22:16:32.659925300 -0500
 @@ -117,9 +117,6 @@ OsVendorVErrorF (const char *pszFormat, 
  void
  winInitializeDefaultScreens (void);
@@ -20,7 +18,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
  void
  winLogCommandLine (int argc, char *argv[]);
  
-@@ -953,15 +950,6 @@ InitOutput (ScreenInfo *screenInfo, int 
+@@ -944,15 +941,6 @@ InitOutput (ScreenInfo *screenInfo, int 
  		  "Exiting.\n");
      }
  
@@ -36,7 +34,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
  #ifdef XWIN_XF86CONFIG
    /* Try to read the xorg.conf-style configuration file */
    if (!winReadConfigfile ())
-@@ -1052,78 +1040,3 @@ InitOutput (ScreenInfo *screenInfo, int 
+@@ -1043,78 +1031,3 @@ InitOutput (ScreenInfo *screenInfo, int 
    winDebug ("InitOutput - Returning.\n");
  #endif
  }
@@ -51,7 +49,7 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
 - */
 -
 -static Bool
--winCheckDisplayNumber ()
+-winCheckDisplayNumber (void)
 -{
 -  int			nDisp;
 -  HANDLE		mutex;
@@ -115,42 +113,35 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/InitOutput.c
 -
 -  return TRUE;
 -}
-Index: xorg-server-1.5.3/xserver/hw/xwin/XWin.man
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/XWin.man
-+++ xorg-server-1.5.3/xserver/hw/xwin/XWin.man
-@@ -230,8 +230,8 @@ The \fIAlt-F4\fP key combination is enab
- .B \-swcursor
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/XWin.man.pre	2009-08-10 23:00:25.000000000 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/XWin.man.pre	2009-10-13 22:17:24.717216100 -0500
+@@ -231,8 +231,8 @@ The \fIAlt-F4\fP key combination is enab
  Disable the usage of the windows cursor and use the X11 software cursor instead.
+ .TP 8
  .B \-silent-dup-error
--If another instance of XWin is found running, exit silently and don't display 
--the error messge.
+-If another instance of XWin is found running, exit silently and don't display
+-the error message.
 +If another instance of XWin with the same display number is found running,
-+exit silently and don't display the error messge.
++exit silently and don't display the error message.
  .TP 8
  .B "\-xkblayout \fIlayout\fP"
  .TP 8
-Index: xorg-server-1.5.3/xserver/hw/xwin/winerror.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winerror.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winerror.c
-@@ -42,7 +42,7 @@
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/winerror.c	2009-08-10 23:00:25.000000000 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/winerror.c	2009-10-13 22:19:52.745874200 -0500
+@@ -43,6 +43,7 @@
  extern char *		g_pszCommandLine;
  extern char *		g_pszLogFile;
  extern Bool		g_fSilentFatalError;
--
 +extern Bool		g_fSilentDupError;
  
+ 
  #ifdef DDXOSVERRORF
- /* Prototype */
-@@ -61,6 +61,24 @@ OsVendorVErrorF (const char *pszFormat, 
+@@ -62,6 +63,22 @@ OsVendorVErrorF (const char *pszFormat, 
    pthread_mutex_lock (&s_pmPrinting);
  #endif
  
-+  /*
-+     If we want to silence it,
-+     detect if we are going to abort due to duplication error
-+  */
++  /* If we want to silence it,
++   * detect if we are going to abort due to duplication error */
 +  if (g_fSilentDupError)
 +    {
 +      if ((strcmp(pszFormat,

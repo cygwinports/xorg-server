@@ -1,35 +1,36 @@
-Hint handling fixes
+From 2ab6c3c2a811685acb3ef22ecd08981680f586eb Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Fri, 19 Jun 2009 21:14:37 +0100
+Subject: [PATCH] Cygwin/X: Hint handling fixes
 
 Respect the systems ownership of the clipping region
 
-When the style changes, adjust the window size so the client area remains the same. 
-Otherwise the window size may change when sizing is reflected from 
+When the style changes, adjust the window size so the client area remains the same.
+Otherwise the window size may change when sizing is reflected from
 Windows to X, and some windows are drawn expecting them to be exactly the reqeusted size
 (e.g. gmplayer control window)
 
-Use the current style in determining the window border when validating which sizing
-XXX: Needs to allow for different border thickness when uncaptioned?
-
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
 ---
- xserver/hw/xwin/winmultiwindowshape.c   |   14 ++++++++++
- xserver/hw/xwin/winmultiwindowwndproc.c |   43 +++++++++++++++++++++++++-------
- 2 files changed, 48 insertions(+), 9 deletions(-)
+ hw/xwin/winmultiwindowshape.c   |   14 ++++++++++++++
+ hw/xwin/winmultiwindowwndproc.c |   11 +++++++++++
+ 2 files changed, 25 insertions(+), 0 deletions(-)
 
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowshape.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
-@@ -73,6 +73,9 @@ winUpdateRgnMultiWindow (WindowPtr pWin)
+diff --git a/hw/xwin/winmultiwindowshape.c b/hw/xwin/winmultiwindowshape.c
+index 4400702..2887064 100644
+--- a/hw/xwin/winmultiwindowshape.c
++++ b/hw/xwin/winmultiwindowshape.c
+@@ -71,6 +71,9 @@ winUpdateRgnMultiWindow (WindowPtr pWin)
  {
    SetWindowRgn (winGetWindowPriv(pWin)->hWnd,
  		winGetWindowPriv(pWin)->hRgn, TRUE);
 +
-+  /* The system now owns the region specified by the region handle and delete it when it is no longer needed. */
++  /* The system now owns the region specified by the region handle and will delete it when it is no longer needed. */
 +  winGetWindowPriv(pWin)->hRgn = NULL;
  }
  
  
-@@ -209,3 +212,14 @@ winReshapeMultiWindow (WindowPtr pWin)
+@@ -206,3 +209,14 @@ winReshapeMultiWindow (WindowPtr pWin)
    
    return;
  }
@@ -44,60 +45,11 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowshape.c
 +      winUpdateRgnMultiWindow(pWin);
 +    }
 +}
-Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
-===================================================================
---- xorg-server-1.5.3.orig/xserver/hw/xwin/winmultiwindowwndproc.c
-+++ xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
-@@ -210,6 +210,7 @@ ValidateSizing (HWND hwnd, WindowPtr pWi
-   WinXSizeHints sizeHints;
-   RECT *rect;
-   int iWidth, iHeight;
-+  unsigned long rcStyle;
- 
-   /* Invalid input checking */
-   if (pWin==NULL || lParam==0)
-@@ -231,19 +232,31 @@ ValidateSizing (HWND hwnd, WindowPtr pWi
-   iWidth = rect->right - rect->left;
-   iHeight = rect->bottom - rect->top;
- 
--  /* Now remove size of any borders */
--  iWidth -= 2 * GetSystemMetrics(SM_CXSIZEFRAME);
--  iHeight -= (GetSystemMetrics(SM_CYCAPTION)
--	      + 2 * GetSystemMetrics(SM_CYSIZEFRAME));
--	      
-+  /* Now remove size of any borders and title bar */
-+  rcStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
-+  if (rcStyle & WS_CAPTION)
-+    {
-+      iHeight -= GetSystemMetrics(SM_CYCAPTION);
-+    }
-+  if (rcStyle & WS_SIZEBOX)
-+    {
-+      iWidth -= 2 * GetSystemMetrics(SM_CXSIZEFRAME);
-+      iHeight -= 2 * GetSystemMetrics(SM_CYSIZEFRAME);
-+    }
- 
-   /* Constrain the size to legal values */
-   ConstrainSize (sizeHints, &iWidth, &iHeight);
- 
--  /* Add back the borders */
--  iWidth += 2 * GetSystemMetrics(SM_CXSIZEFRAME);
--  iHeight += (GetSystemMetrics(SM_CYCAPTION)
--	      + 2 * GetSystemMetrics(SM_CYSIZEFRAME));
-+  /* Add back the size of borders and title bar */
-+  if (rcStyle & WS_CAPTION)
-+    {
-+      iHeight += GetSystemMetrics(SM_CYCAPTION);
-+    }
-+  if (rcStyle & WS_SIZEBOX)
-+    {
-+      iWidth += 2 * GetSystemMetrics(SM_CXSIZEFRAME);
-+      iHeight += 2 * GetSystemMetrics(SM_CYSIZEFRAME);
-+    }
- 
-   /* Adjust size according to where we're dragging from */
-   switch(wParam) {
-@@ -991,6 +1005,17 @@ winTopLevelWindowProc (HWND hwnd, UINT m
+diff --git a/hw/xwin/winmultiwindowwndproc.c b/hw/xwin/winmultiwindowwndproc.c
+index 7f66f86..364cf33 100644
+--- a/hw/xwin/winmultiwindowwndproc.c
++++ b/hw/xwin/winmultiwindowwndproc.c
+@@ -1016,6 +1016,17 @@ winTopLevelWindowProc (HWND hwnd, UINT message,
        if (wParam == SIZE_MINIMIZED) winReorderWindowsMultiWindow();
        return 0; /* end of WM_SIZE handler */
  
@@ -115,3 +67,6 @@ Index: xorg-server-1.5.3/xserver/hw/xwin/winmultiwindowwndproc.c
      case WM_MOUSEACTIVATE:
  
        /* Check if this window needs to be made active when clicked */
+-- 
+1.6.4.2
+

@@ -16,8 +16,8 @@ the last one is accepted (just as other arguments are handled).
  
    ErrorF ("-nounicodeclipboard\n"
  	  "\tDo not use Unicode clipboard even if NT-based platform.\n");
---- origsrc/xorg-server-1.6.1.901/hw/xwin/XWin.man	2009-06-24 20:36:20.118598600 -0500
-+++ src/xorg-server-1.6.1.901/hw/xwin/XWin.man	2009-06-25 14:42:05.066298600 -0500
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/XWin.man.pre
++++ src/xorg-server-1.7.0901/hw/xwin/XWin.man.pre
 @@ -80,10 +80,9 @@ In addition to the normal server options
  manual page, \fIXWin\fP accepts the following command line switches,
  \fIall\fP of which are optional:

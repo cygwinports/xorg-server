@@ -1,0 +1,249 @@
+From 4629955eb31a5f7a6a80cde209eb4cf3a793a67e Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Thu, 1 Oct 2009 13:12:48 +0100
+Subject: [PATCH] Cygwin/X: Improve choice of display name used by internal clients
+
+Choose display name used to connect internal clients and exported into
+environment of processes started by traymenu so that it uses a transport
+we know is working
+
+This should mean the server can start correctly with -multiwindow
+and/or -clipboard and any two of -nolisten inet6 -nolisten inet
+and -nolisten unix (the server will correctly refuse to start if all 3
+are used, as it must be listening on at least one socket)
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/Makefile.am          |    1 +
+ hw/xwin/win.h                |    7 +++++
+ hw/xwin/winclipboardthread.c |    5 +---
+ hw/xwin/windisplay.c         |   56 ++++++++++++++++++++++++++++++++++++++++++
+ hw/xwin/winmultiwindowwm.c   |   10 +------
+ hw/xwin/winprefs.c           |   11 ++------
+ include/os.h                 |    2 +
+ os/connection.c              |   17 ++++++++++++
+ 8 files changed, 89 insertions(+), 20 deletions(-)
+ create mode 100644 hw/xwin/windisplay.c
+
+diff --git a/hw/xwin/Makefile.am b/hw/xwin/Makefile.am
+index 2c7972a..70f8aa5 100644
+--- a/hw/xwin/Makefile.am
++++ b/hw/xwin/Makefile.am
+@@ -120,6 +120,7 @@ SRCS =	InitInput.c \
+ 	winpriv.h \
+ 	winresource.h \
+ 	winwindow.h \
++	windisplay.c \
+ 	XWin.rc \
+ 	$(top_srcdir)/Xext/dpmsstubs.c \
+ 	$(top_srcdir)/Xi/stubs.c \
+diff --git a/hw/xwin/win.h b/hw/xwin/win.h
+index 9009df2..b76ac87 100644
+--- a/hw/xwin/win.h
++++ b/hw/xwin/win.h
+@@ -1454,6 +1454,13 @@ Bool
+ winInitCursor (ScreenPtr pScreen);
+ 
+ /*
++ * windisplay.c
++ */
++
++void
++winGetDisplayName(char *szDisplay, unsigned int screen);
++
++/*
+  * END DDX and DIX Function Prototypes
+  */
+ 
+diff --git a/hw/xwin/winclipboardthread.c b/hw/xwin/winclipboardthread.c
+index 6fadc53..962d9d6 100644
+--- a/hw/xwin/winclipboardthread.c
++++ b/hw/xwin/winclipboardthread.c
+@@ -181,10 +181,7 @@ winClipboardProc (void *pvNotUsed)
+    * for all screens on the display.  That is why there is only
+    * one clipboard client thread.
+    */
+-  snprintf (szDisplay,
+-	    512,
+-	    "127.0.0.1:%s.0",
+-	    display);
++  winGetDisplayName(szDisplay, 0);
+ 
+   /* Print the display connection string */
+   ErrorF ("winClipboardProc - DISPLAY=%s\n", szDisplay);
+diff --git a/hw/xwin/windisplay.c b/hw/xwin/windisplay.c
+new file mode 100644
+index 0000000..ce111ab
+--- /dev/null
++++ b/hw/xwin/windisplay.c
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (C) Jon TURNEY 2009
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++ * DEALINGS IN THE SOFTWARE.
++ *
++ */
++
++#include <opaque.h>  // for display
++#include "win.h"
++
++/*
++  Generate a display name string referring to the display of this server,
++  using a transport we know is enabled
++*/
++
++void
++winGetDisplayName(char *szDisplay, unsigned int screen)
++{
++  if (TransIsListening("local"))
++    {
++      snprintf(szDisplay, 512, ":%s.%d", display, screen);
++    }
++  else if (TransIsListening("inet"))
++    {
++      snprintf(szDisplay, 512, "127.0.0.1:%s.%d", display, screen);
++    }
++  else if (TransIsListening("inet6"))
++    {
++      snprintf(szDisplay, 512, "::1:%s.%d", display, screen);
++    }
++  else
++    {
++      // this can't happen!
++      ErrorF ("winGetDisplay: Don't know what to use for DISPLAY\n");
++      snprintf(szDisplay, 512, "localhost:%s.%d", display, screen);
++    }
++
++  ErrorF ("winGetDisplay: DISPLAY=%s\n", szDisplay);
++}
+diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
+index 12681e0..8b32986 100644
+--- a/hw/xwin/winmultiwindowwm.c
++++ b/hw/xwin/winmultiwindowwm.c
+@@ -137,7 +137,6 @@ typedef struct _XMsgProcArgRec {
+  * References to external symbols
+  */
+ 
+-extern char *display;
+ extern void ErrorF (const char* /*f*/, ...);
+ 
+ 
+@@ -948,8 +947,7 @@ winMultiWindowXMsgProc (void *pArg)
+   XSetIOErrorHandler (winMultiWindowXMsgProcIOErrorHandler);
+ 
+   /* Setup the display connection string x */
+-  snprintf (pszDisplay,
+-	    512, "127.0.0.1:%s.%d", display, (int)pProcArg->dwScreen);
++  winGetDisplayName(pszDisplay, (int)pProcArg->dwScreen);
+ 
+   /* Print the display connection string */
+   ErrorF ("winMultiWindowXMsgProc - DISPLAY=%s\n", pszDisplay);
+@@ -1319,11 +1317,7 @@ winInitMultiWindowWM (WMInfoPtr pWMInfo, WMProcArgPtr pProcArg)
+   XSetIOErrorHandler (winMultiWindowWMIOErrorHandler);
+ 
+   /* Setup the display connection string x */
+-  snprintf (pszDisplay,
+-	    512,
+-	    "127.0.0.1:%s.%d",
+-	    display,
+-	    (int) pProcArg->dwScreen);
++  winGetDisplayName(pszDisplay, (int)pProcArg->dwScreen);
+ 
+   /* Print the display connection string */
+   ErrorF ("winInitMultiWindowWM - DISPLAY=%s\n", pszDisplay);
+diff --git a/hw/xwin/winprefs.c b/hw/xwin/winprefs.c
+index d5bceb9..d854d2e 100644
+--- a/hw/xwin/winprefs.c
++++ b/hw/xwin/winprefs.c
+@@ -69,10 +69,6 @@ extern HICON		g_hSmallIconX;
+ /* Currently in use command ID, incremented each new menu item created */
+ static int g_cmdid = STARTMENUID;
+ 
+-
+-/* Defined in DIX */
+-extern char *display;
+-
+ /* Local function to handle comma-ified icon names */
+ static HICON
+ LoadImageComma (char *fname, int sx, int sy, int flags);
+@@ -780,16 +776,15 @@ LoadPreferences (void)
+ 
+   /* Setup a DISPLAY environment variable, need to allocate on heap */
+   /* because putenv doesn't copy the argument... */
+-  snprintf (szDisplay, 512, "DISPLAY=127.0.0.1:%s.0", display);
+-  szEnvDisplay = (char *)(malloc (strlen(szDisplay)+1));
++  winGetDisplayName(szDisplay, 0);
++  szEnvDisplay = (char *)(malloc(strlen(szDisplay)+strlen("DISPLAY=")+1));
+   if (szEnvDisplay)
+     {
+-      strcpy (szEnvDisplay, szDisplay);
++      snprintf(szEnvDisplay, 512, "DISPLAY=%s", szDisplay);
+       putenv (szEnvDisplay);
+     }
+ 
+   /* Replace any "%display%" in menu commands with display string */
+-  snprintf (szDisplay, 512, "127.0.0.1:%s.0", display);
+   for (i=0; i<pref.menuItems; i++)
+     {
+       for (j=0; j<pref.menu[i].menuItems; j++)
+diff --git a/include/os.h b/include/os.h
+index 2f6b0c0..174ffd3 100644
+--- a/include/os.h
++++ b/include/os.h
+@@ -110,6 +110,8 @@ extern _X_EXPORT int WriteToClient(ClientPtr /*who*/, int /*count*/, const void*
+ 
+ extern _X_EXPORT void ResetOsBuffers(void);
+ 
++extern _X_EXPORT int TransIsListening(char *protocol);
++
+ extern _X_EXPORT void InitConnectionLimits(void);
+ 
+ extern _X_EXPORT void NotifyParentProcess(void);
+diff --git a/os/connection.c b/os/connection.c
+index 3ff93bb..5ea55ae 100644
+--- a/os/connection.c
++++ b/os/connection.c
+@@ -270,6 +270,23 @@ lookup_trans_conn (int fd)
+     return (NULL);
+ }
+ 
++int
++TransIsListening(char *protocol)
++{
++  /* look for this transport in the list of listeners */
++  int i;
++  for (i = 0; i < ListenTransCount; i++)
++    {
++      if (!strcmp(protocol, ListenTransConns[i]->transptr->TransName))
++        {
++          return 1;
++        }
++    }
++
++  return 0;
++}
++
++
+ /* Set MaxClients and lastfdesc, and allocate ConnectionTranslation */
+ 
+ void
+-- 
+1.6.4.2
+

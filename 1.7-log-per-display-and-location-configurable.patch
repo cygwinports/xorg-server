@@ -8,22 +8,22 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
  hw/xwin/InitOutput.c     |   17 +++++++----------
  hw/xwin/winerror.c       |    7 +++++++
  hw/xwin/winglobals.c     |    2 +-
- include/xwin-config.h.in |    1 -
- 5 files changed, 16 insertions(+), 12 deletions(-)
+ include/xwin-config.h.in |    5 ++++-
+ 5 files changed, 20 insertions(+), 12 deletions(-)
 
---- origsrc/xorg-server-1.5.3/configure.ac	2008-11-12 21:54:18.257937400 -0600
-+++ src/xorg-server-1.5.3/configure.ac	2008-11-12 22:13:01.507937400 -0600
-@@ -1659,6 +1659,7 @@
- AC_MSG_RESULT([$XWIN])
+--- origsrc/xorg-server-1.7.0.901/configure.ac	2009-10-13 22:50:18.408257800 -0500
++++ src/xorg-server-1.7.0.901/configure.ac	2009-10-13 22:51:26.268376100 -0500
+@@ -1709,6 +1709,7 @@ AC_MSG_RESULT([$XWIN])
  
  if test "x$XWIN" = xyes; then
+ 	PKG_CHECK_EXISTS($WINDOWSWMPROTO, [WINDOWSWM=yes], [WINDOWSWM=no])
 +	AC_DEFINE_DIR(DEFAULT_LOGDIR, logdir, [Default log location])
  	AC_DEFINE_UNQUOTED(XORG_VERSION_CURRENT, [$VENDOR_RELEASE], [Current Xorg version])
  	AC_DEFINE_UNQUOTED(__VENDORDWEBSUPPORT__, ["$VENDOR_WEB"], [Vendor web address for support])
  	AC_CHECK_TOOL(WINDRES, windres)
---- origsrc/xorg-server-1.5.3/hw/xwin/InitOutput.c	2008-11-12 21:54:13.945437400 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/InitOutput.c	2008-11-12 22:31:23.097847400 -0600
-@@ -243,7 +243,7 @@
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/InitOutput.c	2009-10-13 22:50:13.868649900 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/InitOutput.c	2009-10-13 22:52:06.344846000 -0500
+@@ -243,7 +243,7 @@ ddxGiveUp (void)
  #endif
  
    if (!g_fLogInited) {
@@ -32,7 +32,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
      g_fLogInited = TRUE;
    }  
    LogClose ();
-@@ -698,9 +698,6 @@
+@@ -687,9 +687,6 @@ OsVendorInit (void)
    /* Re-initialize global variables on server reset */
    winInitializeGlobals ();
  
@@ -42,7 +42,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
    winFixupPaths();
  
  #ifdef DDXOSVERRORF
-@@ -715,7 +712,7 @@
+@@ -704,7 +701,7 @@ OsVendorInit (void)
       * avoid the second call 
       */  
      g_fLogInited = TRUE;
@@ -51,8 +51,8 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
    } 
    LogSetParameter (XLOG_FLUSH, 1);
    LogSetParameter (XLOG_VERBOSITY, g_iLogVerbose);
-@@ -888,7 +885,7 @@
- #endif
+@@ -875,7 +872,7 @@ winUseMsg (void)
+ 	  "\tEquivalent to XKBOptions in XF86Config files.\n");
  
    ErrorF ("-logfile filename\n"
 -	  "\tWrite logmessages to <filename> instead of /tmp/Xwin.log.\n");
@@ -60,7 +60,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
  
    ErrorF ("-logverbose verbosity\n"
  	  "\tSet the verbosity of logmessages. [NOTE: Only a few messages\n"
-@@ -918,7 +915,7 @@
+@@ -905,7 +902,7 @@ ddxUseMsg(void)
  
    /* Log file will not be opened for UseMsg unless we open it now */
    if (!g_fLogInited) {
@@ -69,7 +69,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
      g_fLogInited = TRUE;
    }  
    LogClose ();
-@@ -926,9 +923,9 @@
+@@ -913,9 +910,9 @@ ddxUseMsg(void)
    /* Notify user where UseMsg text can be found.*/
    if (!g_fNoHelpMessageBox)
      winMessageBoxF ("The " PROJECT_NAME " help text has been printed to "
@@ -81,21 +81,10 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
 +		  MB_ICONINFORMATION, g_pszLogFile, g_pszLogFile);
  }
  
- /* ddxInitGlobals - called by |InitGlobals| from os/util.c */
---- origsrc/xorg-server-1.5.3/hw/xwin/winglobals.c	2008-11-18 00:47:16.495683100 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/winglobals.c	2008-11-18 00:47:24.730058100 -0600
-@@ -64,7 +64,7 @@
- HICON		g_hIconX = NULL;
- HICON		g_hSmallIconX = NULL;
- #ifndef RELOCATE_PROJECTROOT
--char *		g_pszLogFile = "/tmp/XWin.log";
-+char *		g_pszLogFile = DEFAULT_LOGDIR "/XWin.%s.log";
- #else
- char *		g_pszLogFile = "XWin.log";
- Bool		g_fLogFileChanged = FALSE;
---- origsrc/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-19 23:57:42.368957500 -0600
-+++ src/xorg-server-1.5.3/hw/xwin/winerror.c	2008-11-20 03:48:25.621350500 -0600
-@@ -43,6 +43,7 @@
+ /* See Porting Layer Definition - p. 20 */
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/winerror.c	2009-10-13 22:50:12.963848300 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/winerror.c	2009-10-13 22:52:06.360446100 -0500
+@@ -44,6 +44,7 @@ extern char *		g_pszCommandLine;
  extern char *		g_pszLogFile;
  extern Bool		g_fSilentFatalError;
  extern Bool		g_fSilentDupError;
@@ -103,7 +92,7 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
  
  
  #ifdef DDXOSVERRORF
-@@ -86,6 +87,12 @@
+@@ -104,6 +105,12 @@ OsVendorFatalError (void)
    if (g_fSilentFatalError)
      return;
  
@@ -116,8 +105,19 @@ FIXME: g_pszLogFile should be (const char*) per os/log.c:LogInit().
    winMessageBoxF (
            "A fatal error has occurred and " PROJECT_NAME " will now exit.\n" \
  		  "Please open %s for more information.\n",
---- origsrc/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-12 21:54:18.273562400 -0600
-+++ src/xorg-server-1.5.3/include/xwin-config.h.in	2008-11-12 22:15:07.195437400 -0600
+--- origsrc/xorg-server-1.7.0.901/hw/xwin/winglobals.c	2009-10-13 22:50:09.407042100 -0500
++++ src/xorg-server-1.7.0.901/hw/xwin/winglobals.c	2009-10-13 22:52:06.344846000 -0500
+@@ -69,7 +69,7 @@ Bool           g_fAuthEnabled = FALSE;
+ HICON		g_hIconX = NULL;
+ HICON		g_hSmallIconX = NULL;
+ #ifndef RELOCATE_PROJECTROOT
+-char *		g_pszLogFile = "/tmp/XWin.log";
++char *		g_pszLogFile = DEFAULT_LOGDIR "/XWin.%s.log";
+ #else
+ char *		g_pszLogFile = "XWin.log";
+ Bool		g_fLogFileChanged = FALSE;
+--- origsrc/xorg-server-1.7.0.901/include/xwin-config.h.in	2009-10-13 22:50:18.439457900 -0500
++++ src/xorg-server-1.7.0.901/include/xwin-config.h.in	2009-10-13 22:52:06.360446100 -0500
 @@ -24,4 +24,7 @@
  #undef NEED_SNPRINTF
  
