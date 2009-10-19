@@ -1,0 +1,88 @@
+From 2c7869bc9076b4cac1a1f110fa18fa7f60a1b6f0 Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Wed, 8 Jul 2009 17:48:03 +0100
+Subject: [PATCH 2/5] Cygwin/X: Process _NET_WM_STATE_SKIP_TASKBAR hint in multiwindow mode.
+
+To ensure that taskbar learns the correct state initially (since it
+only updates it's idea of if it should show a button or not on a ShowWindow()),
+we must be a bit more careful to do things in the right order and set all
+the style flags before we show the window.
+
+We have to jump through hoops to ensure that the taskbar notices if the window
+has changed it's style in a way which affects if the taskbar shows it or no
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/winmultiwindowwm.c |   21 ++++++++++++++++++++-
+ 1 files changed, 20 insertions(+), 1 deletions(-)
+
+diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
+index 95ccfc5..9724c2e 100644
+--- a/hw/xwin/winmultiwindowwm.c
++++ b/hw/xwin/winmultiwindowwm.c
+@@ -777,6 +777,14 @@ winMultiWindowWMProc (void *pArg)
+ 
+ 	  pNode->msg.hwndWindow = getHwnd(pWMInfo, pNode->msg.iWindow);
+ 
++         /*
++            XXX: If WS_EX_TOOLWINDOW/WS_EX_APPWINDOW changed, we seem to need to SW_HIDE/SW_SHOWNORMAL
++            to cause a taskbar update...
++         */
++
++	  /* Hide the window whilst we change it */
++/* 	  ShowWindow (pNode->msg.hwndWindow, SW_HIDE); */
++
+ 	  /* Determine the Window style, which determines borders and clipping region... */
+ 	  {
+ 	    HWND zstyle = HWND_NOTOPMOST;
+@@ -1537,6 +1545,8 @@ winDeinitMultiWindowWM ()
+ #define HINT_BORDER	(1L<<1)
+ #define HINT_SIZEBOX	(1l<<2)
+ #define HINT_CAPTION	(1l<<3)
++/* Windows extended window styles */
++#define HINT_SKIPTASKBAR (1L<<0)
+ /* These two are used on their own */
+ #define HINT_MAX	(1L<<0)
+ #define HINT_MIN	(1L<<1)
+@@ -1548,6 +1558,7 @@ winApplyHints (Display *pDisplay, Window iWindow, HWND hWnd, HWND *zstyle)
+   Atom		type, *pAtom = NULL;
+   int 		format;
+   unsigned long	hint = 0, maxmin = 0, rcStyle, nitems = 0 , left = 0;
++  unsigned long exHint = 0;
+   WindowPtr	pWin = GetProp (hWnd, WIN_WINDOW_PROP);
+ 
+   if (!hWnd) return;
+@@ -1563,7 +1574,9 @@ winApplyHints (Display *pDisplay, Window iWindow, HWND hWnd, HWND *zstyle)
+   {
+     if (pAtom)
+     {
+-      static Atom hiddenState, fullscreenState, belowState, aboveState;
++      static Atom skiptaskbarState, hiddenState, fullscreenState, belowState, aboveState;
++
++      if (skiptaskbarState == None) skiptaskbarState = XInternAtom(pDisplay, "_NET_WM_STATE_SKIP_TASKBAR", False);
+       if (hiddenState == None) hiddenState = XInternAtom(pDisplay, "_NET_WM_STATE_HIDDEN", False);
+       if (fullscreenState == None) fullscreenState = XInternAtom(pDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+       if (belowState == None) belowState = XInternAtom(pDisplay, "_NET_WM_STATE_BELOW", False);
+@@ -1572,6 +1585,7 @@ winApplyHints (Display *pDisplay, Window iWindow, HWND hWnd, HWND *zstyle)
+       unsigned long i;
+       for (i = 0; i < nitems; i++)
+ 	{
++	  if (*pAtom == skiptaskbarState) exHint |= HINT_SKIPTASKBAR;
+ 	  if (*pAtom == hiddenState) maxmin |= HINT_MIN;
+ 	  else if (*pAtom == fullscreenState) maxmin |= HINT_MAX;
+ 	  if (*pAtom == belowState) *zstyle = HWND_BOTTOM;
+@@ -1667,6 +1681,11 @@ winApplyHints (Display *pDisplay, Window iWindow, HWND hWnd, HWND *zstyle)
+                               ((hint & HINT_SIZEBOX) ? (GetParent(hWnd) ? 0 : WS_SIZEBOX) : 0) |
+                               ((hint & HINT_CAPTION) ? WS_CAPTION : 0));
+ 
++      if (exHint & HINT_SKIPTASKBAR)
++	SetWindowLongPtr(hWnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
++      else
++	SetWindowLongPtr(hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
++
+       winDebug("winApplyHints: iWindow %d hints %d %d\n", iWindow, hint, exHint);
+     }
+   else
+-- 
+1.6.4.2
+
