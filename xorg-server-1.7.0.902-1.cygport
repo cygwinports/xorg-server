@@ -47,6 +47,8 @@ PATCH_URI="
 	cygwin-set-FD_SETSIZE-for-all-DDXs.patch
 
 	1.7-builderstring.patch
+
+	1.7.0.902-dmx-fixes.patch
 "
 #	1.5-remove-automatic-multiplemonitors.patch
 #

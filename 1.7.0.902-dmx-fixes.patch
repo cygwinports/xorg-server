@@ -1,0 +1,36 @@
+dix/devices.c:  http://bugs.freedesktop.org/show_bug.cgi?id=24621
+hw/dmx/dmxwindow.c:  http://bugs.freedesktop.org/show_bug.cgi?id=24576
+
+--- origsrc/xorg-server-1.7.0.902/dix/devices.c	2009-10-18 19:05:41.000000000 -0500
++++ src/xorg-server-1.7.0.902/dix/devices.c	2009-10-19 17:22:16.080191300 -0500
+@@ -1520,14 +1520,12 @@ int
+ ProcGetModifierMapping(ClientPtr client)
+ {
+     xGetModifierMappingReply rep;
+-    int ret, max_keys_per_mod = 0;
++    int max_keys_per_mod = 0;
+     KeyCode *modkeymap = NULL;
+     REQUEST_SIZE_MATCH(xReq);
+ 
+-    ret = generate_modkeymap(client, PickKeyboard(client), &modkeymap,
++    generate_modkeymap(client, PickKeyboard(client), &modkeymap,
+                              &max_keys_per_mod);
+-    if (ret != Success)
+-        return ret;
+ 
+     memset(&rep, 0, sizeof(xGetModifierMappingReply));
+     rep.type = X_Reply;
+--- origsrc/xorg-server-1.7.0.902/hw/dmx/dmxwindow.c	2009-07-09 23:05:30.000000000 -0500
++++ src/xorg-server-1.7.0.902/hw/dmx/dmxwindow.c	2009-10-19 15:48:18.309297000 -0500
+@@ -419,10 +419,9 @@ Bool dmxDestroyWindow(WindowPtr pWindow)
+ 	pWinPriv->windowDestroyed(pWindow);
+ #endif
+ 
+-#if 0
+     if (pScreen->DestroyWindow)
+ 	ret = pScreen->DestroyWindow(pWindow);
+-#endif
++
+     DMX_WRAP(DestroyWindow, dmxDestroyWindow, dmxScreen, pScreen);
+ 
+     return ret;
