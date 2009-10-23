@@ -2,11 +2,10 @@
  configure.ac              |    1 
  hw/xwin/Makefile.am       |    2 -
  hw/xwin/XWin.exe.manifest |   16 +++++++++++++++
- hw/xwin/XWin.rc           |   51 +++++++++++++++++++++++-------------------------
+ hw/xwin/XWin.rc           |   50 +++++++++++++++++++++++------------------------
  hw/xwin/windialogs.c      |    6 ++---
- hw/xwin/winresource.h     |    1 
  include/xwin-config.h.in  |    3 ++
- 7 files changed, 49 insertions(+), 31 deletions(-)
+ 6 files changed, 49 insertions(+), 29 deletions(-)
 
 --- origsrc/xorg-server-1.7.0.901/configure.ac	2009-10-13 22:37:55.770162700 -0500
 +++ src/xorg-server-1.7.0.901/configure.ac	2009-10-13 22:44:57.889098900 -0500
@@ -48,8 +47,8 @@
 +	   </dependentAssembly>
 +	</dependency>
 +</assembly>
---- origsrc/xorg-server-1.7.0.901/hw/xwin/XWin.rc	2009-08-10 23:00:25.000000000 -0500
-+++ src/xorg-server-1.7.0.901/hw/xwin/XWin.rc	2009-10-13 22:44:57.873498900 -0500
+--- origsrc/xorg-server-1.7.1/hw/xwin/XWin.rc
++++ src/xorg-server-1.7.1/hw/xwin/XWin.rc
 @@ -1,5 +1,6 @@
  /*
   *Copyright (C) 2002-2004 Harold L Hunt II All Rights Reserved.
@@ -144,11 +143,10 @@
  	END
  END
  
-@@ -106,4 +104,4 @@ END
+@@ -106,3 +104,4 @@ END
   */
  
  IDI_XWIN		ICON	"X.ico"
--IDI_XWIN_BOXED		ICON	"X-boxed.ico"
 +CREATEPROCESS_MANIFEST_RESOURCE_ID	RT_MANIFEST	"XWin.exe.manifest"
 --- origsrc/xorg-server-1.7.0.901/hw/xwin/windialogs.c	2009-08-10 23:00:25.000000000 -0500
 +++ src/xorg-server-1.7.0.901/hw/xwin/windialogs.c	2009-10-13 22:44:57.873498900 -0500
@@ -172,16 +170,6 @@
  	    int			iReturn;
  	    
  	    iReturn = ShellExecute (NULL,
---- origsrc/xorg-server-1.7.0.901/hw/xwin/winresource.h	2008-11-28 07:08:46.000000000 -0600
-+++ src/xorg-server-1.7.0.901/hw/xwin/winresource.h	2009-10-13 22:44:57.873498900 -0500
-@@ -37,7 +37,6 @@
- 
- #define IDC_STATIC		-1
- #define IDI_XWIN		101
--#define IDI_XWIN_BOXED		102
- #define IDM_TRAYICON_MENU	103
- #define IDC_CLIENTS_CONNECTED	104
- 
 --- origsrc/xorg-server-1.7.0.901/include/xwin-config.h.in	2008-04-16 01:14:19.000000000 -0500
 +++ src/xorg-server-1.7.0.901/include/xwin-config.h.in	2009-10-13 22:44:57.889098900 -0500
 @@ -22,3 +22,6 @@

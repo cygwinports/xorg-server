@@ -17,7 +17,7 @@ PATCH_URI="
 
 	1.7-ddxBeforeReset.patch
 	1.5-composite.patch
-	1.7.0.902-xwin-resources.patch
+	1.7.1-xwin-resources.patch
 	1.7-log-per-display-and-location-configurable.patch
 	1.7-system_XWinrc-in-etc.patch
 
@@ -48,8 +48,6 @@ PATCH_URI="
 
 	1.7-builderstring.patch
 	1.7-yacc-debug-fix.patch
-
-	1.7.0.902-dmx-fixes.patch
 "
 #	1.5-remove-automatic-multiplemonitors.patch
 #
@@ -62,6 +60,11 @@ PATCH_URI="
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 # new files created by patches
 DISTCLEANFILES="hw/xwin/XWin.exe.manifest hw/xwin/windisplay.c miext/rootless/Xplugin.h"
+
+PKG_NAMES="${PN} ${PN}-dmx"
+PKG_HINTS="setup dmx"
+xorg_server_CONTENTS="--exclude=*dmx* etc/ usr/ var/"
+xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
 
 src_compile() {
 	cd ${S}
