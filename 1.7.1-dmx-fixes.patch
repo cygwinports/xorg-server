@@ -1,0 +1,27 @@
+dmx: Correctly compute DMXGetScreenAttributes reply length
+
+Correctly allow for excess length of DMXGetScreenAttributes reply
+over standard 32 byte reply in addition to the displayName string
+when computing the length of reply
+
+http://bugs.freedesktop.org/show_bug.cgi?id=24685
+---
+ hw/dmx/dmx.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/hw/dmx/dmx.c b/hw/dmx/dmx.c
+index b8fbf02..a1afe76 100644
+--- a/hw/dmx/dmx.c
++++ b/hw/dmx/dmx.c
+@@ -362,7 +362,8 @@ static int ProcDMXGetScreenAttributes(ClientPtr client)
+     paddedLength            = pad_to_int32(length);
+     rep.type                = X_Reply;
+     rep.sequenceNumber      = client->sequence;
+-    rep.length              = bytes_to_int32(paddedLength);
++    rep.length              = bytes_to_int32((sizeof(xDMXGetScreenAttributesReply) - sizeof(xGenericReply))
++                                             + paddedLength);
+     rep.displayNameLength   = length;
+ 
+     if (client->swapped) {
+--
+1.6.4.2 

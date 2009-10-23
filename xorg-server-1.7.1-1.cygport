@@ -44,10 +44,13 @@ PATCH_URI="
 	cygwin-Improve-DISPLAY-used-by-internal-clients.patch
 	cygwin-cause-xserver-to-terminate-if-internal-clients-exit.patch
 	cygwin-Copy-the-state-of-the-Windows-keyboard-device-to-the.patch
+	cygwin-fix-regression-in-window-placement.patch
 	cygwin-set-FD_SETSIZE-for-all-DDXs.patch
 
 	1.7-builderstring.patch
 	1.7-yacc-debug-fix.patch
+
+	1.7.1-dmx-fixes.patch
 "
 #	1.5-remove-automatic-multiplemonitors.patch
 #
