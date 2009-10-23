@@ -105,12 +105,14 @@ src_compile() {
 	# So, we build this in two cycles: one just for XWin with rootless
 	# and a second time for all other DDXs without.
 
+	# To enable debugging messages, add:
+	#	--enable-debug \
+
 	mkdir -p ${B}/xwin-ddx
 	cd ${B}/xwin-ddx
 
 	CYGCONF_SOURCE=${S}
 	cygconf \
-		--enable-debug \
 		--disable-dmx \
 		--disable-kdrive \
 		--disable-xephyr \
@@ -140,8 +142,6 @@ src_compile() {
 		"--with-vendor-web=http://x.cygwin.com/"
 
 	cygmake
-
-	return 0   ###############################
 
 	mkdir -p ${B}/other-ddx
 	cd ${B}/other-ddx
