@@ -26,7 +26,6 @@ PATCH_URI="
 	cygwin-clipboard-debugging.patch
 
 	1.7-libXfont14.patch
-	1.7.0.902-win32-rootless.patch
 	1.6-revert-fdo-bug-5735.patch
 	1.6-cygwin17.patch
 	1.7-xwin-noclipboard.patch
@@ -49,9 +48,13 @@ PATCH_URI="
 
 	1.7-builderstring.patch
 	1.7-yacc-debug-fix.patch
-
 	1.7.1-dmx-fixes.patch
+
+	cygwin-XSupportsLocale-failure-non-critical.patch
+	cygwin-update-DDX-specific-help-text.patch
+	cygwin-update-XWin-man-page.patch
 "
+#
 #	1.5-remove-automatic-multiplemonitors.patch
 #
 #	cygwin-Re-order-window-creation-process.patch
@@ -62,7 +65,7 @@ PATCH_URI="
 
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 # new files created by patches
-DISTCLEANFILES="hw/xwin/XWin.exe.manifest hw/xwin/windisplay.c miext/rootless/Xplugin.h"
+DISTCLEANFILES="hw/xwin/XWin.exe.manifest hw/xwin/windisplay.c"
 
 PKG_NAMES="${PN} ${PN}-dmx"
 PKG_HINTS="setup dmx"

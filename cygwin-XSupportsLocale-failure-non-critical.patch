@@ -1,0 +1,56 @@
+From 974665396bf21d311b4791050f10778dcfee7d87 Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Thu, 29 Oct 2009 18:50:23 +0000
+Subject: [PATCH] Cygwin/X: XSupportsLocale() failure is non-critical
+
+Treat XSupportsLocale() returning false as non-critical to internal client
+theads startup, and issue a warning, not an error
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/winclipboardthread.c |    3 +--
+ hw/xwin/winmultiwindowwm.c   |    7 ++-----
+ 2 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/hw/xwin/winclipboardthread.c b/hw/xwin/winclipboardthread.c
+index 992b145..a8bcde6 100644
+--- a/hw/xwin/winclipboardthread.c
++++ b/hw/xwin/winclipboardthread.c
+@@ -120,8 +120,7 @@ winClipboardProc (void *pvNotUsed)
+   /* See if X supports the current locale */
+   if (XSupportsLocale () == False)
+     {
+-      ErrorF ("winClipboardProc - Locale not supported by X.  Exiting.\n");
+-      pthread_exit (NULL);
++      ErrorF ("winClipboardProc - Warning: Locale not supported by X.\n");
+     }
+ 
+   /* Set jump point for Error exits */
+diff --git a/hw/xwin/winmultiwindowwm.c b/hw/xwin/winmultiwindowwm.c
+index 5b05f71..dda84d0 100644
+--- a/hw/xwin/winmultiwindowwm.c
++++ b/hw/xwin/winmultiwindowwm.c
+@@ -877,9 +877,7 @@ winMultiWindowXMsgProc (void *pArg)
+   /* See if X supports the current locale */
+   if (XSupportsLocale () == False)
+     {
+-      ErrorF ("winMultiWindowXMsgProc - Locale not supported by X.  "
+-	      "Exiting.\n");
+-      pthread_exit (NULL);
++      ErrorF ("winMultiWindowXMsgProc - Warning: locale not supported by X\n");
+     }
+ 
+   /* Release the server started mutex */
+@@ -1262,8 +1260,7 @@ winInitMultiWindowWM (WMInfoPtr pWMInfo, WMProcArgPtr pProcArg)
+   /* See if X supports the current locale */
+   if (XSupportsLocale () == False)
+     {
+-      ErrorF ("winInitMultiWindowWM - Locale not supported by X.  Exiting.\n");
+-      pthread_exit (NULL);
++      ErrorF ("winInitMultiWindowWM - Warning: Locale not supported by X.\n");
+     }
+ 
+   /* Release the server started mutex */
+-- 
+1.6.4.2
+

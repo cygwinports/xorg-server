@@ -1,16 +1,33 @@
---- origsrc/xorg-server-1.7.0.901/hw/xwin/winmultiwindowwindow.c	2009-10-16 20:53:42.390625000 +0100
-+++ src/xorg-server-1.7.0.901/hw/xwin/winmultiwindowwindow.c	2009-10-18 20:11:24.250000000 +0100
-@@ -580,7 +580,11 @@ winCreateWindowsWindow (WindowPtr pWin)
-   winSelectIcons(pWin, &hIcon, &hIconSmall);
-   if (hIcon) SendMessage (hWnd, WM_SETICON, ICON_BIG, (LPARAM) hIcon);
-   if (hIconSmall) SendMessage (hWnd, WM_SETICON, ICON_SMALL, (LPARAM) hIconSmall);
-- 
+From a1dbe3798ba3ca16469370bc2b99dc69a5e741f4 Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Fri, 19 Jun 2009 21:14:39 +0100
+Subject: [PATCH] Cygwin/X: Window placement refinements
+
+Ensure window actually ends up somewhere visible if it tries to create itself offscreen
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/winmultiwindowwindow.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/hw/xwin/winmultiwindowwindow.c b/hw/xwin/winmultiwindowwindow.c
+index bb558d1..753dc2c 100644
+--- a/hw/xwin/winmultiwindowwindow.c
++++ b/hw/xwin/winmultiwindowwindow.c
+@@ -527,6 +527,13 @@ winCreateWindowsWindow (WindowPtr pWin)
+   iWidth = pWin->drawable.width;
+   iHeight = pWin->drawable.height;
+ 
++  /* ensure window actually ends up somewhere visible */
++  if (iX > GetSystemMetrics (SM_CXVIRTUALSCREEN))
++    iX = CW_USEDEFAULT;
 +
-+  /* If we asked the native WM to place the window, synchronize the X window position */
-+  if ((iX == CW_USEDEFAULT) || (iY == CW_USEDEFAULT))
-+    winAdjustXWindow(pWin, hWnd);
++  if (iY > GetSystemMetrics (SM_CYVIRTUALSCREEN))
++    iY = CW_USEDEFAULT;
 +
-   /* Change style back to popup, already placed... */
-   SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
-   SetWindowPos (hWnd, 0, 0, 0, 0, 0,
+     if (winMultiWindowGetTransientFor (pWin, &pDaddy))
+     {
+       if (pDaddy)
+-- 
+1.6.4.2
 

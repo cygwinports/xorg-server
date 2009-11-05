@@ -134,6 +134,11 @@ Files included in the binary packages:
 
 Port Notes:
 
+----- version 1.7.1-2 -----
+Added patches:
+- Don't exit with error if locale is not supported by X11.
+- Update and better organize options in -help output and XWin(1) manpage.
+
 ----- version 1.7.1-1 -----
 Version bump for X11R7.5.
 Added DMX server and clients as separate package.
