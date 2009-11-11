@@ -53,6 +53,7 @@ PATCH_URI="
 	cygwin-XSupportsLocale-failure-non-critical.patch
 	cygwin-update-DDX-specific-help-text.patch
 	cygwin-update-XWin-man-page.patch
+	cygwin-fix-UTF8-window-name-crash.patch
 "
 #
 #	1.5-remove-automatic-multiplemonitors.patch

@@ -134,6 +134,10 @@ Files included in the binary packages:
 
 Port Notes:
 
+----- version 1.7.1-3 -----
+Added patch:
+- Don't crash if conversion of window name to UTF-8 fails.
+
 ----- version 1.7.1-2 -----
 Added patches:
 - Don't exit with error if locale is not supported by X11.

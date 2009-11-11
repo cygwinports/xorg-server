@@ -1,0 +1,26 @@
+Cygwin/X: Don't crash if conversion of window name to UTF-8 fails
+
+Don't crash if conversion of window name to UTF-8 fails.  This
+happens at the moment if the locale is C.UTF-8
+---
+ hw/xwin/winmultiwindowwm.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+--- origsrc/xorg-server-1.7.1/hw/xwin/winmultiwindowwm.c	2009-11-11 03:32:24.330436000 -0600
++++ src/xorg-server-1.7.1/hw/xwin/winmultiwindowwm.c	2009-11-11 03:35:14.576717000 -0600
+@@ -450,6 +450,7 @@ GetWindowName (Display *pDisplay, Window
+  	pszReturnData = (char *) malloc (iLen + 1);
+  	pszReturnData[0] = '\0';
+  	for (i = 0; i < nNum; i++) strcat (pszReturnData, ppList[i]);
++ 	if (ppList) XFreeStringList (ppList);
+    }
+    else
+    {
+@@ -460,7 +461,6 @@ GetWindowName (Display *pDisplay, Window
+    *ppName = (wchar_t*)malloc(sizeof(wchar_t)*(iLen + 1));
+    MultiByteToWideChar (CP_UTF8, 0, pszReturnData, -1, *ppName, iLen);
+    XFree (xtpName.value);
+-   if (ppList) XFreeStringList (ppList);
+    free (pszReturnData);
+ 
+ #if CYGMULTIWINDOW_DEBUG
