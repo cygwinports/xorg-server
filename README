@@ -137,6 +137,7 @@ Port Notes:
 ----- version 1.7.1-3 -----
 Added patch:
 - Don't crash if conversion of window name to UTF-8 fails.
+- Discourage other window managers from starting when in multiwindow mode.
 
 ----- version 1.7.1-2 -----
 Added patches:
