@@ -16,15 +16,13 @@
  	   g_pszCommandLine);
    if (!pszMsgBox)
      goto winMessageBoxF_Cleanup;
---- origsrc/xorg-server-1.7.0.901/hw/xwin/winprocarg.c	2009-10-15 16:56:09.563553200 -0500
-+++ src/xorg-server-1.7.0.901/hw/xwin/winprocarg.c	2009-10-15 23:37:26.364545400 -0500
-@@ -1551,7 +1551,8 @@ winLogVersionInfo (void)
- 
+--- origsrc/xorg-server-1.7.3/hw/xwin/winprocarg.c	2009-10-15 16:56:09.563553200 -0500
++++ src/xorg-server-1.7.3/hw/xwin/winprocarg.c	2009-10-15 23:37:26.364545400 -0500
+@@ -1552,6 +1552,7 @@ winLogVersionInfo (void)
    ErrorF ("Welcome to the XWin X Server\n");
    ErrorF ("Vendor: %s\n", VENDOR_STRING);
--  ErrorF ("Release: %d.%d.%d.%d (%d)\n\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
-+  ErrorF ("Release: %d.%d.%d.%d (%d)\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
+   ErrorF ("Release: %d.%d.%d.%d (%d)\n", XORG_VERSION_MAJOR, XORG_VERSION_MINOR, XORG_VERSION_PATCH, XORG_VERSION_SNAP, XORG_VERSION_CURRENT);
 +  ErrorF ("%s\n\n", BUILDERSTRING);
-   ErrorF ("Contact: %s\n\n", VENDOR_CONTACT);
+   ErrorF ("Contact: %s\n", VENDOR_CONTACT);
  }
  

@@ -1,0 +1,77 @@
+From 8d2059c19262bbdf6f5cc4cb79b3bc0ed012bcb3 Mon Sep 17 00:00:00 2001
+From: Jon TURNEY <jon.turney@dronecode.org.uk>
+Date: Sun, 29 Nov 2009 13:49:41 +0000
+Subject: [PATCH] Cygwin/X: Don't terminate Xserver if clipboard client is killed
+
+This is a temporary solution.
+
+Really we should either improve the way we try to avoid the internal
+clipboard client getting killed or perhaps restart it after an interval.
+
+Avoiding getting killed by the XDM is horribly heuristic at the moment,
+as we basically try to guess about what the XDM is doing, so this is
+always going to be fragile. (Should just check that we can't actually
+intercept the close request for the client)
+
+Restarting the clipboard client thread is complicated by the fact that
+at the moment the clipboard thread exits on server regeneration and is
+restarted by hooks installed by InitInput())
+(So we either need to make arrangements not restart when server is restarting,
+or only start once and properly re-cache atoms on server regeneration)
+
+Also: http://xkcd.com/292/
+
+Signed-off-by: Jon TURNEY <jon.turney@dronecode.org.uk>
+---
+ hw/xwin/winclipboardthread.c |   14 +++++++++-----
+ 1 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/hw/xwin/winclipboardthread.c b/hw/xwin/winclipboardthread.c
+index 5e6c528..9788d88 100644
+--- a/hw/xwin/winclipboardthread.c
++++ b/hw/xwin/winclipboardthread.c
+@@ -140,9 +140,9 @@ winClipboardProc (void *pvNotUsed)
+     }
+   else if (iReturn == WIN_JMP_ERROR_IO)
+     {
+-      /* TODO: Cleanup the Win32 window and free any allocated memory */
+-      ErrorF ("winClipboardProc - setjmp returned for IO Error Handler.\n");
+-      pthread_exit (NULL);
++      /* TODO: cleanup and free any allocated memory */
++      ErrorF("winClipboardProc - setjmp returned for IO Error Handler\n");
++      goto winClipboardProc_Done;
+     }
+ 
+   /* Use our generated cookie for authentication */
+@@ -193,7 +193,7 @@ winClipboardProc (void *pvNotUsed)
+       pthread_exit (NULL);
+     }
+ 
+-  /* Save the display in the screen privates */
++  /* Save the display in a global used by the wndproc */
+   g_pClipboardDisplay = pDisplay;
+ 
+   ErrorF ("winClipboardProc - XOpenDisplay () returned and "
+@@ -288,7 +288,10 @@ winClipboardProc (void *pvNotUsed)
+ 
+   /* Pre-flush Windows messages */
+   if (!winClipboardFlushWindowsMessageQueue (hwnd))
+-    return 0;
++    {
++      ErrorF ("winClipboardProc - winClipboardFlushWindowsMessageQueue failed\n");
++      pthread_exit (NULL);
++    }
+ 
+   /* Signal that the clipboard client has started */
+   g_fClipboardStarted = TRUE;
+@@ -378,6 +381,7 @@ winClipboardProc (void *pvNotUsed)
+ 	}
+     }
+ 
++winClipboardProc_Done:
+   /* Close our X window */
+   if (pDisplay && iWindow)
+     {
+-- 
+1.6.4.2
+
