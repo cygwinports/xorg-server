@@ -33,9 +33,9 @@ Runtime requirements:
 Build requirements:
 (besides corresponding devel packages)
   autoconf2.5-2.65-1
-  automake1.10-1.10.2-10
+  automake1.11-1.11.1-1
   binutils-2.19.51-1
-  cygport-0.9.10-1
+  cygport-0.9.81-1
   gawk-3.1.7-1
   gcc4-core-4.3.4-3
   libtool-2.2.7a-15
@@ -65,7 +65,7 @@ Build requirements:
   xextproto-7.1.1-1
   xf86bigfontproto-1.2.0-1
   xineramaproto-1.2-1
-  xorg-util-macros-1.4.1-1
+  xorg-util-macros-1.6.0-1
   xproto-7.0.16-1
   xtrans-1.2.5-1
 
@@ -78,20 +78,24 @@ Canonical download:
 -------------------------------------------
 
 Build instructions:
-  unpack xorg-server-1.7.5-X-src.tar.bz2
+  unpack xorg-server-1.7.6-X-src.tar.bz2
     if you use setup to install this src package, it will be
 	 unpacked under /usr/src automatically
   cd /usr/src
-  cygport ./xorg-server-1.7.5-X.cygport all
+  cygport ./xorg-server-1.7.6-X.cygport all
 
 This will create:
-  /usr/src/xorg-server-1.7.5-X-src.tar.bz2
-  /usr/src/xorg-server-1.7.5-X.tar.bz2
-  /usr/src/xorg-server-dmx-1.7.5-X.tar.bz2
+  /usr/src/xorg-server-1.7.6-X-src.tar.bz2
+  /usr/src/xorg-server-1.7.6-X.tar.bz2
+  /usr/src/xorg-server-dmx-1.7.6-X.tar.bz2
 
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.7.6-1 -----
+Version bump.
+RECORD extension fixed and reenabled.
 
 ----- version 1.7.5-1 -----
 Version bump.

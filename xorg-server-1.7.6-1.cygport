@@ -16,8 +16,8 @@ src_compile() {
 	cd ${S}
 	cygautoreconf
 
-	# Record required for libXtst, still in use, but it's currently broken
-	# and never init'ed at runtime even if built
+	# Record required for libXtst, still in use, but disabled by default
+	# (commit 3eaecdd, reason unknown)
 
 	# Previously, the rootless code was only used within XWin (and Xquartz)
 	# and hence was only linked there; the other DDXs did not use it.
@@ -54,6 +54,7 @@ src_compile() {
 		--disable-dri \
 		--disable-dri2 \
 		--disable-install-setuid \
+		--enable-record \
 		--enable-windowswm \
 		--enable-xf86bigfont \
 		--disable-xf86vidmode \
@@ -90,6 +91,7 @@ src_compile() {
 		--disable-dri \
 		--disable-dri2 \
 		--disable-install-setuid \
+		--enable-record \
 		--enable-xf86bigfont \
 		--disable-xf86vidmode \
 		--disable-xv \
