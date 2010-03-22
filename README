@@ -6,10 +6,10 @@ Runtime requirements:
   cygwin-1.7.1-1
   libbz2_1-1.0.50-10
   libfontenc1-1.0.5-1
-  libfreetype6-2.3.11-1
+  libfreetype6-2.3.12-1
   libgcc1-4.3.4-3
-  libGL1-7.5.2-1
-  libpixman1_0-0.16.4-1
+  libGL1-7.6.1-1
+  libpixman1_0-0.16.6-1
   libX11_6-1.3.3-1
   libXau6-1.0.5-1
   libXdmcp6-1.0.3-1
@@ -51,7 +51,7 @@ Build requirements:
   fixesproto-4.1-1
   font-util-1.1.1-1
   fontsproto-2.1.0-1
-  glproto-1.4.10-1
+  glproto-1.4.11-1
   inputproto-2.0-1
   kbproto-1.0.4-1
   libXfont-devel-1.4.1-2
@@ -92,6 +92,10 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.7.6-2 -----
+Added patch:
+- Silence erroneous "/tmp mounted in textmode" warning.
 
 ----- version 1.7.6-1 -----
 Version bump.

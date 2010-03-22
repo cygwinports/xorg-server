@@ -115,7 +115,5 @@ src_install() {
 	cd ${B}/xwin-ddx
 	cyginstall
 
-	dosym XWin.exe /usr/bin/X
-
 	make_etc_defaults /etc/X11/system.XWinrc
 }
