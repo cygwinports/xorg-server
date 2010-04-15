@@ -1,8 +1,5 @@
 category: X11
-requires: libbz2_1 libdmx1 libfontenc1 libfreetype6 libgcc1 libpixman1_0 libX11_6 libXau6 libXaw7 libXdmcp6 libXext6 libXfixes3 libXi6 libXmu6 libXmuu1 libXrender1 libXt6 openssl xorg-server zlib0
+requires: libbz2_1 libdmx1 libfontenc1 libfreetype6 libgcc1 libgcrypt11 libpixman1_0 libX11_6 libXau6 libXaw7 libXdmcp6 libXext6 libXfixes3 libXi6 libXmu6 libXmuu1 libXrender1 libXt6 openssl xorg-server zlib0
 external-source: xorg-server
 sdesc: "X.Org DMX server and clients"
 ldesc: "X.Org X servers"
-prev: 1.7.3-1
-curr: 1.7.6-2
-test: 1.7.99.902-1

@@ -50,6 +50,7 @@ src_compile() {
 		--disable-xvfb \
 		--enable-xwin \
 		--disable-config-hal \
+		--disable-config-udev \
 		--disable-dri \
 		--disable-dri2 \
 		--disable-install-setuid \
@@ -86,6 +87,7 @@ src_compile() {
 		--enable-xvfb \
 		--disable-xwin \
 		--disable-config-hal \
+		--disable-config-udev \
 		--disable-dri \
 		--disable-dri2 \
 		--disable-install-setuid \
