@@ -54,7 +54,7 @@ Build requirements:
   glproto-1.4.11-1
   inputproto-2.0-1
   kbproto-1.0.4-1
-  libXfont-devel-1.4.2-1
+  libXfont-devel-1.4.2-2
   randrproto-1.3.1-1
   recordproto-1.14-1
   renderproto-0.11-1
@@ -78,20 +78,30 @@ Canonical download:
 -------------------------------------------
 
 Build instructions:
-  unpack xorg-server-1.8.2-X-src.tar.bz2
+  unpack xorg-server-N.N.N-N-src.tar.bz2
     if you use setup to install this src package, it will be
 	 unpacked under /usr/src automatically
   cd /usr/src
-  cygport ./xorg-server-1.8.2-X.cygport all
+  cygport ./xorg-server-N.N.N-N.cygport all
 
 This will create:
-  /usr/src/xorg-server-1.8.2-X-src.tar.bz2
-  /usr/src/xorg-server-1.8.2-X.tar.bz2
-  /usr/src/xorg-server-dmx-1.8.2-X.tar.bz2
+  /usr/src/xorg-server-N.N.N-N-src.tar.bz2
+  /usr/src/xorg-server-N.N.N-N.tar.bz2
+  /usr/src/xorg-server-dmx-N.N.N-N.tar.bz2
 
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.9.0-1 -----
+Version bump.
+Added patches:
+- fix a clipboard-related crash during XDMCP session startup
+- added Turkish keyboard layout detection.
+- add -displayfd option (experimental)
+- crash fixes for -resize
+- enable AIGLX code and -wgl option which has been merged upstream,
+and various GLX fixes
 
 ----- version 1.8.2-1 -----
 Version bump.
