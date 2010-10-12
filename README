@@ -93,6 +93,12 @@ This will create:
 
 Port Notes:
 
+----- version 1.9.0-2 -----
+- Fix a regression with window placement: Windows which remember their
+position were drifting towards the bottom-right with each appearance
+- Move log files to /var/log/xwin, which is created mode 0777, to avoid
+logging failures in multiuser setups
+
 ----- version 1.9.0-1 -----
 Version bump.
 Added patches:

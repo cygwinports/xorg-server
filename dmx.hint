@@ -3,6 +3,6 @@ requires: libbz2_1 libdmx1 libfontenc1 libfreetype6 libgcc1 libgcrypt11 libpixma
 external-source: xorg-server
 sdesc: "X.Org DMX server and clients"
 ldesc: "X.Org X servers"
-test: 1.9.0-1
+test: 1.9.0-2
 curr: 1.8.2-1
 prev: 1.8.0-1

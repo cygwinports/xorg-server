@@ -56,7 +56,7 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
-		--with-log-dir=/var/log \
+		--with-log-dir=/var/log/xwin \
 		--with-serverconfig-path=/usr/lib/X11 \
 		--with-xkb-output=/var/lib/xkb \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
@@ -91,7 +91,7 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
-		--with-log-dir=/var/log \
+		--with-log-dir=/var/log/xwin \
 		--with-serverconfig-path=/usr/lib/X11 \
 		--with-xkb-output=/var/lib/xkb \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
@@ -113,4 +113,8 @@ src_install() {
 	cyginstall
 
 	make_etc_defaults /etc/X11/system.XWinrc
+
+	dodir /var/log/xwin
+	chmod 0777 ${D}/var/log/xwin
+	keepdir /var/log/xwin
 }
