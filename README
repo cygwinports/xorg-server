@@ -93,6 +93,16 @@ This will create:
 
 Port Notes:
 
+----- version 1.9.2-1 -----
+Version bump.
+- Rewrite of the way clipboard thread is started, which should improve clipboard robustness in XDMCP sessions
+- Fix clipboard interaction with nxproxy (and possibly other X clients)
+- Various clipboard improvements
+- Fix WM_DISPLAYCHANGE handling in windowed mode to not resize the X screen
+- Don't write list email address into log
+- Fix random DPI after resize
+- Implement WGL AIGLX for non-toplevel X windows
+
 ----- version 1.9.0-2 -----
 - Fix a regression with window placement: Windows which remember their
 position were drifting towards the bottom-right with each appearance

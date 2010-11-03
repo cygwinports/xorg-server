@@ -2,6 +2,3 @@ category: X11
 requires: bash libbz2_1 libfontenc1 libfreetype6 libgcc1 libgcrypt11 libGL1 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 xauth xcursor-themes xkbcomp xkeyboard-config zlib0
 sdesc: "X.Org X servers"
 ldesc: "X.Org X servers"
-test: 1.9.0-2
-curr: 1.8.2-1
-prev: 1.8.0-1
