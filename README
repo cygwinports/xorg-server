@@ -93,6 +93,12 @@ This will create:
 
 Port Notes:
 
+----- version 1.9.3-1 -----
+Version bump.
+- Explicitly configure to use libgcrypt SHA1 implementation, rather than picking one depending on build environment,
+so setup.hint dependencies are correct
+- In WGL mode, handle GLX windows being reparented from a mapped window to an unmapped window correctly.
+
 ----- version 1.9.2-1 -----
 Version bump.
 - Rewrite of the way clipboard thread is started, which should improve clipboard robustness in XDMCP sessions
