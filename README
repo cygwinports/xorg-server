@@ -93,6 +93,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.9.3-2 -----
+- Fix a crash which occurred using indirect rendering with some OpenGL applications e.g. ParaView by synchronizing
+the indirect function dispatch table offsets with the current Mesa (7.8).  The need for this synchronization is an
+unfortunate consequence of the way we currently work around some linkage problems with Mesa due to PE/COFF limitations.
+
 ----- version 1.9.3-1 -----
 Version bump.
 - Explicitly configure to use libgcrypt SHA1 implementation, rather than picking one depending on build environment,
