@@ -93,6 +93,16 @@ This will create:
 
 Port Notes:
 
+----- version 1.9.4-1 -----
+Version bump.
+- Handle failure to get any GLX fbConfigs more gracefully: If we didn't
+get any useful pixel formats from WGL_ARB_pixel_format, fall back
+to using DescribePixelFormat().  If that doesn't give us any useful
+pixel formats, fallback to software rendering.
+- Decorate function pointers retrieved via GetProcAddress which are currently
+missing it with WINAPI, so stdcall ABI is used.  This fixes a crash currently
+seen when -screen option uses a size and monitor number e.g. -screen 0 1280x1000@2
+
 ----- version 1.9.3-2 -----
 - Fix a crash which occurred using indirect rendering with some OpenGL applications e.g. ParaView by synchronizing
 the indirect function dispatch table offsets with the current Mesa (7.8).  The need for this synchronization is an
