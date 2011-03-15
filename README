@@ -62,7 +62,7 @@ Build requirements:
   scrnsaverproto-1.2.0-1
   windowswmproto-1.0.4-1
   xcmiscproto-1.2.0-1
-  xextproto-7.1.1-1
+  xextproto-7.2.0-1
   xf86bigfontproto-1.2.0-1
   xineramaproto-1.2-1
   xorg-util-macros-1.10.0-1
@@ -92,6 +92,17 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.10.0-1 -----
+Version bump.
+- Fix clipboard integration when XSupportsLocale() fails by setting a known good locale
+- Report XLocaleNotSupported result from X*TextPropertyToTextList()
+- When using -from option, only the specified address is sent in the XDMCP REQUEST
+- Tidy up OS version detection and reporting
+- Don't bother reporting XORG_VERSION_CURRENT
+- Remove some uninformative, always emitted log output
+- Handle failure of winScreenInit() during startup without crashing
+- Configure with --disable-glx-tls as default has changed from disabled to enabled if platform has TLS
 
 ----- version 1.9.4-1 -----
 Version bump.
