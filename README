@@ -93,6 +93,16 @@ This will create:
 
 Port Notes:
 
+----- version 1.10.1-1 -----
+Version bump.
+- Report if OS is WoW64 or not when reporting OS version
+- Fix WM_ENDSESSION handling
+- Remove _TrackMouseEvent pre-NT4 compatibility cruft
+- Add an item to open the logfile to the default tray icon menu
+- Allow XScreenSaverSuspend() to effect Windows screen saver or monitor power off
+- Bug fixes for screen sizing when the screen window is on a non-primary monitor
+- In multiwindow mode, don't grab native input focus for new windows which hint they don't want it
+
 ----- version 1.10.0-1 -----
 Version bump.
 - Fix clipboard integration when XSupportsLocale() fails by setting a known good locale

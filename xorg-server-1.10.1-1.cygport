@@ -62,7 +62,7 @@ src_compile() {
 		--with-serverconfig-path=/usr/lib/X11 \
 		--with-xkb-output=/var/lib/xkb \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
-		"--with-builderstring=Package version ${PVR} built $(date +%Y-%m-%d)" \
+		"--with-builderstring=Package: version ${PVR} built $(date +%Y-%m-%d)" \
 		"--with-os-name=Cygwin" \
 		"--with-os-vendor=Red Hat" \
 		"--with-vendor-name=The Cygwin/X Project" \
