@@ -93,6 +93,15 @@ This will create:
 
 Port Notes:
 
+----- version 1.10.2-1 -----
+Version bump.
+- Automatically activate the -nolock option if /tmp is on a FAT filesystem
+- Automatically activate the -emulate3buttons option if less than 3 mouse buttons are reported
+- Add -noemulate3buttons option
+- Use system() rather than pipe() & fork() to invoke xkbcomp
+- If GALLIUM_DRIVER env var is set, load swrastg rather than swrast
+- In -wgl mode, create a new dispatch table, rather than modifying the existing one to avoid a GLX crash
+
 ----- version 1.10.1-1 -----
 Version bump.
 - Report if OS is WoW64 or not when reporting OS version
