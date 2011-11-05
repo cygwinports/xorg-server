@@ -93,6 +93,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.2-1 -----
+Version bump.
+- Use spawnl() instead of pipe() & fork() to invoke xkbcomp
+
 ----- version 1.11.1-1 -----
 Version bump.
 - Make XWin support the same XKB private actions for grab debugging as XOrg
