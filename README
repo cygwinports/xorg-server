@@ -93,6 +93,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.3-1 -----
+Version bump.
+- Add experimental option -hostintitle which adds remote hostname to multiwindow mode window
+titles.
+
 ----- version 1.11.2-1 -----
 Version bump.
 - Use spawnl() instead of pipe() & fork() to invoke xkbcomp
