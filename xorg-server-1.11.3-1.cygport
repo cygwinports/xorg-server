@@ -9,11 +9,10 @@ SRC_DIR=${GIT_TAG}
 
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
-PKG_NAMES="${PN} ${PN}-dmx ${PN}-debuginfo"
-PKG_HINTS="setup dmx debuginfo"
+PKG_NAMES="${PN} ${PN}-dmx"
+PKG_HINTS="setup dmx"
 xorg_server_CONTENTS="--exclude=*dmx* --exclude=usr/lib/debug* etc/ usr/ var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
-xorg_server_debuginfo_CONTENTS="usr/lib/debug"
 
 src_compile() {
 	cd ${S}
