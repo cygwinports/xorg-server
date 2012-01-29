@@ -93,6 +93,17 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.4-1 -----
+Version bump.
+- Enable RANDR resize (option -resize) by default
+- Enable AIGLX (option -wgl) by default
+- Ignore bogus WM_DISPLAYCHANGE messages that have 0 bpp
+- Avoid WIN_WINDOW_PROP races which could cause a crash during Windows window destruction
+- Restore modifier key state when an X window gains focus
+- RANDR resize didn't occur, in windowed mode, with option -resize, when the window was maximized or restored
+- Fix rrScreenSetSize function pointer mismatch
+- Add Windows 8 to the list of Windows versions we know the name of
+
 ----- version 1.11.3-1 -----
 Version bump.
 - Add experimental option -hostintitle which adds remote hostname to multiwindow mode window
