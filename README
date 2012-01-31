@@ -93,6 +93,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.4-2 -----
+- Fix a crash in -wgl mode when the WGL_ARB_extensions_string extension is not supported
+
 ----- version 1.11.4-1 -----
 Version bump.
 - Enable RANDR resize (option -resize) by default
