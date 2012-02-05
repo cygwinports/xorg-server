@@ -93,6 +93,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.4-3 -----
+- Fall back to mesa software rendering rather than using the GDI Generic native renderer
+- Synchronize the indirect function dispatch table offsets with mesa 7.11
+- Use shared libglapi for dispatch table
+
 ----- version 1.11.4-2 -----
 - Fix a crash in -wgl mode when the WGL_ARB_extensions_string extension is not supported
 
