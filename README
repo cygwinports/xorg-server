@@ -93,6 +93,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.4-4 -----
+- Remove useless /usr/adm/Xnmsgs functionality, so it doesn't trample on one of our listener
+sockets if we start with stderr closed, causing XWin to spin on Cygwin 1.7.10
+- Empty the Windows clipboard when X loses focus.  This should allow us to notice when the
+selection changes, but the selection owner has not, at the cost of emptying the clipboard if
+the selection was not changed while X has the focus.
+
 ----- version 1.11.4-3 -----
 - Fall back to mesa software rendering rather than using the GDI Generic native renderer
 - Synchronize the indirect function dispatch table offsets with mesa 7.11
