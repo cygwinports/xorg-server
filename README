@@ -93,6 +93,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.11.4-5 -----
+- Reverted clipboard change in 1.11.4-4, it broke copying from native Firefox into a cygwin
+X emacs window, somehow.
+
 ----- version 1.11.4-4 -----
 - Remove useless /usr/adm/Xnmsgs functionality, so it doesn't trample on one of our listener
 sockets if we start with stderr closed, causing XWin to spin on Cygwin 1.7.10
