@@ -93,6 +93,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.12.0-1 -----
+Version bump.
+
 ----- version 1.11.4-5 -----
 - Reverted clipboard change in 1.11.4-4, it broke copying from native Firefox into a cygwin
 X emacs window, somehow.
