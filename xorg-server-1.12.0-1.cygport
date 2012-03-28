@@ -9,10 +9,11 @@ SRC_DIR=${GIT_TAG}
 
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
-PKG_NAMES="${PN} ${PN}-dmx"
-PKG_HINTS="setup dmx"
-xorg_server_CONTENTS="--exclude=*dmx* --exclude=usr/lib/debug* etc/ usr/ var/"
+PKG_NAMES="${PN} ${PN}-dmx ${PN}-extra"
+PKG_HINTS="setup dmx extra"
+xorg_server_CONTENTS="--exclude=*dmx* etc/ usr/bin/X usr/bin/XWin.exe usr/lib usr/share/doc usr/share/man/man*/XWin* usr/share/man/man1/Xserver* var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
+xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=usr/bin/X --exclude=*dmx* --exclude=*Xserver* usr/bin usr/share/man/man1"
 
 src_compile() {
 	cd ${S}

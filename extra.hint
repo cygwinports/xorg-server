@@ -1,0 +1,5 @@
+category: X11
+requires: xorg-server
+external-source: xorg-server
+sdesc: "X.Org Xephyr, Xfake, Xnest and Xvfb servers"
+ldesc: "X.Org Xephyr, Xfake, Xnest and Xvfb servers"
