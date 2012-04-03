@@ -7,11 +7,13 @@ inherit xorg
 SRC_URI="http://cgit.freedesktop.org/~jturney/xserver/snapshot/${GIT_TAG}.tar.bz2"
 SRC_DIR=${GIT_TAG}
 
+DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
-PKG_NAMES="${PN} ${PN}-dmx ${PN}-extra ${PN}-devel"
-PKG_HINTS="setup dmx extra devel"
-xorg_server_CONTENTS="--exclude=*dmx* --exclude=*.la --exclude=*.a etc/ usr/bin/X usr/bin/XWin.exe usr/bin/Xorg.exe usr/lib/X11 usr/lib/xorg usr/share/doc usr/share/man/man*/XWin* usr/share/man/man1/Xserver* usr/share/man/man1/Xorg* usr/share/man/man4 usr/share/man/man5/xorg* var/"
+PKG_NAMES="${PN} ${PN}-common ${PN}-dmx ${PN}-extra ${PN}-devel"
+PKG_HINTS="setup common dmx extra devel"
+xorg_server_CONTENTS="--exclude=*dmx* --exclude=*.la --exclude=*.a etc/ usr/bin/X usr/bin/XWin.exe usr/bin/Xorg.exe usr/lib/xorg usr/share/man/man*/XWin* usr/share/man/man1/Xserver* usr/share/man/man1/Xorg* usr/share/man/man4 usr/share/man/man5/xorg*"
+xorg_server_common_CONTENTS="usr/lib/X11/ usr/share/doc/ var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
 xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=*Xorg* --exclude=*dmx* --exclude=*Xserver* --exclude=usr/bin/X usr/bin usr/share/man/man1"
 xorg_server_devel_CONTENTS="--exclude=usr/lib/X11 --exclude=*.dll usr/lib usr/include usr/share/aclocal"
@@ -42,12 +44,14 @@ src_compile() {
 
 	CYGCONF_SOURCE=${S}
 	cygconf \
+		--disable-docs --disable-devel-docs \
 		--disable-dmx \
 		--disable-kdrive \
 		--disable-xephyr \
 		--disable-xfake \
 		--disable-xfbdev \
 		--disable-xnest \
+		--disable-xorg \
 		--disable-xvfb \
 		--enable-xwin \
 		--disable-config-hal \

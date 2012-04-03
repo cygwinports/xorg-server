@@ -1,4 +1,4 @@
 category: X11
-requires: bash dri-drivers libbz2_1 libfontenc1 libfreetype6 libgcc1 libgcrypt11 libglapi0 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 xauth xcursor-themes xkbcomp xkeyboard-config zlib0
+requires: bash libbz2_1 libfontenc1 libfreetype6 libgcrypt11 libglapi0 libpixman1_0 libX11_6 libXau6 libXdmcp6 xf86-video-dummy xf86-video-nested xorg-server-common zlib0
 sdesc: "X.Org X servers"
 ldesc: "X.Org X servers"
