@@ -52,9 +52,9 @@ Build requirements:
   font-util-1.1.1-1
   fontsproto-2.1.0-1
   glproto-1.4.14-1
-  inputproto-2.0-1
+  inputproto-2.2-1
   kbproto-1.0.4-1
-  libXfont-devel-1.4.2-2
+  libXfont-devel-1.4.5-1
   randrproto-1.3.1-1
   recordproto-1.14-1
   renderproto-0.11-1
@@ -65,7 +65,7 @@ Build requirements:
   xextproto-7.2.0-1
   xf86bigfontproto-1.2.0-1
   xineramaproto-1.2-1
-  xorg-util-macros-1.10.0-1
+  xorg-util-macros-1.17-1
   xproto-7.0.22-1
   xtrans-1.2.5-1
 
@@ -92,6 +92,27 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.12.0-2 -----
+- Move Xephyr, Xfake, Xnest and Xvfb servers to a separate package
+- Build the xorg server
+- Add devel package, which contains the xorg driver sdk
+- In multiwindow mode, the native window icon now updates if the X window
+_NEW_WM_ICON icon hint changes
+- In multiwindow mode, the native window styling now updates if the X window
+styling hints change
+- The _NET_WM_STATE_SKIP_TASKBAR hint is now implemented in multiwindow mode
+- A crash caused by a race condition in the conversion of the window icon from
+an X property to a Windows icon has been fixed (Reported by Ken Brown)
+- In multiwindow mode, the native window now flashes on the taskbar if the X
+window's urgency hint is set
+0 A bug which could cause the X server to use 100% of a core while waiting for
+the X clipboard contents to be converted has been fixed [1]
+- Fake XINERAMA data is now generated describing the native monitors when
+multiplemonitor mode is enabled, allowing XINERAMA-aware X applications to
+correctly place their windows so they don't get split between monitors.
+- A couple of timing-sensitive failures in clipboard handling have been fixed.
+- Lots of debugging improvements, correctness changes and obsolete cruft removed.
 
 ----- version 1.12.0-1 -----
 Version bump.
