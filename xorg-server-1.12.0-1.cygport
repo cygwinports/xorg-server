@@ -9,11 +9,12 @@ SRC_DIR=${GIT_TAG}
 
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
-PKG_NAMES="${PN} ${PN}-dmx ${PN}-extra"
-PKG_HINTS="setup dmx extra"
-xorg_server_CONTENTS="--exclude=*dmx* etc/ usr/bin/X usr/bin/XWin.exe usr/lib usr/share/doc usr/share/man/man*/XWin* usr/share/man/man1/Xserver* var/"
+PKG_NAMES="${PN} ${PN}-dmx ${PN}-extra ${PN}-devel"
+PKG_HINTS="setup dmx extra devel"
+xorg_server_CONTENTS="--exclude=*dmx* --exclude=*.la --exclude=*.a etc/ usr/bin/X usr/bin/XWin.exe usr/bin/Xorg.exe usr/lib/X11 usr/lib/xorg usr/share/doc usr/share/man/man*/XWin* usr/share/man/man1/Xserver* usr/share/man/man1/Xorg* usr/share/man/man4 usr/share/man/man5/xorg* var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
-xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=usr/bin/X --exclude=*dmx* --exclude=*Xserver* usr/bin usr/share/man/man1"
+xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=*Xorg* --exclude=*dmx* --exclude=*Xserver* --exclude=usr/bin/X usr/bin usr/share/man/man1"
+xorg_server_devel_CONTENTS="--exclude=usr/lib/X11 --exclude=*.dll usr/lib usr/include usr/share/aclocal"
 
 src_compile() {
 	cd ${S}
@@ -88,6 +89,7 @@ src_compile() {
 		--enable-xnest \
 		--enable-xvfb \
 		--disable-xwin \
+		--enable-xorg \
 		--disable-config-hal \
 		--disable-config-udev \
 		--disable-dri \
