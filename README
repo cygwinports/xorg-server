@@ -93,6 +93,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.12.0-3 -----
+- Various fixes to WM_HINTS bitmap icon conversion
+- Crash fix to icon regeneration on XWinrc reload
+
 ----- version 1.12.0-2 -----
 - Move Xephyr, Xfake, Xnest and Xvfb servers to a separate package
 - Build the xorg server
