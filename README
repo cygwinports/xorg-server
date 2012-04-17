@@ -93,6 +93,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.12.0-4 -----
+- Fix multiple monitors support
+- If a window has had its taskbar button removed, disable its minimize button to prevent it becoming lost
+
 ----- version 1.12.0-3 -----
 - Various fixes to WM_HINTS bitmap icon conversion
 - Crash fix to icon regeneration on XWinrc reload
