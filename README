@@ -93,6 +93,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.12.1-1 -----
+Version bump.
+- Patch to enable upstream code to run an external crash reporting tool and capture output to log
+- Include a simple xorg-backtrace script which tries to use gdb to generate a backtrace
+
 ----- version 1.12.0-5 -----
 - Fix crash in icon conversion if icon_pixmap is invalid
 - Revert "Load swrastg if GALLIUM_DRIVER environment variable is set"
