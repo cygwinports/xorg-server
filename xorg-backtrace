@@ -4,7 +4,7 @@
 # based on http://lists.x.org/archives/xorg-devel/2010-October/013814.html
 #
 
-$timeout = 5;
+$timeout = 60;
 $xtracmds= "/etc/X11/xorg-backtrace-cmds";
 
 

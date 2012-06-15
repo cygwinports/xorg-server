@@ -94,6 +94,10 @@ This will create:
 Port Notes:
 
 ----- version 1.12.1-1 -----
+- Fix wrapper code generation, so OpenGL is functional again in WGL mode
+- Increase the timeout the xorg-backtrace script uses for gdb from 5 to 60 seconds
+
+----- version 1.12.1-1 -----
 Version bump.
 - Patch to enable upstream code to run an external crash reporting tool and capture output to log
 - Include a simple xorg-backtrace script which tries to use gdb to generate a backtrace
