@@ -93,7 +93,12 @@ This will create:
 
 Port Notes:
 
------ version 1.12.1-1 -----
+----- version 1.12.2-1 -----
+Version bump.
+- Fix a merge error with 1.12.1, which made OpenGL non-functional in non-toplevel windows in WGL mode
+- Ensure full styling is properly applied when the window is first shown
+
+----- version 1.12.1-2 -----
 - Fix wrapper code generation, so OpenGL is functional again in WGL mode
 - Increase the timeout the xorg-backtrace script uses for gdb from 5 to 60 seconds
 
