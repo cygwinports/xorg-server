@@ -14,11 +14,16 @@ if ($pid == 0) {
     exit 1;
 }
 
-
 if (! -e "/usr/bin/gdb") {
     print "Install gdb to get reasonable backtraces\n";
     exit 2;
 }
+
+if (! -e "/etc/setup/xorg-server-debuginfo.lst.gz") {
+    print "Install xorg-server-debuginfo to get symbol table info for backtraces\n";
+}
+
+print "Attempting backtrace on pid $pid\n";
 
 $SIG{ALRM} = sub { die "timeout starting gdb" };
 alarm $timeout;

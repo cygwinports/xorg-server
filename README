@@ -93,6 +93,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.12.2.2 -----
+- Don't log all fbConfigs and GL/WGL extensions, unless verbose logging is requested
+- Add '-notrapsignals' option to disable running crash analysis tool
+- Report cygwin version as well as native OS version in log
+- Do not report the GLX_INTEL_swap_event extension as supported by indirect swrast
+- Report if debug symbols for the X server aren't installed in the xorg-backtrace script
+
 ----- version 1.12.2-1 -----
 Version bump.
 - Fix a merge error with 1.12.1, which made OpenGL non-functional in non-toplevel windows in WGL mode
