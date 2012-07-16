@@ -93,7 +93,12 @@ This will create:
 
 Port Notes:
 
------ version 1.12.2.2 -----
+----- version 1.12.3-1 -----
+Version bump.
+- Don't register two XINERAMA extensions in multiwindow mode
+- Add dpi and xkb configuration via XWinrc
+
+----- version 1.12.2-2 -----
 - Don't log all fbConfigs and GL/WGL extensions, unless verbose logging is requested
 - Add '-notrapsignals' option to disable running crash analysis tool
 - Report cygwin version as well as native OS version in log
