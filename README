@@ -95,6 +95,9 @@ Port Notes:
 
 ----- version 1.12.3-1 -----
 Version bump.
+
+----- version 1.12.3-1 -----
+Version bump.
 - Don't register two XINERAMA extensions in multiwindow mode
 - Add dpi and xkb configuration via XWinrc
 
