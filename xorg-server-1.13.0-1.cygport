@@ -10,8 +10,23 @@ SRC_DIR=${GIT_TAG}
 DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 
+HOMEPAGE="http://www.x.org/"
+
+CATEGORY="X11"
 PKG_NAMES="${PN} ${PN}-common ${PN}-dmx ${PN}-extra ${PN}-devel"
-PKG_HINTS="setup common dmx extra devel"
+
+xorg_server_SUMMARY="X.Org X servers"
+xorg_server_common_SUMMARY="X.Org X server common data"
+xorg_server_dmx_SUMMARY="X.Org DMX server and clients"
+xorg_server_extra_SUMMARY="X.Org Xephyr, Xfake, Xnest and Xvfb servers"
+xorg_server_devel_SUMMARY="X.Org SDK for developing drivers and extensions for the Xorg X server"
+
+xorg_server_REQUIRES="bash xf86-video-dummy xf86-video-nested xorg-server-common"
+xorg_server_common_REQUIRES="dri-drivers xauth xcursor-themes xkbcomp xkeyboard-config"
+xorg_server_dmx_REQUIRES="xorg-server-common"
+xorg_server_extra_REQUIRES="xorg-server-common"
+xorg_server_devel_REQUIRES="xorg-server"
+
 xorg_server_CONTENTS="--exclude=*dmx* --exclude=*.la --exclude=*.a etc/ usr/bin/X usr/bin/XWin.exe usr/bin/Xorg.exe usr/lib/xorg usr/share/man/man*/XWin* usr/share/man/man1/Xserver* usr/share/man/man1/Xorg* usr/share/man/man4 usr/share/man/man5/xorg*"
 xorg_server_common_CONTENTS="usr/bin/xorg-backtrace usr/lib/X11/ usr/share/doc/ var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"

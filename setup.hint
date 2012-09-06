@@ -1,4 +1,0 @@
-category: X11
-requires: bash libbz2_1 libfontenc1 libfreetype6 libgcrypt11 libglapi0 libpixman1_0 libX11_6 libXau6 libXdmcp6 xf86-video-dummy xf86-video-nested xorg-server-common zlib0
-sdesc: "X.Org X servers"
-ldesc: "X.Org X servers"

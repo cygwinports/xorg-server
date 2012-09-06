@@ -1,5 +1,0 @@
-category: X11
-requires: libbz2_1 libfontenc1 libfreetype6 libgcrypt11 libglapi0 libpixman1_0 libX11_6 libXau6 libXdmcp6 libXext6 xorg-server-common zlib0
-external-source: xorg-server
-sdesc: "X.Org Xephyr, Xfake, Xnest and Xvfb servers"
-ldesc: "X.Org Xephyr, Xfake, Xnest and Xvfb servers"

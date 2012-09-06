@@ -1,5 +1,0 @@
-category: X11
-requires: dri-drivers xauth xcursor-themes xkbcomp xkeyboard-config
-external-source: xorg-server
-sdesc: "X.Org X server common data"
-ldesc: "X.Org X server common data"

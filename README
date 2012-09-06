@@ -51,11 +51,11 @@ Build requirements:
   fixesproto-4.1-1
   font-util-1.1.1-1
   fontsproto-2.1.0-1
-  glproto-1.4.14-1
+  glproto-1.4.16-1
   inputproto-2.2-1
   kbproto-1.0.4-1
   libXfont-devel-1.4.5-1
-  randrproto-1.3.1-1
+  randrproto-1.4.0-1
   recordproto-1.14-1
   renderproto-0.11-1
   resourceproto-1.1.0-1
@@ -93,7 +93,15 @@ This will create:
 
 Port Notes:
 
------ version 1.12.3-1 -----
+----- version 1.13.0-1 -----
+Version bump.
+- Fix compilation of Xorg DDX on cygwin since upstream extmod removal changes
+- Update .cygport for automatic setup .hint file generation
+- Fix compilation with mingw-w64 w32api headers
+- Stop spammming MotionNotify events when the mouse is outside an X window but not moving
+- Fix a potential crash in multiwindow mode when class name isn't null terminated
+
+----- version 1.12.4-1 -----
 Version bump.
 
 ----- version 1.12.3-1 -----
