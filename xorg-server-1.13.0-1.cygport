@@ -87,7 +87,6 @@ src_compile() {
 		--with-xkb-output=/var/lib/xkb \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
 		"--with-builderstring=Package: version ${PVR} built $(date +%Y-%m-%d)" \
-		"--with-os-name=Cygwin" \
 		"--with-os-vendor=Red Hat" \
 		"--with-vendor-name=The Cygwin/X Project" \
 		"--with-vendor-name-short=Cygwin/X" \
@@ -126,7 +125,6 @@ src_compile() {
 		--with-xkb-output=/var/lib/xkb \
 		"--with-builder-addr=cygwin-xfree@cygwin.com" \
 		"--with-builderstring=Package version ${PVR} built $(date +%Y-%m-%d)" \
-		"--with-os-name=Cygwin" \
 		"--with-os-vendor=Red Hat" \
 		"--with-vendor-name=The Cygwin/X Project" \
 		"--with-vendor-name-short=Cygwin/X" \
