@@ -93,6 +93,20 @@ This will create:
 
 Port Notes:
 
+----- version 1.13.1-1 -----
+Version bump.
+- Configure to use Win32 CryptoAPI instead of gcrypt for SHA-1
+- Fix the use of a temporary directory for files passed to xkbcomp when TMP is set but TEMP is not
+- Fix code which is supposed to bring the X screen window to the front on a single left-click on the tray icon 
+in windowed mode, but has never worked
+- Improve the way that pressed modifier keys are restored when an X window gains focus: Left and right ctrl and 
+shift keys are now handled independently.
+- Fix checking of _NET_WM_STATE to consider atoms other than the first one in the list
+- Don't configure with --with-os-name=Cygwin, so Xorg reports the full build time uname
+- Various build fixes for MinGW
+- Various distcheck fixes
+- Package some internal WM utility code as a library for use with XtoW
+
 ----- version 1.13.0-1 -----
 Version bump.
 - Fix compilation of Xorg DDX on cygwin since upstream extmod removal changes
