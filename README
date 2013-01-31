@@ -93,6 +93,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.13.2-1 -----
+Version bump.
+
 ----- version 1.13.1-1 -----
 Version bump.
 - Configure to use Win32 CryptoAPI instead of gcrypt for SHA-1
