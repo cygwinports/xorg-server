@@ -1,5 +1,3 @@
- _CYGPORT_RESTRICT_debug_=1
-
 GIT_TAG="xserver-cygwin-${PVR}"
 
 inherit xorg
