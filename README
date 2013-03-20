@@ -51,7 +51,7 @@ Build requirements:
   font-util-1.1.1-1
   fontsproto-2.1.0-1
   glproto-1.4.16-1
-  inputproto-2.2-1
+  inputproto-2.3-1
   kbproto-1.0.4-1
   libXfont-devel-1.4.5-1
   randrproto-1.4.0-1
@@ -91,6 +91,13 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.14.1-1 -----
+Version bump.
+- Change mouse buttons 4 and 5 from X11 buttons 6 and 7 to X11 buttons 8 and 9
+- Add tilt wheel as X11 buttons 6 and 7
+- Add PaintWindow hook which lets us build all DDX in one pass
+- Handle -displayfd and an explicit :display sensibly
 
 ----- version 1.13.3-1 -----
 Version bump.
