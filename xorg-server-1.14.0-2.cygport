@@ -43,10 +43,21 @@ src_compile() {
 	# To enable debugging messages, add:
 	#	--enable-debug \
 
+	# temporarily disable GLX for x86_64 builds until mesa is sorted out
+	case ${CHOST} in
+	x86_64-*)   DISABLE_GLX="--disable-glx" ;;
+	esac
+
+	# temporarily disable DMX for x86_64 builds until dependencies are packaged
+	case ${CHOST} in
+	x86_64-*)   DISABLE_DMX="--disable-dmx" ;;
+	*)          DISABLE_DMX="--enable-dmx" ;;
+	esac
+
 	cd ${B}
 	cygconf \
 		--enable-docs --enable-devel-docs \
-		--enable-dmx \
+		${DISABLE_DMX} \
 		--enable-kdrive \
 		--enable-xephyr \
 		--enable-xfake \
@@ -65,6 +76,7 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
+		${DISABLE_GLX} \
 		--disable-glx-tls \
 		--disable-unit-tests \
 		--with-sha1=CryptoAPI \
