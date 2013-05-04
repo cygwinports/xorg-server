@@ -4,6 +4,7 @@ X.Org servers
 
 Runtime requirements:
   cygwin-1.7.5-1
+  dri-drivers-8.0.4-1
   libbz2_1-1.0.5-10
   libfontenc1-1.0.5-1
   libfreetype6-2.3.12-1
@@ -93,6 +94,16 @@ This will create:
 Port Notes:
 
 ----- version 1.14.1-1 -----
+Version bump.
+- Debug and GLX build fixes for cygwin64
+- Workaround to make using XSendEvent() to send WM_DELETE_WINDOW work on cygwin64
+- Fix OS version reporting on cygwin64
+- Fix a potential crash on startup when GetSystemMetrics(SM_CMOUSEBUTTONS) < 5
+
+----- version 1.14.0-2 -----
+- Initial set of fixes for cygwin64
+
+----- version 1.14.0-1 -----
 Version bump.
 - Change mouse buttons 4 and 5 from X11 buttons 6 and 7 to X11 buttons 8 and 9
 - Add tilt wheel as X11 buttons 6 and 7

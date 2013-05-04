@@ -1,3 +1,7 @@
+NAME=xorg-server
+VERSION=1.14.1
+RELEASE=1
+
 GIT_TAG="xserver-cygwin-${PVR}"
 
 inherit xorg
@@ -96,6 +100,9 @@ src_compile() {
 src_install() {
 	cd ${B}
 	cyginstall
+
+	# ensure cygport doesn't delete the implibs
+	rm -f ${D}/usr/lib/xorg/modules/*.la
 
 	make_etc_defaults /etc/X11/system.XWinrc
 
