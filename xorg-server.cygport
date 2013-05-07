@@ -52,16 +52,10 @@ src_compile() {
 	x86_64-*)   DISABLE_GLX="--disable-glx" ;;
 	esac
 
-	# temporarily disable DMX for x86_64 builds until dependencies are packaged
-	case ${CHOST} in
-	x86_64-*)   DISABLE_DMX="--disable-dmx" ;;
-	*)          DISABLE_DMX="--enable-dmx" ;;
-	esac
-
 	cd ${B}
 	cygconf \
 		--enable-docs --enable-devel-docs \
-		${DISABLE_DMX} \
+		--enable-dmx \
 		--enable-kdrive \
 		--enable-xephyr \
 		--enable-xfake \
