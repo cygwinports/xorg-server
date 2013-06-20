@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.14.1
-RELEASE=1
+RELEASE=2
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -15,13 +15,14 @@ DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
 HOMEPAGE="http://www.x.org/"
 
 CATEGORY="X11"
-PKG_NAMES="${PN} ${PN}-common ${PN}-dmx ${PN}-extra ${PN}-devel"
+PKG_NAMES="${PN} ${PN}-common ${PN}-dmx ${PN}-extra ${PN}-devel xwinclip"
 
 xorg_server_SUMMARY="X.Org X servers"
 xorg_server_common_SUMMARY="X.Org X server common data"
 xorg_server_dmx_SUMMARY="X.Org DMX server and clients"
 xorg_server_extra_SUMMARY="X.Org Xephyr, Xfake, Xnest and Xvfb servers"
 xorg_server_devel_SUMMARY="X.Org SDK for developing drivers and extensions for the Xorg X server"
+xwinclip_SUMMARY="Windows clipboard integration tool for the X.Org X server"
 
 xorg_server_REQUIRES="bash xf86-video-dummy xf86-video-nested xorg-server-common"
 xorg_server_common_REQUIRES="dri-drivers xauth xcursor-themes xkbcomp xkeyboard-config"
@@ -32,8 +33,9 @@ xorg_server_devel_REQUIRES="xorg-server"
 xorg_server_CONTENTS="--exclude=*dmx* --exclude=*.la --exclude=*.a etc/ usr/bin/X usr/bin/XWin.exe usr/bin/Xorg.exe usr/lib/xorg usr/share/man/man*/XWin* usr/share/man/man1/Xserver* usr/share/man/man1/Xorg* usr/share/man/man4 usr/share/man/man5/xorg*"
 xorg_server_common_CONTENTS="usr/bin/xorg-backtrace usr/lib/X11/ usr/share/doc/ var/"
 xorg_server_dmx_CONTENTS="usr/bin/*dmx* usr/share/man/man1/*dmx*"
-xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=*Xorg* --exclude=*dmx* --exclude=*Xserver* --exclude=*backtrace* --exclude=usr/bin/X usr/bin usr/share/man/man1"
+xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=*Xorg* --exclude=*dmx* --exclude=*Xserver* --exclude=*backtrace* --exclude=usr/bin/X usr/bin/X* usr/share/man/man1/X*"
 xorg_server_devel_CONTENTS="--exclude=usr/lib/X11 --exclude=*.dll usr/lib usr/include usr/share/aclocal"
+xwinclip_CONTENTS="usr/bin/xwinclip.exe usr/share/man/man1/xwinclip.1.gz"
 
 src_compile() {
 	cd ${S}
@@ -97,6 +99,9 @@ src_install() {
 
 	# ensure cygport doesn't delete the implibs
 	rm -f ${D}/usr/lib/xorg/modules/*.la
+
+	# remove useless multimedia i2c drivers
+	rm -rf ${D}/usr/lib/xorg/modules/multimedia
 
 	make_etc_defaults /etc/X11/system.XWinrc
 
