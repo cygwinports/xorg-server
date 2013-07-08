@@ -99,6 +99,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.2-1 -----
+Version bump.
+- Add ICCCM WM_TAKE_FOCUS WM protocol in multiwindow mode
+
 ----- version 1.14.1-2 -----
 - Fix a multiwindow mode crash if a failure occured making a Windows icon
 - Stop processing of _NET_WM_ICON hint if malformed
