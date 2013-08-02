@@ -99,6 +99,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.2-2 -----
+- Fix multiwindow mode windows not being able to change title, icon or decoration after they are first shown on cygwin64
+- Fix ARGB cursors being vertically stretched by interleaving blank rows of pixels on cygwin64
+
 ----- version 1.14.2-1 -----
 Version bump.
 - Add ICCCM WM_TAKE_FOCUS WM protocol in multiwindow mode
