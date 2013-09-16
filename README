@@ -99,6 +99,15 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.3-1 -----
+Version bump.
+- Display host triplet in About... dialog
+- Fix _WINDOWSWM_NATIVE_HWND on cygwin64
+- Warning fixes on cygwin64
+- Implement self-maximizing windows using gtk_window_maximize() in multiwindow mode
+- Fix a WM_ENDSESSION crash on cygwin64
+- Update WGL wrapper function generation script to use Khronos group XML description of interface
+
 ----- version 1.14.2-2 -----
 - Fix multiwindow mode windows not being able to change title, icon or decoration after they are first shown on cygwin64
 - Fix ARGB cursors being vertically stretched by interleaving blank rows of pixels on cygwin64
