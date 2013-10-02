@@ -99,6 +99,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.3-2 -----
+- Enable GLX on cygwin64
+- Revert some clipboard changes which caused it to be unreliable
+- More clipboard tweaks
+- Avoid blocking the Windows application which requested clipboard contents when clipboard contents can't be converted to a text format
+- Add command line and tray menu options to control monitoring of PRIMARY selection
+
 ----- version 1.14.3-1 -----
 Version bump.
 - Display host triplet in About... dialog

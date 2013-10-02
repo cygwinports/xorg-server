@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.14.3
-RELEASE=1
+RELEASE=2
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -49,11 +49,6 @@ src_compile() {
 	# To enable debugging messages, add:
 	#	--enable-debug \
 
-	# temporarily disable GLX for x86_64 builds until mesa is sorted out
-	case ${CHOST} in
-	x86_64-*)   DISABLE_GLX="--disable-glx" ;;
-	esac
-
 	cd ${B}
 	cygconf \
 		--enable-docs --enable-devel-docs \
@@ -76,7 +71,6 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
-		${DISABLE_GLX} \
 		--disable-glx-tls \
 		--disable-unit-tests \
 		--with-sha1=CryptoAPI \
