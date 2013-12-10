@@ -99,6 +99,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.4-2 -----
+- Improve relability of large X->Windows clipboard pastes
+
+----- version 1.14.4-1 -----
+Version bump.
+- Fix a crash on shutdown or losing fullscreen when '-fullscreen' and '-depth 8' are used.
+
 ----- version 1.14.3-2 -----
 - Enable GLX on cygwin64
 - Revert some clipboard changes which caused it to be unreliable
