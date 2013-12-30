@@ -99,6 +99,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.14.5-1 -----
+Version bump.
+- Fix compilation issues due to wglext.h from current w32api-headers being older than current khronos-opengl-registry, by only generating needed WGL wrappers
+- Add Windows 8.1, Windows Server 2012 R2, Windows XP x64 to the list of Windows versions we know the name of
+
 ----- version 1.14.4-2 -----
 - Improve relability of large X->Windows clipboard pastes
 
