@@ -99,6 +99,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.0-3 -----
+- Fix clipboard integration thread restarting
+
 ----- version 1.15.0-2 -----
 - Fix a crash when GL client exits without deleting GL contexts
 - Don't create fbConfigs for un-acceleated pixelFormats
