@@ -99,6 +99,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.0-4 -----
+- Remove decorations from _NET_WM_WINDOW_TYPE_SPLASH type windows
+- Improve mapping of no-decoration MOTIF hint
+- Fix Xephyr initial window sizing (fd.o bug #74849)
+
 ----- version 1.15.0-3 -----
 - Fix clipboard integration thread restarting
 
