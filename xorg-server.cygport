@@ -1,6 +1,6 @@
 NAME=xorg-server
-VERSION=1.15.0
-RELEASE=4
+VERSION=1.15.1
+RELEASE=1
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -84,7 +84,11 @@ src_compile() {
 		"--with-vendor-name-short=Cygwin/X" \
 		"--with-vendor-web=http://x.cygwin.com/"
 
-	cygmake
+	# Workaround for a bug in merging Windows resources in the current binutils
+	# https://sourceware.org/bugzilla/show_bug.cgi?id=16807
+	(cd ${B}/hw/xwin/ ; touch default-manifest.c ; ${CC} -c default-manifest.c; rm default-manifest.c )
+
+	cygmake LDFLAGS="-Wl,--build-id"
 }
 
 src_install() {

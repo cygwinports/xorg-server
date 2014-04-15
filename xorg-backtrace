@@ -14,6 +14,14 @@ if ($pid == 0) {
     exit 1;
 }
 
+if (-e "/usr/bin/xorg_cygwin_crash_reporter_gui") {
+    $winpid = `/usr/bin/cat /proc/${pid}/winpid`;
+    chomp $winpid;
+    print "Using crash reporter on pid $pid (winpid $winpid)\n";
+    system "/usr/bin/xorg_cygwin_crash_reporter_gui", "-n", "-d", "-s", "http://www.dronecode.org.uk/cgi-bin/addreport.php", "ignored.dmp", $winpid;
+    if ($?>> 8 == 0) { exit 0; }
+}
+
 if (! -e "/usr/bin/gdb") {
     print "Install gdb to get reasonable backtraces\n";
     exit 2;
@@ -23,7 +31,7 @@ if (! -e "/etc/setup/xorg-server-debuginfo.lst.gz") {
     print "Install xorg-server-debuginfo to get symbol table info for backtraces\n";
 }
 
-print "Attempting backtrace on pid $pid\n";
+print "Attempting gdb backtrace on pid $pid\n";
 
 $SIG{ALRM} = sub { die "timeout starting gdb" };
 alarm $timeout;

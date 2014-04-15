@@ -99,6 +99,18 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.1-1 -----
+Version bump.
+- Enable -hostintitle by default.
+- Fix checking of WM_NORMAL_HINTS for not-maximizeable and fixed size hints in multiwindow mode
+- Stop reporting GL extensions which are supported by WGL but not by the server
+- MinGW build fix
+- Fix for linking to a shared libXfont
+- Fix GL_ARB_vertex_program glGetvertex[dfi]v() failing with GLXUnsupportedPrivateRequest
+- Cosmetic and technical improvements to crash backtrace logging
+- Disable PrimaryDD and ShadowDD DirectDraw2 drawing engines
+- Fix a crash if OpenGL is used on root window in multiwindow mode
+
 ----- version 1.15.0-4 -----
 - Remove decorations from _NET_WM_WINDOW_TYPE_SPLASH type windows
 - Improve mapping of no-decoration MOTIF hint
@@ -109,7 +121,7 @@ Port Notes:
 
 ----- version 1.15.0-2 -----
 - Fix a crash when GL client exits without deleting GL contexts
-- Don't create fbConfigs for un-acceleated pixelFormats
+- Don't create fbConfigs for un-accelerated pixelFormats
 
 ----- version 1.15.0-1 -----
 Version bump.
