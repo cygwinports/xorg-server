@@ -99,6 +99,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.1-2 -----
+- Fix a hang on shutdown which could occur when we own the Windows clipboard
+- Fix sometimes missing sysmenu icons in multiwindow mode on Vista and later
+- Avoid "Your OS is unknown" warning when configuring Xorg for cygwin
+
 ----- version 1.15.1-1 -----
 Version bump.
 - Enable -hostintitle by default.
