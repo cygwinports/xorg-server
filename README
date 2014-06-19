@@ -99,6 +99,14 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.1-3 -----
+- Cosmetic fix to version reporting on x86_64
+- Improve visual matching with a remote libGL by not reporting pbuffer size limits
+- Log counts of WGL pixel formats which couldn't be used for various reasons
+- Correctly interpret WM_HINTS, WM_NORMAL_HINTS properties on x86_64
+- Ignore any WM_NORMAL_HINTS PPosition if it specifies the origin
+- Fix building with khronos-opengl-registry since 2013-08-16 by limiting the considered features for shim generation to GL version <=1.2
+
 ----- version 1.15.1-2 -----
 - Fix a hang on shutdown which could occur when we own the Windows clipboard
 - Fix sometimes missing sysmenu icons in multiwindow mode on Vista and later
