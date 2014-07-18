@@ -99,6 +99,14 @@ This will create:
 
 Port Notes:
 
+----- version 1.15.1-4 -----
+- Give "View logfile" window a better title
+- Fix a couple of bugs in WGL mode which prevented pbuffers from being created with certain fbconfigs
+- Improve the check that window position is visible to work correctly for non-rectangular virtual desktops
+- Downgrade the "forcing window to exist" log message from error to debug
+- Some compilation warning fixes
+- Remove an incorrect assertion in WGL mdoe, triggered by glXSwapBuffers() in the piglit glx_make_current test
+
 ----- version 1.15.1-3 -----
 - Cosmetic fix to version reporting on x86_64
 - Improve visual matching with a remote libGL by not reporting pbuffer size limits
