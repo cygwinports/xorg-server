@@ -1,6 +1,6 @@
 NAME=xorg-server
-VERSION=1.15.1
-RELEASE=4
+VERSION=1.16.0
+RELEASE=1
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -11,6 +11,7 @@ SRC_DIR=${GIT_TAG}
 
 DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/extensions:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
+DEPEND="pkgconfig(xorg-sgml-doctools)"
 
 HOMEPAGE="http://www.x.org/"
 
@@ -51,7 +52,7 @@ src_compile() {
 
 	cd ${B}
 	cygconf \
-		--enable-docs --enable-devel-docs \
+		--enable-docs --enable-devel-docs --with-doxygen --with-xmlto --with-fop --with-xsltproc \
 		--enable-dmx \
 		--enable-kdrive \
 		--enable-xephyr \
