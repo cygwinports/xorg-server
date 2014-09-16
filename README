@@ -66,6 +66,7 @@ Build requirements:
   renderproto-0.11-1
   resourceproto-1.1.0-1
   scrnsaverproto-1.2.0-1
+  windowsdriproto-10.2.5-2
   windowswmproto-1.0.4-1
   xcmiscproto-1.2.0-1
   xextproto-7.3.0-1
@@ -98,6 +99,12 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.16.0-2 -----
+- Fix -displayfd to respect -pn/-nopn
+- Fix -displayfd to check port 65535
+- Fix problems with pixelformat selection for GLX pixmaps on certain drivers
+- Add experimental Windows-DRI extension
 
 ----- version 1.16.0-1 -----
 Version bump.
