@@ -87,7 +87,7 @@ Canonical download:
 Build instructions:
   unpack xorg-server-N.N.N-N-src.tar.bz2
     if you use setup to install this src package, it will be
-	 unpacked under /usr/src automatically
+    unpacked under /usr/src automatically
   cd /usr/src
   cygport ./xorg-server.cygport all
 
@@ -99,6 +99,17 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.16.1-1 -----
+Version bump.
+- Also automatically activate the -nolock option if /tmp is on an exFAT filesystem
+- Log owning HWND when OpenClipboard fails
+- Log name of format atom when conversion of X clipboard to a format is refused
+- Also use _NET_WM_NAME for window titles in multiwindow mode
+- Downgrade some uninformative, always-emitted log output to debug
+- Check TEMP and TMP directories for accessibilty before using for xkbcomp temporary file
+- Log filename when xkbcomp temporary file cannot be opened
+- Don't add an extra null character at the end of the text on the Windows clipboard
 
 ----- version 1.16.0-2 -----
 - Fix -displayfd to respect -pn/-nopn
