@@ -100,6 +100,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.16.1-2 -----
+- Fix transposed format specifiers
+
 ----- version 1.16.1-1 -----
 Version bump.
 - Also automatically activate the -nolock option if /tmp is on an exFAT filesystem
