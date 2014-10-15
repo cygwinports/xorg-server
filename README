@@ -100,6 +100,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.16.1-3 -----
+- Make XWin backup the previous logfile as .old
+- Properly log the reason in an XDMCP unwilling response
+- Only invoke the crashreporter on a fatal signal, not in places where we just want to log a backtrace
+- Add marketing name for Windows 6.4 and manifest for compatibility
+- Unsilence an XErrorHandler
+
 ----- version 1.16.1-2 -----
 - Fix transposed format specifiers
 
