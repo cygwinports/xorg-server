@@ -1,5 +1,5 @@
 NAME=xorg-server
-VERSION=1.16.2
+VERSION=1.16.3
 RELEASE=1
 
 GIT_TAG="xserver-cygwin-${PVR}"
@@ -73,7 +73,7 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
-		--disable-glx-tls \
+		--enable-glx-tls \
 		--disable-unit-tests \
 		--with-sha1=CryptoAPI \
 		--with-log-dir=/var/log/xwin \
@@ -85,10 +85,6 @@ src_compile() {
 		"--with-vendor-name=The Cygwin/X Project" \
 		"--with-vendor-name-short=Cygwin/X" \
 		"--with-vendor-web=http://x.cygwin.com/"
-
-	# Workaround for a bug in merging Windows resources in the current binutils
-	# https://sourceware.org/bugzilla/show_bug.cgi?id=16807
-	(cd ${B}/hw/xwin/ ; touch default-manifest.c ; ${CC} -c default-manifest.c; rm default-manifest.c )
 
 	cygmake LDFLAGS="-Wl,--build-id"
 }

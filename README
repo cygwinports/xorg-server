@@ -100,6 +100,15 @@ This will create:
 
 Port Notes:
 
+----- version 1.16.3-1 -----
+Version bump.
+- Defend against and report crashes in glxWinScreenProbe()
+- Add a tentative entry for the Korean keyboard to the list of known keyboards
+- Typo fix in "Fix crash when a client exits without deleting GL contexts"
+- Improve code generator to deal with Khronos OpenGL registry XML since svn r27498
+- Enable GLX TLS
+- Remove workaround for binutils bug #16807
+
 ----- version 1.16.2-1 -----
 Version bump.
 - Use the modern clipboard viewer API, which doesn't require applications to maintain the clipboard viewer list, available on Vista and later
@@ -108,7 +117,7 @@ Version bump.
 - In multiwindow mode, add EWMH properties for describing multiple desktops to the root window
 - Fix a problem with logging using a format specifier with a variable field width or precision
 - Default to -noresize when -fullscreen is used
-- Propogate crashreporter exit code through xorg-crashreport
+- Propagate crashreporter exit code through xorg-crashreport
 
 ----- version 1.16.1-3 -----
 - Make XWin backup the previous logfile as .old
