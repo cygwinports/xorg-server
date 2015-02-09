@@ -13,10 +13,14 @@ if (-e "/usr/bin/xorg_cygwin_crash_reporter_gui") {
     $winpid = `/usr/bin/cat /proc/${pid}/winpid`;
     chomp $winpid;
     print "Using crash reporter on pid $pid (winpid $winpid)\n";
-    $logfile = `/usr/bin/cygpath -wa $ENV{'XWINLOGFILE'}`;
-    chomp $logfile;
-    print "logfile is $logfile\n";
-    system "/usr/bin/xorg_cygwin_crash_reporter_gui", "-f", "$logfile", "-n", "-d", "-s", "http://www.dronecode.org.uk/cgi-bin/addreport.php", "ignored.dmp", $winpid;
+    if (defined($ENV{'XWINLOGFILE'})) {
+        $logfile = `/usr/bin/cygpath -wa $ENV{'XWINLOGFILE'}`;
+        chomp $logfile;
+        print "logfile is $logfile\n";
+        system "/usr/bin/xorg_cygwin_crash_reporter_gui", "-f", "$logfile", "-n", "-d", "-s", "http://www.dronecode.org.uk/cgi-bin/addreport.php", "ignored.dmp", $winpid;
+    } else {
+        system "/usr/bin/xorg_cygwin_crash_reporter_gui", "-n", "-d", "-s", "http://www.dronecode.org.uk/cgi-bin/addreport.php", "ignored.dmp", $winpid;
+    }
     exit $? >> 8;
 }
 

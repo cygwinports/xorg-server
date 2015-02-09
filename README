@@ -100,6 +100,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.0-1 -----
+Version bump.
+
 ----- version 1.16.3-1 -----
 Version bump.
 - Defend against and report crashes in glxWinScreenProbe()
