@@ -100,6 +100,11 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.1-1 -----
+Version bump.
+- Improve RANDR data returned so a primary output exists
+- Make the XDMCP options -query,-indirect,etc. imply -listen tcp
+
 ----- version 1.17.0-1 -----
 Version bump.
 
