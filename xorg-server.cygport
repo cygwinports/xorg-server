@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.17.1
-RELEASE=1
+RELEASE=2
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -11,7 +11,6 @@ SRC_DIR=${GIT_TAG}
 
 DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/extensions:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
-DEPEND="pkgconfig(xorg-sgml-doctools)"
 
 HOMEPAGE="http://www.x.org/"
 
@@ -38,6 +37,14 @@ xorg_server_extra_CONTENTS="--exclude=*XWin* --exclude=*Xorg* --exclude=*dmx* --
 xorg_server_devel_CONTENTS="--exclude=usr/lib/X11 --exclude=*.dll usr/lib usr/include usr/share/aclocal"
 xwinclip_CONTENTS="usr/bin/xwinclip.exe usr/share/man/man1/xwinclip*"
 
+# xorg-server developer documentation is not meant to be installed, so we do not
+# package any of it.  But we may wish to verify that it can be built from the
+# source package.
+if [ ! -z "$XORG_SERVER_BUILD_DEVDOC" ]; then
+	ENABLE_DOCS="--enable-docs --enable-devel-docs --with-doxygen --with-xmlto --with-fop --with-xsltproc"
+	DEPEND="pkgconfig(xorg-sgml-doctools)"
+fi
+
 src_compile() {
 	cd ${S}
 	cygautoreconf
@@ -52,7 +59,7 @@ src_compile() {
 
 	cd ${B}
 	cygconf \
-		--enable-docs --enable-devel-docs --with-doxygen --with-xmlto --with-fop --with-xsltproc \
+		${ENABLE_DOCS} \
 		--enable-dmx \
 		--enable-kdrive \
 		--enable-xephyr \
@@ -86,7 +93,7 @@ src_compile() {
 		"--with-vendor-name-short=Cygwin/X" \
 		"--with-vendor-web=http://x.cygwin.com/"
 
-	cygmake LDFLAGS="-Wl,--build-id"
+	cygmake
 }
 
 src_install() {
