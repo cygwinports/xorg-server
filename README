@@ -109,6 +109,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.1-4 -----
+- Fix a bug in "Capture xkbcomp exit status, stderr and stdout to log" which could cause a crash at startup
+
 ----- version 1.17.1-3 -----
 - Crashreporting improvements using new Cygwin DLL features
 - Update builder email for cygwin-xfree list deprecation
