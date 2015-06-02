@@ -109,6 +109,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.1-5 -----
+- Fix -silent-dup-error option
+- Update WM_STATE, _NET_WM_STATE properties when window state changes
+
 ----- version 1.17.1-4 -----
 - Fix a bug in "Capture xkbcomp exit status, stderr and stdout to log" which could cause a crash at startup
 
