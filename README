@@ -109,6 +109,15 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.2-1 -----
+Version bump.
+- Only apply MINIMIZE or MAXIMIZE styles from XWinrc when mapping a window
+- Ensure WM_TRANSIENT_FOR windows are always parented
+- Downgrade a warning when experimental crashreporter isn't present to debug
+- When a SEGV occurs checking WGL, disable WGL and continue, rather than exiting
+- Report invalid options in combination with -nodecoration
+- Add support for a SKIPTASKBAR style in XWinrc
+
 ----- version 1.17.1-5 -----
 - Fix -silent-dup-error option
 - Update WM_STATE, _NET_WM_STATE properties when window state changes
