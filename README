@@ -109,6 +109,12 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.2-2 -----
+- Show maximize window decoration if a maximum size larger than virtual desktop size is specified
+- Give dock type windows the SKIPTASKBAR tyle
+- Add experimental '-compositewm' option
+- When resizing a window, black fill the area outside the current window size
+
 ----- version 1.17.2-1 -----
 Version bump.
 - Only apply MINIMIZE or MAXIMIZE styles from XWinrc when mapping a window
