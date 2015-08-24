@@ -109,9 +109,15 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.2-3 -----
+- Fix windows hidden by virtual desktop software becoming lost (regression in 1.17.2-1)
+- Log xkbcomp exit status in hex
+- Fix a typo in generic handling for Macintosh keyboard layouts
+- Check /var/log/xwin/ gets correct permissions
+
 ----- version 1.17.2-2 -----
 - Show maximize window decoration if a maximum size larger than virtual desktop size is specified
-- Give dock type windows the SKIPTASKBAR tyle
+- Give dock type windows the SKIPTASKBAR style
 - Add experimental '-compositewm' option
 - When resizing a window, black fill the area outside the current window size
 

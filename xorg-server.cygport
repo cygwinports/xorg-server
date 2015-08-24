@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.17.2
-RELEASE=2
+RELEASE=3
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -109,7 +109,10 @@ src_install() {
 	make_etc_defaults /etc/X11/system.XWinrc
 
 	dodir /var/log/xwin
-	chmod 0777 ${D}/var/log/xwin
+	chmod 0777  ${D}/var/log/xwin
+        if [ `stat -c "%a" ${D}/var/log/xwin` != '777' ]; then
+           error "Failed to set correct permissions on /var/log/xwin directory"
+        fi
 	keepdir /var/log/xwin
 
 	cp ${C}/xorg-backtrace ${D}/usr/bin/xorg-backtrace
