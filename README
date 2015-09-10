@@ -109,6 +109,10 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.2-4 -----
+- Change default fontpath
+- Disable building developer documentation, rather than leaving it as auto, if not requested
+
 ----- version 1.17.2-3 -----
 - Fix windows hidden by virtual desktop software becoming lost (regression in 1.17.2-1)
 - Log xkbcomp exit status in hex

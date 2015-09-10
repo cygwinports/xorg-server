@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.17.2
-RELEASE=3
+RELEASE=4
 
 GIT_TAG="xserver-cygwin-${PVR}"
 
@@ -43,6 +43,8 @@ xwinclip_CONTENTS="usr/bin/xwinclip.exe usr/share/man/man1/xwinclip*"
 if [ ! -z "$XORG_SERVER_BUILD_DEVDOC" ]; then
 	ENABLE_DOCS="--enable-docs --enable-devel-docs --with-doxygen --with-xmlto --with-fop --with-xsltproc"
 	DEPEND="pkgconfig(xorg-sgml-doctools)"
+else
+	ENABLE_DOCS="--disable-docs --disable-devel-docs"
 fi
 
 src_compile() {
@@ -86,6 +88,7 @@ src_compile() {
 		--with-log-dir=/var/log/xwin \
 		--with-serverconfig-path=/usr/lib/X11 \
 		--with-xkb-output=/var/lib/xkb \
+                --with-default-font-path=catalogue:/etc/X11/fontpath.d,built-ins \
 		"--with-builder-addr=cygwin@cygwin.com" \
 		"--with-builderstring=Package: version ${PVR} built $(date +%Y-%m-%d)" \
 		"--with-os-vendor=Red Hat" \
