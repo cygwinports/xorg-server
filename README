@@ -109,6 +109,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.17.4-1 -----
+Version bump.
+
 ----- version 1.17.2-4 -----
 - Change default fontpath
 - Disable building developer documentation, rather than leaving it as auto, if not requested
