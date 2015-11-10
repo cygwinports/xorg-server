@@ -1,13 +1,13 @@
 NAME=xorg-server
-VERSION=1.17.4
-RELEASE=1
-
-GIT_TAG="xserver-cygwin-${PVR}"
+VERSION=1.18.0
+RELEASE=0.1.20151104gitcdd6add
 
 inherit xorg
 
-SRC_URI="http://cgit.freedesktop.org/~jturney/xserver/snapshot/${GIT_TAG}.tar.bz2"
-SRC_DIR=${GIT_TAG}
+GIT_REV=${RELEASE##*git}
+GIT_URI="http://cgit.freedesktop.org/~jturney/xserver/"
+
+inherit git
 
 DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/extensions:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"
@@ -82,7 +82,6 @@ src_compile() {
 		--disable-xf86vidmode \
 		--disable-xv \
 		--disable-xvmc \
-		--enable-glx-tls \
 		--disable-unit-tests \
 		--with-sha1=CryptoAPI \
 		--with-log-dir=/var/log/xwin \
