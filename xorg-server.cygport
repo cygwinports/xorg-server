@@ -1,13 +1,13 @@
 NAME=xorg-server
 VERSION=1.18.0
-RELEASE=0.3.20151110git8734f05
+RELEASE=1
+
+GIT_TAG="xserver-cygwin-${PVR}"
 
 inherit xorg
 
-GIT_REV=${RELEASE##*git}
-GIT_URI="http://cgit.freedesktop.org/~jturney/xserver/"
-
-inherit git
+SRC_URI="http://cgit.freedesktop.org/~jturney/xserver/snapshot/${GIT_TAG}.tar.bz2"
+SRC_DIR=${GIT_TAG}
 
 DEPS_PATH="/usr/lib/xorg/modules:/usr/lib/xorg/modules/extensions:/usr/lib/xorg/modules/multimedia"
 DIFF_EXCLUDES="xfree86 xquartz xf86Build.h *-config.h xorg-server.h"

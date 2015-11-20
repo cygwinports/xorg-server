@@ -109,6 +109,16 @@ This will create:
 
 Port Notes:
 
+----- version 1.18.0-1 -----
+Version bump.
+- Convert the  multiwindow internal WM from libX11 to xcb
+- The -internalwm option is accepted but ignored.
+- _NET_WM_WINDOW_TYPE_SPLASH_SCREEN, is accepted as equivalent to the correct _NET_WM_WINDOW_TYPE_SPLASH
+- gtk+ applications with client-side decorations but a window manager frame should now be given a resizeable frame, when appropriate.
+- Remove the "Applications" submenu from the default XWinrc for new installations, as redundant to xwin-xdg-menu.
+- Handle _NET_WM_STATE messages to maximize, iconify and restore. 
+- Don't use the removed --enable-glx-tls option
+
 ----- version 1.17.4-1 -----
 Version bump.
 
