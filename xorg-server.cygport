@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.18.0
-RELEASE=1
+RELEASE=2
 
 GIT_TAG="xserver-cygwin-${PVR}"
 

@@ -109,6 +109,9 @@ This will create:
 
 Port Notes:
 
+----- version 1.18.0-2 -----
+- Fix a problem with initially maximized windows in multiwindow mode
+
 ----- version 1.18.0-1 -----
 Version bump.
 - Convert the  multiwindow internal WM from libX11 to xcb
