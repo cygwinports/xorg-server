@@ -109,6 +109,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.18.1-1 -----
+Version bump.
+- Implement >16MB X -> Windows clipboard pastes using INCR
+- Report >16MB Windows -> X clipboard pastes as not yet supported
+- Fix build with latest Cygwin headers
+- Raise XRANDR limit on X display size from 4Kx4K to 32Kx32K
+
 ----- version 1.18.0-2 -----
 - Fix a problem with initially maximized windows in multiwindow mode
 
