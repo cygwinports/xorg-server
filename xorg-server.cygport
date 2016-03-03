@@ -1,6 +1,6 @@
 NAME=xorg-server
 VERSION=1.18.1
-RELEASE=1.20160229gitffba670
+RELEASE=2
 
 inherit xorg
 

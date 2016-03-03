@@ -109,6 +109,13 @@ This will create:
 
 Port Notes:
 
+----- version 1.18.1-2 -----
+- Fix compilation with gcc5
+- Fix a crash which occurs if focus returns to XWin after xkbcomp has failed
+- Fix a crash which could occur in reloading XWinrc when not in multiwindow mode
+- Fix handling of WM_DISPLAYCHANGE in windowed mode
+- Avoid a re-entrancy scenario which was incorrectly handled, probably leading to a crash
+
 ----- version 1.18.1-1 -----
 Version bump.
 - Implement >16MB X -> Windows clipboard pastes using INCR
