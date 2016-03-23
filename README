@@ -109,6 +109,12 @@ This will create:
 
 Port Notes:
 
+----- version 1.18.2-1 -----
+Version bump.
+- Remove -mwextwm and -internalwm options
+- Fix broken xvfb
+- Add xvfb-run script
+
 ----- version 1.18.1-2 -----
 - Fix compilation with gcc5
 - Fix a crash which occurs if focus returns to XWin after xkbcomp has failed
