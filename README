@@ -72,7 +72,6 @@ Build requirements:
   resourceproto
   scrnsaverproto
   windowsdriproto
-  windowswmproto
   xcmiscproto
   xextproto
   xf86bigfontproto
@@ -108,6 +107,12 @@ This will create:
 -------------------------------------------
 
 Port Notes:
+
+----- version 1.18.3-1 -----
+Version bump.
+- Turn on -compositewm by default
+- Fix custom sysmenu not used when window is initially shown
+- Configure with --disable-windowswm
 
 ----- version 1.18.2-1 -----
 Version bump.

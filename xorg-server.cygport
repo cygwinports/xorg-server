@@ -1,5 +1,5 @@
 NAME=xorg-server
-VERSION=1.18.2
+VERSION=1.18.3
 RELEASE=1
 
 inherit xorg
@@ -87,7 +87,7 @@ src_compile() {
 		--disable-dri2 \
 		--enable-windowsdri \
 		--disable-install-setuid \
-		--enable-windowswm \
+		--disable-windowswm \
 		--enable-xf86bigfont \
 		--disable-xf86vidmode \
 		--disable-xv \
